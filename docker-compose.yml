@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: sportbook-postgres
+    environment:
+      POSTGRES_DB: sportbook
+      POSTGRES_USER: sportbook
+      POSTGRES_PASSWORD: sportbook_dev_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - sportbook-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  sportbook-postgres-data:

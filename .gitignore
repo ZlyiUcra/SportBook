@@ -1,0 +1,27 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Node / frontend
+node_modules/
+dist/
+.vite/
+*.local
+
+# IDE
+.idea/
+
+# AI-assistant tooling - never tracked, never pushed
+.claude/
+.specify/
+CLAUDE.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files with secrets
+.env
+.env.local
