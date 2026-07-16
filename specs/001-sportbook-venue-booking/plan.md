@@ -30,7 +30,10 @@ TypeScript 5.9+ for the frontend.
 - Frontend (npm/yarn): React 19, Vite 7, `react-router-dom` (~10KB gzip) for navigation,
   `@tanstack/react-query` (~13KB gzip) for server state; auth/session state via React Context
   (no extra dependency) rather than a state library, since this app has one piece of global
-  client state (the current user); Vitest + `@testing-library/react` for tests.
+  client state (the current user); Vitest + `@testing-library/react` for tests. Note: `yarn
+  create vite` scaffolded current registry latest at implementation time (Vite 8.1, TypeScript
+  6.0.3) rather than the exact versions above - accepted as a routine drift, no architectural
+  impact.
 
 **Storage**: Microsoft SQL Server 2025 from day 1, via EF Core +
 `Microsoft.EntityFrameworkCore.SqlServer`, run locally and in any non-prod environment via Docker
@@ -63,10 +66,11 @@ SPA served as static assets, targeting evergreen browsers.
 **Project Type**: Web application (backend API + frontend SPA, two independently deployable
 projects).
 
-**Performance Goals**: Derived from spec SC-005 - the API must serve at least 500 concurrent venue
-search requests without added latency versus baseline; no other specific throughput target is set
-for a greenfield product with unproven demand (per pragmatist/performance consilium guidance -
-avoid scaling infrastructure the product doesn't need yet).
+**Performance Goals**: Derived from spec SC-005 - the API must serve at least 500 concurrent
+`GET /venues` requests with p95 response time under 500ms and no more than 2x the single-user
+baseline p95 latency; no other specific throughput target is set for a greenfield product with
+unproven demand (per pragmatist/performance consilium guidance - avoid scaling infrastructure the
+product doesn't need yet).
 
 **Constraints**: Booking overlap check MUST be enforced server-side and hold under concurrent
 requests (spec FR-004); cancellation cutoff of 2 hours before start MUST be enforced server-side

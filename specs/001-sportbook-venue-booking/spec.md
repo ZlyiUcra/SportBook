@@ -103,7 +103,7 @@ An authenticated user reads reviews left by other users on a venue before bookin
 - **SC-002**: Zero double-bookings occur for the same court and time slot, even when multiple customers attempt to book concurrently.
 - **SC-003**: A venue owner can list a new court and have it appear in customer search results in under 1 minute.
 - **SC-004**: 100% of attempts by a user to view or modify another user's venue, court, or booking data are blocked.
-- **SC-005**: The platform supports at least 500 concurrent venue searches without noticeable slowdown to any individual user.
+- **SC-005**: The platform supports at least 500 concurrent venue search requests (`GET /venues`) with p95 response time under 500ms, no more than 2x the single-user baseline p95 latency.
 
 ## Assumptions
 

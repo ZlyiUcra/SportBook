@@ -34,33 +34,36 @@ implementation and testing of each story.
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create backend solution layout: `backend/src/SportBook.Api`,
+- [X] T001 Create backend solution layout: `backend/src/SportBook.Api`,
       `backend/src/SportBook.Application`, `backend/src/SportBook.Domain`,
       `backend/src/SportBook.Infrastructure` (.NET 10 class libraries / web project per
       plan.md Project Structure), add all four to `SportBook.sln`
-- [ ] T002 Initialize `backend/src/SportBook.Api` as an ASP.NET Core 10 Web API project (MVC
+- [X] T002 Initialize `backend/src/SportBook.Api` as an ASP.NET Core 10 Web API project (MVC
       Controllers) referencing Application; add NuGet packages
       `Microsoft.AspNetCore.Authentication.JwtBearer`,
       `Microsoft.AspNetCore.DataProtection` (pinned >=10.0.7, CVE-2026-40372), and built-in
       `Microsoft.AspNetCore.OpenApi`
-- [ ] T003 [P] Add `Microsoft.EntityFrameworkCore.SqlServer` and `Microsoft.EntityFrameworkCore`
+- [X] T003 [P] Add `Microsoft.EntityFrameworkCore.SqlServer` and `Microsoft.EntityFrameworkCore`
       to `backend/src/SportBook.Infrastructure`; enable nullable reference types and
       file-scoped namespaces solution-wide per `CLAUDE.md`
-- [ ] T004 [P] Create `backend/tests/SportBook.UnitTests` (xUnit +
+- [X] T004 [P] Create `backend/tests/SportBook.UnitTests` (xUnit +
       `Microsoft.EntityFrameworkCore.Sqlite` for in-memory EF Core) and
       `backend/tests/SportBook.IntegrationTests` (xUnit + `Microsoft.AspNetCore.Mvc.Testing`
       for `WebApplicationFactory`), referencing the relevant backend projects
-- [ ] T005 [P] Initialize `frontend/` with Vite 7 + React 19 + TypeScript 5.9; set
+- [X] T005 [P] Initialize `frontend/` with Vite 7 + React 19 + TypeScript 5.9; set
       `base: ''` in `vite.config.ts` per `CLAUDE.md`; add `react-router-dom` and
-      `@tanstack/react-query`
-- [ ] T006 [P] Add Vitest + `@testing-library/react` + `@testing-library/jest-dom` to
+      `@tanstack/react-query` (scaffolded with current registry latest: Vite 8.1, TypeScript
+      6.0, React 19.2 - see plan.md note)
+- [X] T006 [P] Add Vitest + `@testing-library/react` + `@testing-library/jest-dom` to
       `frontend/` and a `frontend/tests/` setup file
-- [ ] T007 [P] Verify `docker-compose.yml` SQL Server service (loopback host port 14330) reaches
+- [X] T007 [P] Verify `docker-compose.yml` SQL Server service (loopback host port 14330) reaches
       healthy with `docker compose up -d` (cold start takes tens of seconds - wait on the
       healthcheck, do not race it); document the connection string shape in
       `backend/src/SportBook.Api/appsettings.Development.json` (read from configuration, not
-      hardcoded; `TrustServerCertificate=True` is dev-only; the app uses a least-privilege login,
-      SA is bootstrap-only - per plan.md Storage constraint)
+      hardcoded; `TrustServerCertificate=True` is dev-only; the app uses a least-privilege login
+      `sportbook_app` (member of `dbcreator`), SA is bootstrap-only - per plan.md Storage
+      constraint). Local dev connection string stored via `dotnet user-secrets`, never in a
+      committed file; `appsettings.json` documents the shape with an empty value.
 
 **Checkpoint**: Solution builds, both projects run empty, SQL Server container healthy.
 
@@ -72,33 +75,38 @@ implementation and testing of each story.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 [P] Create Domain enums in `backend/src/SportBook.Domain/Enums/`: `Role`,
+- [X] T008 [P] Create Domain enums in `backend/src/SportBook.Domain/Enums/`: `Role`,
       `SubscriptionTier`, `SportType`, `BookingStatus` per data-model.md
-- [ ] T009 [P] Create Domain entities in `backend/src/SportBook.Domain/Entities/`: `User`,
+- [X] T009 [P] Create Domain entities in `backend/src/SportBook.Domain/Entities/`: `User`,
       `RefreshToken`, `Venue`, `Court`, `Booking`, `Review` per data-model.md field/relationship
       tables (depends on T008)
-- [ ] T010 Create `SportBookDbContext` in
+- [X] T010 Create `SportBookDbContext` in
       `backend/src/SportBook.Infrastructure/SportBookDbContext.cs` with entity configurations
       (depends on T009)
-- [ ] T011 Isolate SqlServer provider registration to a single DI extension method
+- [X] T011 Isolate SqlServer provider registration to a single DI extension method
       `AddSportBookInfrastructure` in
       `backend/src/SportBook.Infrastructure/ServiceCollectionExtensions.cs`, called once from
       `backend/src/SportBook.Api/Program.cs`, so test hosts can swap the provider (per plan.md
       Storage constraint) (depends on T010)
-- [ ] T012 Create the initial EF Core migration in `backend/src/SportBook.Infrastructure/Migrations/`
+- [X] T012 Create the initial EF Core migration in `backend/src/SportBook.Infrastructure/Migrations/`
       including the supporting index on `Booking(CourtId, StartTime, EndTime)` and explicit
       `HasPrecision` for `decimal` columns; overlap safety itself is enforced by the serializable
       transaction + retry in `BookingService.Create` (T032) - SQL Server has no exclusion
       constraints and a unique index cannot express range overlap (data-model.md concurrency
-      requirement) (depends on T010)
-- [ ] T013 [P] Implement password hashing (`IPasswordHasher`) in
+      requirement) (depends on T010). Applied against the real container; Booking.User and
+      Review.User FKs set to `Restrict` (not `Cascade`) to avoid SQL Server's "multiple cascade
+      paths" rejection (User is reachable via Venue -> Court -> Booking too).
+- [X] T013 [P] Implement password hashing (`IPasswordHasher`) in
       `backend/src/SportBook.Application/Security/PasswordHasher.cs`
-- [ ] T014 [P] Implement JWT issuance/validation (access + refresh token generation, claims
+- [X] T014 [P] Implement JWT issuance/validation (access + refresh token generation, claims
       including `sub`, `role`) in `backend/src/SportBook.Application/Security/TokenService.cs`
       (depends on T009 for `RefreshToken`)
-- [ ] T015 Wire JWT bearer authentication + authorization policies in
-      `backend/src/SportBook.Api/Program.cs` (depends on T014)
-- [ ] T016 [P] Implement the error-handling middleware producing the
+- [X] T015 Wire JWT bearer authentication + authorization policies in
+      `backend/src/SportBook.Api/Program.cs`, including a global fallback policy
+      (`RequireAuthenticatedUser`) so any endpoint without explicit `[AllowAnonymous]` requires
+      authentication by default (spec FR-014 - no unauthenticated access anywhere) (depends on
+      T014)
+- [X] T016 [P] Implement the error-handling middleware producing the
       `{ error: { code, message } }` shape in
       `backend/src/SportBook.Api/Middleware/ErrorHandlingMiddleware.cs`
 - [ ] T017 [P] Implement the shared ownership-check helpers (Venue/Court/Booking ownership
@@ -106,7 +114,7 @@ implementation and testing of each story.
       `backend/src/SportBook.Application/Authorization/OwnershipChecks.cs` (depends on T009)
 - [ ] T018 [P] Implement the shared `PagedResponse<T>` type and page/pageSize query-parameter
       binding in `backend/src/SportBook.Application/Common/PagedResponse.cs`
-- [ ] T019 [P] Create `frontend/src/api/client.ts` (base fetch wrapper with auth header
+- [X] T019 [P] Create `frontend/src/api/client.ts` (base fetch wrapper with auth header
       injection) and `frontend/src/context/AuthContext.tsx` (current user + token state)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin.
@@ -146,10 +154,10 @@ is rejected, and verify cancellation before/after the 2-hour cutoff behaves per 
 
 ### Implementation for User Story 1
 
-- [ ] T026 [US1] Implement `AuthService` (register/login/refresh/logout, forces
+- [X] T026 [US1] Implement `AuthService` (register/login/refresh/logout, forces
       `Role = Customer` on register per research.md) in
       `backend/src/SportBook.Application/Services/AuthService.cs` (depends on T013, T014)
-- [ ] T027 [US1] Implement `AuthController` in
+- [X] T027 [US1] Implement `AuthController` in
       `backend/src/SportBook.Api/Controllers/AuthController.cs` per contracts/api.md Auth
       section (depends on T026)
 - [ ] T028 [P] [US1] Implement `VenueService.Search`/`GetById` (with `AsSplitQuery()` for
@@ -173,13 +181,16 @@ is rejected, and verify cancellation before/after the 2-hour cutoff behaves per 
 - [ ] T033 [US1] Implement `BookingService.Cancel` (2h cutoff, owner-of-booking check via
       T017) in `backend/src/SportBook.Application/Services/BookingService.cs` (depends on
       T032, T017)
-- [ ] T034 [US1] Implement `BookingsController` POST, GET (mine), GET-by-id, PUT cancel in
+- [ ] T034 [US1] Implement `BookingsController` POST, GET (mine), GET-by-id (owner-of-booking
+      check via T017 - spec FR-006), PUT cancel in
       `backend/src/SportBook.Api/Controllers/BookingsController.cs` per contracts/api.md
-      Bookings section (depends on T032, T033)
+      Bookings section (depends on T032, T033, T017)
 - [ ] T035 [P] [US1] Frontend: typed request/response types + API calls for auth, venues,
       courts, availability, bookings in `frontend/src/api/` (depends on T019)
-- [ ] T036 [P] [US1] Frontend: `Login`/`Register` pages wired to `AuthContext` in
-      `frontend/src/pages/Login.tsx`, `frontend/src/pages/Register.tsx` (depends on T035)
+- [X] T036 [P] [US1] Frontend: `Login`/`Register` pages wired to `AuthContext` in
+      `frontend/src/pages/Login.tsx`, `frontend/src/pages/Register.tsx` (depends on T035).
+      Built ahead of T035's full scope - only `frontend/src/api/auth.ts` (auth-only types/calls)
+      exists so far, not the venues/courts/availability/bookings API surface.
 - [ ] T037 [US1] Frontend: `VenueSearch` page (city/sport filter, paginated list) in
       `frontend/src/pages/VenueSearch.tsx` (depends on T035)
 - [ ] T038 [US1] Frontend: `VenueDetail` page with court list, availability picker, and
@@ -207,7 +218,8 @@ resources return 403; confirm a pending booking and verify its status changes.
       `backend/tests/SportBook.IntegrationTests/VenueManagementTests.cs`
 - [ ] T041 [P] [US2] Integration test: cross-owner access to venue/court/booking write and
       read endpoints returns 403 (spec Acceptance Scenario 2, SC-004, research.md
-      Authorization checklist) in
+      Authorization checklist), INCLUDING customer-vs-customer booking access (Customer A
+      cannot `GET`/cancel a booking made by Customer B - spec FR-006, quickstart Scenario 5) in
       `backend/tests/SportBook.IntegrationTests/OwnershipBoundaryTests.cs`
 - [ ] T042 [P] [US2] Integration test: owner confirms a pending booking; non-owner confirm
       attempt is rejected (spec Acceptance Scenario 3, FR-011) in
@@ -294,6 +306,11 @@ verify it appears in that venue's review list and its average rating updates.
       `Booking(CourtId, StartTime, EndTime)`)
 - [ ] T062 [P] Update `backend/README.md` / `frontend/README.md` with setup commands mirroring
       quickstart.md (docker compose, dotnet, yarn)
+- [ ] T063 Verify SC-005 (500 concurrent `GET /venues` requests, p95 latency under 500ms and
+      under 2x single-user baseline) via a load test; confirm tooling choice with the user
+      before adding any new test dependency (e.g. NBomber, k6, or a simple concurrent
+      `HttpClient` harness inside `SportBook.IntegrationTests`) per `CLAUDE.md` dependency
+      sign-off rule
 
 ---
 
