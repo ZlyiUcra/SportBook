@@ -12,10 +12,20 @@ namespace SportBook.Application.Services;
 /// <summary>Venue search/detail reads (US1) and owner-only writes (US2).</summary>
 public class VenueService(SportBookDbContext db, TimeProvider timeProvider)
 {
+    /// <summary>
+    /// <paramref name="ownerId"/> is server-derived from the caller's JWT when `mine=true`
+    /// (VenuesController), never client-supplied - this is the read side of the owner dashboard
+    /// (T051), added alongside it since a "manage my venues" page has no other way to list them.
+    /// </summary>
     public async Task<PagedResponse<VenueSummaryResponse>> SearchAsync(
-        string? city, SportType? sportType, PageRequest page, CancellationToken ct)
+        string? city, SportType? sportType, Guid? ownerId, PageRequest page, CancellationToken ct)
     {
         var query = db.Venues.AsNoTracking();
+
+        if (ownerId is not null)
+        {
+            query = query.Where(v => v.OwnerId == ownerId);
+        }
 
         if (!string.IsNullOrWhiteSpace(city))
         {

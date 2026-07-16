@@ -5,6 +5,7 @@ import type { SportType, VenueDetail, VenueSummary } from '../model/types'
 export type VenueSearchParams = {
   city?: string
   sportType?: SportType
+  mine?: boolean
   page?: number
 }
 
@@ -13,7 +14,9 @@ export async function searchVenues(params: VenueSearchParams): Promise<PagedResp
     params: {
       city: params.city || undefined,
       sportType: params.sportType,
+      mine: params.mine || undefined,
       page: params.page ?? 1,
+      pageSize: params.mine ? 100 : undefined,
     },
   })
   return data

@@ -5,6 +5,8 @@
   "nav": {
     "venues": "Venues",
     "myBookings": "My bookings",
+    "myVenues": "My venues",
+    "venueBookings": "Venue bookings",
     "signOut": "Sign out",
     "openMenu": "Open menu"
   },
@@ -12,7 +14,12 @@
     "loading": "Loading...",
     "requestFailed": "Request failed. Please try again.",
     "prev": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "auth": {
     "email": "Email",
@@ -90,5 +97,37 @@
     "empty": "You have no bookings yet.",
     "total": "Total: {{price}}",
     "cancel": "Cancel"
+  },
+  "owner": {
+    "title": "My venues",
+    "addVenue": "Add venue",
+    "noVenues": "You have no venues yet.",
+    "manageCourts": "Manage courts",
+    "hideCourts": "Hide courts",
+    "addCourt": "Add court",
+    "noCourts": "This venue has no courts yet.",
+    "venue": {
+      "name": "Name",
+      "city": "City",
+      "address": "Address",
+      "description": "Description",
+      "nameRequired": "Name is required.",
+      "cityRequired": "City is required.",
+      "addressRequired": "Address is required.",
+      "deleteConfirm": "Delete venue \"{{name}}\"? This also removes its courts and reviews."
+    },
+    "court": {
+      "name": "Name",
+      "sport": "Sport",
+      "pricePerHour": "Price per hour",
+      "pricePerHourValue": "{{price}}/h",
+      "opening": "Opening time",
+      "closing": "Closing time",
+      "active": "Active (visible to customers)",
+      "inactive": "inactive",
+      "nameRequired": "Name is required.",
+      "priceInvalid": "Enter a price greater than 0.",
+      "deleteConfirm": "Delete court \"{{name}}\"?"
+    }
   }
 }

@@ -5,6 +5,8 @@
   "nav": {
     "venues": "Locais",
     "myBookings": "Minhas reservas",
+    "myVenues": "Meus locais",
+    "venueBookings": "Reservas do local",
     "signOut": "Sair",
     "openMenu": "Abrir menu"
   },
@@ -12,7 +14,12 @@
     "loading": "Carregando...",
     "requestFailed": "Falha na requisição. Tente novamente.",
     "prev": "Anterior",
-    "next": "Próxima"
+    "next": "Próxima",
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Excluir"
   },
   "auth": {
     "email": "Email",
@@ -90,5 +97,37 @@
     "empty": "Você ainda não tem reservas.",
     "total": "Total: {{price}}",
     "cancel": "Cancelar"
+  },
+  "owner": {
+    "title": "Meus locais",
+    "addVenue": "Adicionar local",
+    "noVenues": "Você ainda não tem locais.",
+    "manageCourts": "Gerenciar quadras",
+    "hideCourts": "Ocultar quadras",
+    "addCourt": "Adicionar quadra",
+    "noCourts": "Este local ainda não tem quadras.",
+    "venue": {
+      "name": "Nome",
+      "city": "Cidade",
+      "address": "Endereço",
+      "description": "Descrição",
+      "nameRequired": "O nome é obrigatório.",
+      "cityRequired": "A cidade é obrigatória.",
+      "addressRequired": "O endereço é obrigatório.",
+      "deleteConfirm": "Excluir o local \"{{name}}\"? Isso também remove suas quadras e avaliações."
+    },
+    "court": {
+      "name": "Nome",
+      "sport": "Esporte",
+      "pricePerHour": "Preço por hora",
+      "pricePerHourValue": "{{price}}/h",
+      "opening": "Horário de abertura",
+      "closing": "Horário de fechamento",
+      "active": "Ativa (visível para clientes)",
+      "inactive": "inativa",
+      "nameRequired": "O nome é obrigatório.",
+      "priceInvalid": "Informe um preço maior que 0.",
+      "deleteConfirm": "Excluir a quadra \"{{name}}\"?"
+    }
   }
 }

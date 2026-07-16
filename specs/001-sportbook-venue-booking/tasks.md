@@ -240,8 +240,12 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
 - [X] T050 [US2] Implement `BookingsController` GET `/venues/{id}/bookings` and PUT
       `/bookings/{id}/confirm` in
       `backend/src/SportBook.Api/Controllers/BookingsController.cs` (depends on T049, T034)
-- [ ] T051 [P] [US2] Frontend: `OwnerDashboard` page (venue/court create/edit/delete forms)
-      in `frontend/src/pages/OwnerDashboard.tsx` (depends on T035, T036)
+- [X] T051 [P] [US2] Frontend: `OwnerDashboard` page (venue/court create/edit/delete forms)
+      in `frontend/src/pages/owner-dashboard/ui/OwnerDashboardPage.tsx` (depends on T035, T036).
+      Backend: added a `mine=true` filter to `GET /venues` (server-derives ownerId from the JWT)
+      so the dashboard has a way to list the caller's own venues - not its own task, but a direct
+      prerequisite for this one. Also fixed a `z.coerce.number()` / zodResolver type
+      incompatibility in the court form (switched to plain `z.number()` + `valueAsNumber: true`).
 - [ ] T052 [US2] Frontend: `OwnerBookings` page (list own venue's bookings, confirm action)
       in `frontend/src/pages/OwnerBookings.tsx` (depends on T035, T051)
 

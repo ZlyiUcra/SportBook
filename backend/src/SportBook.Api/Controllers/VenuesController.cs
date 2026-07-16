@@ -13,9 +13,11 @@ public class VenuesController(VenueService venueService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<PagedResponse<VenueSummaryResponse>>> List(
-        [FromQuery] string? city, [FromQuery] SportType? sportType, [FromQuery] PageRequest page, CancellationToken ct)
+        [FromQuery] string? city, [FromQuery] SportType? sportType, [FromQuery] bool mine,
+        [FromQuery] PageRequest page, CancellationToken ct)
     {
-        return Ok(await venueService.SearchAsync(city, sportType, page, ct));
+        var ownerId = mine ? User.GetUserId() : (Guid?)null;
+        return Ok(await venueService.SearchAsync(city, sportType, ownerId, page, ct));
     }
 
     [HttpGet("{id:guid}")]
