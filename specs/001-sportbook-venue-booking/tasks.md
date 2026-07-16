@@ -299,21 +299,21 @@ Moved here from Phase 4/5 per user direction 2026-07-16 (velocity over test-firs
 stories) - now depend on the corresponding implementation tasks already existing, not the
 reverse.
 
-- [ ] T040 [P] Integration test: venue owner creates a venue and court, which becomes
+- [x] T040 [P] Integration test: venue owner creates a venue and court, which becomes
       searchable/bookable (spec Acceptance Scenario 1, US2) in
       `backend/tests/SportBook.IntegrationTests/VenueManagementTests.cs` (depends on T045-T048)
-- [ ] T041 [P] Integration test: cross-owner access to venue/court/booking write and
+- [x] T041 [P] Integration test: cross-owner access to venue/court/booking write and
       read endpoints returns 403 (spec Acceptance Scenario 2, SC-004, research.md
       Authorization checklist, US2), INCLUDING customer-vs-customer booking access (Customer A
       cannot `GET`/cancel a booking made by Customer B - spec FR-006, quickstart Scenario 5) in
       `backend/tests/SportBook.IntegrationTests/OwnershipBoundaryTests.cs` (depends on T045-T050)
-- [ ] T042 [P] Integration test: owner confirms a pending booking; non-owner confirm
+- [x] T042 [P] Integration test: owner confirms a pending booking; non-owner confirm
       attempt is rejected (spec Acceptance Scenario 3, FR-011, US2) in
       `backend/tests/SportBook.IntegrationTests/BookingConfirmationTests.cs` (depends on T049-T050)
-- [ ] T043 [P] Integration test: deleting a venue/court with an upcoming non-cancelled
+- [x] T043 [P] Integration test: deleting a venue/court with an upcoming non-cancelled
       booking is rejected (FR-009, US2) in
       `backend/tests/SportBook.IntegrationTests/VenueDeletionTests.cs` (depends on T045, T047)
-- [ ] T044 [P] Unit test: ownership-check helpers for Venue/Court/Booking chains (US2) in
+- [x] T044 [P] Unit test: ownership-check helpers for Venue/Court/Booking chains (US2) in
       `backend/tests/SportBook.UnitTests/OwnershipChecksTests.cs` (depends on T017)
 - [ ] T053 [P] Integration test: submit a review, verify it appears in the venue's
       review list and the venue's average rating updates (spec Acceptance Scenarios 1-2, US3) in
