@@ -226,9 +226,12 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
       T017)
 - [X] T046 [US2] Implement `VenuesController` POST/PUT/DELETE in
       `backend/src/SportBook.Api/Controllers/VenuesController.cs` (depends on T045, T029)
-- [ ] T047 [US2] Implement `CourtService.Create`/`Update`/`Delete` (owner-only via Venue
+- [X] T047 [US2] Implement `CourtService.Create`/`Update`/`Delete` (owner-only via Venue
       chain, FR-009 delete guard) in
-      `backend/src/SportBook.Application/Services/CourtService.cs` (depends on T030, T017)
+      `backend/src/SportBook.Application/Services/CourtService.cs` (depends on T030, T017).
+      Also registered a global `JsonStringEnumConverter` in Program.cs (needed for
+      `CreateCourtRequest.SportType` to bind from the same string values, e.g. "Tennis", that
+      responses and the frontend already use).
 - [ ] T048 [US2] Implement `CourtsController` POST/PUT/DELETE in
       `backend/src/SportBook.Api/Controllers/CourtsController.cs` (depends on T047, T030)
 - [ ] T049 [US2] Implement `BookingService.ListByVenueForOwner` and `Confirm` (owner-only via
