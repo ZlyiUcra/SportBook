@@ -27,10 +27,14 @@ TypeScript 5.9+ for the frontend.
   Swashbuckle needed on .NET 10); xUnit + `Microsoft.NET.Test.Sdk` +
   `xunit.runner.visualstudio` for tests; `Microsoft.EntityFrameworkCore.Sqlite` (in-memory mode)
   for fast Service-layer unit tests without a real SQL Server instance.
-- Frontend (npm/yarn): React 19, Vite 7, `react-router-dom` (~10KB gzip) for navigation,
-  `@tanstack/react-query` (~13KB gzip) for server state; auth/session state via React Context
-  (no extra dependency) rather than a state library, since this app has one piece of global
-  client state (the current user); Vitest + `@testing-library/react` for tests. Note: `yarn
+- Frontend (npm/yarn): React 19, Vite 7, `react-router-dom` for navigation, `@tanstack/react-query`
+  for server-state caching, `axios` for HTTP (wrapped in one `shared/api` instance with an auth
+  interceptor), `zustand` for the session store (current user + access token, in-memory only),
+  `react-hook-form` + `zod` (`@hookform/resolvers`) for all forms, `i18next` + `react-i18next`
+  for i18n (locales: en, uk, pt - es tentative, not added yet), Tailwind CSS v4 + `shadcn/ui`
+  (radix base, Nova preset) for styling/components; Vitest + `@testing-library/react` for tests.
+  Stated 2026-07-16 (frontend_stack_requirements memory), superseding the lighter original
+  sketch (React Context, no CSS framework) once frontend work actually started. Note: `yarn
   create vite` scaffolded current registry latest at implementation time (Vite 8.1, TypeScript
   6.0.3) rather than the exact versions above - accepted as a routine drift, no architectural
   impact.
@@ -124,13 +128,20 @@ backend/
     └── SportBook.IntegrationTests/ # xUnit + WebApplicationFactory, endpoint + auth tests
 
 frontend/
-├── src/
-│   ├── api/                        # Typed API client + Request/Response types mirroring backend
-│   ├── pages/                      # VenueSearch, VenueDetail, MyBookings, OwnerDashboard, etc.
-│   ├── components/
-│   ├── hooks/                      # useAuth, useVenues, useBookings (TanStack Query wrappers)
-│   └── context/                    # AuthContext (current user, tokens)
-└── tests/                          # Vitest + React Testing Library
+├── src/                             # Feature-Sliced Design (FSD) layering, per user-stated
+│   │                                # requirement 2026-07-16 (frontend_stack_requirements memory) -
+│   │                                # supersedes the flat api/pages/components/context layout
+│   │                                # originally sketched above
+│   ├── app/                         # App.tsx (routes), providers/RequireAuth
+│   ├── pages/                       # <route>/ui/<Route>Page.tsx, one folder per route
+│   ├── features/                    # auth/{login,register,logout}: ui + model (RHF+Zod schema) + api
+│   ├── entities/                    # user (types, getMe), session (Zustand store, in-memory only)
+│   └── shared/
+│       ├── ui/                      # shadcn/ui components (components.json aliases point here)
+│       ├── api/                     # Axios instance + response error unwrapping
+│       ├── config/                  # env.ts (VITE_API_BASE_URL)
+│       └── i18n/                    # react-i18next setup + locales/{en,uk,pt}.json
+└── tests/                           # Vitest + React Testing Library
 ```
 
 **Structure Decision**: Web application layout (backend + frontend as two independent projects).
