@@ -274,9 +274,11 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
       Average-rating aggregate already exists in `VenueService.GetByIdAsync` (T028); this
       service returns the create-or-replace `bool Created` flag so the controller can pick
       201 vs 200 per contracts/api.md.
-- [ ] T056 [US3] Implement `ReviewsController` GET/POST in
+- [X] T056 [US3] Implement `ReviewsController` GET/POST in
       `backend/src/SportBook.Api/Controllers/ReviewsController.cs` per contracts/api.md
-      Reviews section (depends on T055)
+      Reviews section (depends on T055). Verified end-to-end via API: first POST -> 201,
+      same-user repeat POST -> 200 with the same row updated (not duplicated),
+      GET /venues/{id} reflects the new average rating, rating outside 1-5 -> 400.
 - [ ] T057 [US3] Frontend: review list + review submission form on `VenueDetail` page in
       `frontend/src/pages/VenueDetail.tsx` (depends on T035, T038)
 
