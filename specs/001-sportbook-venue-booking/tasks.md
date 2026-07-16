@@ -37,7 +37,7 @@ implementation and testing of each story.
 - [ ] T001 Create backend solution layout: `backend/src/SportBook.Api`,
       `backend/src/SportBook.Application`, `backend/src/SportBook.Domain`,
       `backend/src/SportBook.Infrastructure` (.NET 10 class libraries / web project per
-      plan.md Project Structure), add all four to `Solution1.sln`
+      plan.md Project Structure), add all four to `SportBook.sln`
 - [ ] T002 Initialize `backend/src/SportBook.Api` as an ASP.NET Core 10 Web API project (MVC
       Controllers) referencing Application; add NuGet packages
       `Microsoft.AspNetCore.Authentication.JwtBearer`,
