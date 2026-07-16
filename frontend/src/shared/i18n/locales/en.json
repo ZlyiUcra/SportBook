@@ -129,5 +129,10 @@
       "priceInvalid": "Enter a price greater than 0.",
       "deleteConfirm": "Delete court \"{{name}}\"?"
     }
+  },
+  "ownerBookings": {
+    "selectVenue": "Select venue",
+    "empty": "No bookings for this venue yet.",
+    "confirm": "Confirm"
   }
 }

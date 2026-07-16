@@ -129,5 +129,10 @@
       "priceInvalid": "Informe um preço maior que 0.",
       "deleteConfirm": "Excluir a quadra \"{{name}}\"?"
     }
+  },
+  "ownerBookings": {
+    "selectVenue": "Selecionar local",
+    "empty": "Ainda não há reservas para este local.",
+    "confirm": "Confirmar"
   }
 }

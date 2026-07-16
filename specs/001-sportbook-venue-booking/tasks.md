@@ -246,10 +246,12 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
       so the dashboard has a way to list the caller's own venues - not its own task, but a direct
       prerequisite for this one. Also fixed a `z.coerce.number()` / zodResolver type
       incompatibility in the court form (switched to plain `z.number()` + `valueAsNumber: true`).
-- [ ] T052 [US2] Frontend: `OwnerBookings` page (list own venue's bookings, confirm action)
-      in `frontend/src/pages/OwnerBookings.tsx` (depends on T035, T051)
+- [X] T052 [US2] Frontend: `OwnerBookings` page (list own venue's bookings, confirm action)
+      in `frontend/src/pages/owner-bookings/ui/OwnerBookingsPage.tsx` (depends on T035, T051)
 
-**Checkpoint**: User Stories 1 AND 2 both work independently.
+**Checkpoint**: User Stories 1 AND 2 both work independently. Verified end-to-end via API: create
+venue+court, cross-owner 403, booking confirm, FR-009 delete guard - all correct against the live
+backend (2026-07-16).
 
 ---
 

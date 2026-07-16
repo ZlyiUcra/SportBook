@@ -13,3 +13,11 @@ export async function listMyBookings(page = 1): Promise<PagedResponse<Booking>> 
   const { data } = await axiosInstance.get<PagedResponse<Booking>>('/bookings', { params: { page } })
   return data
 }
+
+/** Owner-only: bookings for one of the caller's own venues (backend enforces ownership). */
+export async function listBookingsByVenue(venueId: string, page = 1): Promise<PagedResponse<Booking>> {
+  const { data } = await axiosInstance.get<PagedResponse<Booking>>(`/venues/${venueId}/bookings`, {
+    params: { page },
+  })
+  return data
+}

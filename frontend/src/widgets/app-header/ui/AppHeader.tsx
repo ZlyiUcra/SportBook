@@ -34,6 +34,10 @@ function isOwnerVenuesRoute(pathname: string) {
   return pathname.startsWith('/owner/venues')
 }
 
+function isOwnerBookingsRoute(pathname: string) {
+  return pathname.startsWith('/owner/bookings')
+}
+
 /** Underline-style active indicator for the inline desktop nav. */
 function DesktopNavLink({
   to,
@@ -102,6 +106,7 @@ export function AppHeader() {
   const venuesActive = isVenuesRoute(location.pathname)
   const bookingsActive = isBookingsRoute(location.pathname)
   const ownerVenuesActive = isOwnerVenuesRoute(location.pathname)
+  const ownerBookingsActive = isOwnerBookingsRoute(location.pathname)
 
   return (
     <header className="flex items-center justify-between gap-2 border-b px-4 py-2">
@@ -118,6 +123,9 @@ export function AppHeader() {
           </DesktopNavLink>
           <DesktopNavLink to="/owner/venues" isActive={ownerVenuesActive}>
             {t('nav.myVenues')}
+          </DesktopNavLink>
+          <DesktopNavLink to="/owner/bookings" isActive={ownerBookingsActive}>
+            {t('nav.venueBookings')}
           </DesktopNavLink>
         </nav>
       </div>
@@ -150,6 +158,9 @@ export function AppHeader() {
             </MobileNavLink>
             <MobileNavLink to="/owner/venues" isActive={ownerVenuesActive}>
               {t('nav.myVenues')}
+            </MobileNavLink>
+            <MobileNavLink to="/owner/bookings" isActive={ownerBookingsActive}>
+              {t('nav.venueBookings')}
             </MobileNavLink>
           </nav>
 
