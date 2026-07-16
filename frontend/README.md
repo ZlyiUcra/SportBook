@@ -1,32 +1,26 @@
-# React + TypeScript + Vite
+# SportBook frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React SPA (Vite + TypeScript). See the repository root `README.md` for prerequisites and the full
+local setup sequence.
 
-Currently, two official plugins are available:
+## Architecture
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Feature-Sliced Design layering under `src/`:
 
-## React Compiler
+- `app/` - routes, layouts, providers.
+- `pages/` - one folder per route (`ui/<Route>Page.tsx`).
+- `features/` - one user action per slice (`ui` + `model` + `api`).
+- `entities/` - domain data: types and read API calls.
+- `shared/` - UI kit (`shadcn/ui`), the Axios instance, i18n setup, theme store, utilities.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Common commands
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```powershell
+yarn install
+yarn dev
+yarn build
+yarn test
+yarn lint
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The dev server expects the API at `http://localhost:5217/api` by default - see `.env.development`.

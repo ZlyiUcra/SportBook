@@ -335,8 +335,13 @@ reverse.
       the cartesian-explosion pattern from the performance consilium finding) and for
       `GET /courts/{id}/availability` (confirms an index exists on
       `Booking(CourtId, StartTime, EndTime)`)
-- [ ] T062 [P] Update `backend/README.md` / `frontend/README.md` with setup commands mirroring
-      quickstart.md (docker compose, dotnet, yarn)
+- [X] T062 [P] Update `backend/README.md` / `frontend/README.md` with setup commands mirroring
+      quickstart.md (docker compose, dotnet, yarn). Went further than scoped: added a
+      comprehensive root `README.md` (product description, components, prerequisites, full
+      local setup) since a fresh clone needs two undocumented manual steps to actually run -
+      the `sportbook_app` SQL login (container only bootstraps `sa`) and `dotnet user-secrets`
+      for `Jwt:Key`/`ConnectionStrings:DefaultConnection` (nothing secret is committed). Both
+      commands verified to actually work against the live container.
 - [ ] T063 Verify SC-005 (500 concurrent `GET /venues` requests, p95 latency under 500ms and
       under 2x single-user baseline) via a load test; confirm tooling choice with the user
       before adding any new test dependency (e.g. NBomber, k6, or a simple concurrent
