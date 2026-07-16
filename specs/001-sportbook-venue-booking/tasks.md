@@ -224,7 +224,7 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
 - [X] T045 [US2] Implement `VenueService.Create`/`Update`/`Delete` (owner-only, FR-009 delete
       guard) in `backend/src/SportBook.Application/Services/VenueService.cs` (depends on T028,
       T017)
-- [ ] T046 [US2] Implement `VenuesController` POST/PUT/DELETE in
+- [X] T046 [US2] Implement `VenuesController` POST/PUT/DELETE in
       `backend/src/SportBook.Api/Controllers/VenuesController.cs` (depends on T045, T029)
 - [ ] T047 [US2] Implement `CourtService.Create`/`Update`/`Delete` (owner-only via Venue
       chain, FR-009 delete guard) in
