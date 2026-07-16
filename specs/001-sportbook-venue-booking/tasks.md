@@ -232,7 +232,7 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
       Also registered a global `JsonStringEnumConverter` in Program.cs (needed for
       `CreateCourtRequest.SportType` to bind from the same string values, e.g. "Tennis", that
       responses and the frontend already use).
-- [ ] T048 [US2] Implement `CourtsController` POST/PUT/DELETE in
+- [X] T048 [US2] Implement `CourtsController` POST/PUT/DELETE in
       `backend/src/SportBook.Api/Controllers/CourtsController.cs` (depends on T047, T030)
 - [ ] T049 [US2] Implement `BookingService.ListByVenueForOwner` and `Confirm` (owner-only via
       Court->Venue chain) in
