@@ -2,6 +2,18 @@
   "app": {
     "title": "SportBook"
   },
+  "nav": {
+    "venues": "Venues",
+    "myBookings": "My bookings",
+    "signOut": "Sign out",
+    "openMenu": "Open menu"
+  },
+  "common": {
+    "loading": "Loading...",
+    "requestFailed": "Request failed. Please try again.",
+    "prev": "Previous",
+    "next": "Next"
+  },
   "auth": {
     "email": "Email",
     "password": "Password",
@@ -28,6 +40,9 @@
       "loginLink": "Log in"
     }
   },
+  "settings": {
+    "label": "Settings"
+  },
   "theme": {
     "label": "Theme",
     "light": "Light",
@@ -37,11 +52,43 @@
   "language": {
     "label": "Language"
   },
-  "home": {
-    "registeredAs": "Registered as: {{name}} ({{email}})",
-    "loading": "loading...",
-    "error": "request failed",
-    "confirmed": "Confirmed via authenticated GET /api/users/me: {{name}} - role {{role}}",
-    "signOut": "Sign out"
+  "sport": {
+    "Tennis": "Tennis",
+    "Football": "Football",
+    "Basketball": "Basketball",
+    "Padel": "Padel",
+    "Badminton": "Badminton",
+    "Volleyball": "Volleyball",
+    "Other": "Other"
+  },
+  "status": {
+    "Pending": "Pending",
+    "Confirmed": "Confirmed",
+    "Cancelled": "Cancelled",
+    "Completed": "Completed"
+  },
+  "venues": {
+    "title": "Find a venue",
+    "cityPlaceholder": "City",
+    "sportLabel": "Sport",
+    "allSports": "All sports",
+    "noResults": "No venues found."
+  },
+  "venueDetail": {
+    "courts": "Courts",
+    "noCourts": "This venue has no active courts.",
+    "pricePerHour": "{{price}}/h",
+    "rating": "Rating: {{rating}} ({{count}} reviews)",
+    "availabilityFor": "Availability - {{court}}",
+    "date": "Date",
+    "noSlots": "No free slots for this date.",
+    "bookingSuccess": "Booked! Total price: {{price}}.",
+    "viewBookings": "View my bookings"
+  },
+  "bookings": {
+    "title": "My bookings",
+    "empty": "You have no bookings yet.",
+    "total": "Total: {{price}}",
+    "cancel": "Cancel"
   }
 }

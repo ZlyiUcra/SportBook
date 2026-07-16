@@ -2,6 +2,18 @@
   "app": {
     "title": "SportBook"
   },
+  "nav": {
+    "venues": "Майданчики",
+    "myBookings": "Мої бронювання",
+    "signOut": "Вийти",
+    "openMenu": "Відкрити меню"
+  },
+  "common": {
+    "loading": "Завантаження...",
+    "requestFailed": "Запит не вдався. Спробуйте ще раз.",
+    "prev": "Назад",
+    "next": "Далі"
+  },
   "auth": {
     "email": "Email",
     "password": "Пароль",
@@ -28,6 +40,9 @@
       "loginLink": "Увійти"
     }
   },
+  "settings": {
+    "label": "Налаштування"
+  },
   "theme": {
     "label": "Тема",
     "light": "Світла",
@@ -37,11 +52,43 @@
   "language": {
     "label": "Мова"
   },
-  "home": {
-    "registeredAs": "Зареєстровано як: {{name}} ({{email}})",
-    "loading": "завантаження...",
-    "error": "запит не вдався",
-    "confirmed": "Підтверджено через авторизований GET /api/users/me: {{name}} - роль {{role}}",
-    "signOut": "Вийти"
+  "sport": {
+    "Tennis": "Теніс",
+    "Football": "Футбол",
+    "Basketball": "Баскетбол",
+    "Padel": "Падел",
+    "Badminton": "Бадмінтон",
+    "Volleyball": "Волейбол",
+    "Other": "Інше"
+  },
+  "status": {
+    "Pending": "Очікує підтвердження",
+    "Confirmed": "Підтверджено",
+    "Cancelled": "Скасовано",
+    "Completed": "Завершено"
+  },
+  "venues": {
+    "title": "Знайти майданчик",
+    "cityPlaceholder": "Місто",
+    "sportLabel": "Вид спорту",
+    "allSports": "Всі види спорту",
+    "noResults": "Майданчиків не знайдено."
+  },
+  "venueDetail": {
+    "courts": "Корти",
+    "noCourts": "У цього закладу немає активних кортів.",
+    "pricePerHour": "{{price}}/год",
+    "rating": "Рейтинг: {{rating}} ({{count}} відгуків)",
+    "availabilityFor": "Вільні слоти - {{court}}",
+    "date": "Дата",
+    "noSlots": "Немає вільних слотів на цю дату.",
+    "bookingSuccess": "Заброньовано! Загальна вартість: {{price}}.",
+    "viewBookings": "Переглянути мої бронювання"
+  },
+  "bookings": {
+    "title": "Мої бронювання",
+    "empty": "У вас ще немає бронювань.",
+    "total": "Разом: {{price}}",
+    "cancel": "Скасувати"
   }
 }

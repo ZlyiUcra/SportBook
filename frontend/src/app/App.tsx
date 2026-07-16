@@ -1,28 +1,47 @@
-import { Routes, Route } from 'react-router-dom'
-import { ThemeSwitcher } from '@/shared/theme/ui/ThemeSwitcher'
+import { Routes, Route, Outlet } from 'react-router-dom'
+import { SettingsMenu } from '@/widgets/settings-menu/ui/SettingsMenu'
+import { AppHeader } from '@/widgets/app-header/ui/AppHeader'
 import { RequireAuth } from './providers/RequireAuth'
 import { LoginPage } from '@/pages/login/ui/LoginPage'
 import { RegisterPage } from '@/pages/register/ui/RegisterPage'
-import { HomePage } from '@/pages/home/ui/HomePage'
+import { VenueSearchPage } from '@/pages/venues/ui/VenueSearchPage'
+import { VenueDetailPage } from '@/pages/venue-detail/ui/VenueDetailPage'
+import { MyBookingsPage } from '@/pages/my-bookings/ui/MyBookingsPage'
 
-export function App() {
+/** Authenticated area: header navigation, with the settings menu (language + theme) on the right. */
+function AuthenticatedLayout() {
+  return (
+    <RequireAuth>
+      <AppHeader />
+      <Outlet />
+    </RequireAuth>
+  )
+}
+
+/** Anonymous area: just the settings menu, top-right, same as the authenticated header slot. */
+function AnonymousLayout() {
   return (
     <>
       <div className="flex justify-end p-2">
-        <ThemeSwitcher />
+        <SettingsMenu />
       </div>
-      <Routes>
+      <Outlet />
+    </>
+  )
+}
+
+export function App() {
+  return (
+    <Routes>
+      <Route element={<AnonymousLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route
-          path="/"
-          element={
-            <RequireAuth>
-              <HomePage />
-            </RequireAuth>
-          }
-        />
-      </Routes>
-    </>
+      </Route>
+      <Route element={<AuthenticatedLayout />}>
+        <Route path="/" element={<VenueSearchPage />} />
+        <Route path="/venues/:id" element={<VenueDetailPage />} />
+        <Route path="/bookings" element={<MyBookingsPage />} />
+      </Route>
+    </Routes>
   )
 }

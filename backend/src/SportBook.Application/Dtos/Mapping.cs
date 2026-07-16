@@ -1,0 +1,35 @@
+using SportBook.Domain.Entities;
+using SportBook.Domain.Enums;
+
+namespace SportBook.Application.Dtos;
+
+/// <summary>
+/// Hand-written entity-to-DTO mapping (research.md decision: no mapping library) so the response
+/// whitelist stays visible in code review - `PasswordHash` can never leak through convention magic.
+/// </summary>
+public static class Mapping
+{
+    public static UserResponse ToResponse(this User user) =>
+        new(user.Id, user.Name, user.Email, user.Role.ToString(), user.SubscriptionTier.ToString(), user.CreatedAt);
+
+    public static VenueSummaryResponse ToSummaryResponse(this Venue venue) =>
+        new(venue.Id, venue.Name, venue.City, venue.Address, venue.Description);
+
+    public static CourtResponse ToResponse(this Court court) =>
+        new(court.Id, court.VenueId, court.Name, court.SportType.ToString(), court.PricePerHour,
+            court.OpeningTime, court.ClosingTime, court.IsActive);
+
+    /// <summary>
+    /// `Completed` is derived on read (data-model.md state transitions): a Confirmed booking whose
+    /// EndTime has passed is displayed as Completed without a stored transition or background job.
+    /// </summary>
+    public static BookingResponse ToResponse(this Booking booking, DateTime utcNow)
+    {
+        var status = booking.Status == BookingStatus.Confirmed && booking.EndTime <= utcNow
+            ? BookingStatus.Completed
+            : booking.Status;
+
+        return new BookingResponse(booking.Id, booking.CourtId, booking.UserId, booking.StartTime,
+            booking.EndTime, status.ToString(), booking.TotalPrice, booking.CreatedAt);
+    }
+}

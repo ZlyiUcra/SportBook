@@ -11,9 +11,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddSportBookApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenService, TokenService>();
         services.AddScoped<AuthService>();
+        services.AddScoped<VenueService>();
+        services.AddScoped<CourtService>();
+        services.AddScoped<AvailabilityService>();
+        services.AddScoped<BookingService>();
 
         return services;
     }

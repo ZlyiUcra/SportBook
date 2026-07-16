@@ -2,6 +2,18 @@
   "app": {
     "title": "SportBook"
   },
+  "nav": {
+    "venues": "Locais",
+    "myBookings": "Minhas reservas",
+    "signOut": "Sair",
+    "openMenu": "Abrir menu"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "requestFailed": "Falha na requisição. Tente novamente.",
+    "prev": "Anterior",
+    "next": "Próxima"
+  },
   "auth": {
     "email": "Email",
     "password": "Senha",
@@ -28,6 +40,9 @@
       "loginLink": "Entrar"
     }
   },
+  "settings": {
+    "label": "Configurações"
+  },
   "theme": {
     "label": "Tema",
     "light": "Claro",
@@ -37,11 +52,43 @@
   "language": {
     "label": "Idioma"
   },
-  "home": {
-    "registeredAs": "Registrado como: {{name}} ({{email}})",
-    "loading": "carregando...",
-    "error": "falha na requisição",
-    "confirmed": "Confirmado via GET /api/users/me autenticado: {{name}} - papel {{role}}",
-    "signOut": "Sair"
+  "sport": {
+    "Tennis": "Tênis",
+    "Football": "Futebol",
+    "Basketball": "Basquete",
+    "Padel": "Padel",
+    "Badminton": "Badminton",
+    "Volleyball": "Vôlei",
+    "Other": "Outro"
+  },
+  "status": {
+    "Pending": "Pendente",
+    "Confirmed": "Confirmada",
+    "Cancelled": "Cancelada",
+    "Completed": "Concluída"
+  },
+  "venues": {
+    "title": "Encontrar um local",
+    "cityPlaceholder": "Cidade",
+    "sportLabel": "Esporte",
+    "allSports": "Todos os esportes",
+    "noResults": "Nenhum local encontrado."
+  },
+  "venueDetail": {
+    "courts": "Quadras",
+    "noCourts": "Este local não tem quadras ativas.",
+    "pricePerHour": "{{price}}/h",
+    "rating": "Avaliação: {{rating}} ({{count}} avaliações)",
+    "availabilityFor": "Disponibilidade - {{court}}",
+    "date": "Data",
+    "noSlots": "Sem horários livres nesta data.",
+    "bookingSuccess": "Reservado! Preço total: {{price}}.",
+    "viewBookings": "Ver minhas reservas"
+  },
+  "bookings": {
+    "title": "Minhas reservas",
+    "empty": "Você ainda não tem reservas.",
+    "total": "Total: {{price}}",
+    "cancel": "Cancelar"
   }
 }
