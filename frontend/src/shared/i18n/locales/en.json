@@ -134,5 +134,15 @@
     "selectVenue": "Select venue",
     "empty": "No bookings for this venue yet.",
     "confirm": "Confirm"
+  },
+  "review": {
+    "title": "Reviews",
+    "empty": "No reviews yet.",
+    "ratingValue": "{{rating}}/5",
+    "rating": "Rating",
+    "comment": "Comment",
+    "submit": "Submit review",
+    "addTitle": "Leave a review",
+    "editTitle": "Update your review"
   }
 }

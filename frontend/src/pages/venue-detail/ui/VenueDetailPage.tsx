@@ -11,6 +11,10 @@ import { formatTime, tomorrowIsoDate } from '@/shared/lib/datetime'
 import { getVenue } from '@/entities/venue/api/venueApi'
 import { getAvailability } from '@/entities/booking/api/bookingApi'
 import { createBooking } from '@/features/booking/create/api/createBooking'
+import { listReviews } from '@/entities/review/api/reviewApi'
+import { createReview } from '@/features/review/create/api/createReview'
+import { ReviewForm } from '@/features/review/create/ui/ReviewForm'
+import { useSessionStore } from '@/entities/session/model/store'
 
 /** T038: venue detail with court list, availability picker, and booking action. */
 export function VenueDetailPage() {
@@ -35,6 +39,22 @@ export function VenueDetailPage() {
   const bookMutation = useMutation({
     mutationFn: createBooking,
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['availability', selectedCourtId, date] }),
+  })
+
+  const currentUser = useSessionStore((state) => state.user)
+
+  const reviewsQuery = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: () => listReviews(id!),
+    enabled: !!id,
+  })
+
+  const reviewMutation = useMutation({
+    mutationFn: (values: Parameters<typeof createReview>[1]) => createReview(id!, values),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', id] })
+      queryClient.invalidateQueries({ queryKey: ['venue', id] })
+    },
   })
 
   if (venueQuery.isLoading) {
@@ -142,6 +162,51 @@ export function VenueDetailPage() {
           </CardContent>
         </Card>
       )}
+
+      <h2 className="text-lg font-medium">{t('review.title')}</h2>
+      {reviewsQuery.isLoading && <p className="text-muted-foreground">{t('common.loading')}</p>}
+      {reviewsQuery.data && reviewsQuery.data.items.length === 0 && (
+        <p className="text-muted-foreground">{t('review.empty')}</p>
+      )}
+      <div className="flex flex-col gap-3">
+        {reviewsQuery.data?.items.map((review) => (
+          <Card key={review.id}>
+            <CardContent className="py-4">
+              <p className="font-medium">
+                {review.userName} - {t('review.ratingValue', { rating: review.rating })}
+              </p>
+              {review.comment && <p className="mt-1 text-sm text-muted-foreground">{review.comment}</p>}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {reviewsQuery.data?.items.some((r) => r.userId === currentUser?.id)
+              ? t('review.editTitle')
+              : t('review.addTitle')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ReviewForm
+            defaultValues={(() => {
+              const mine = reviewsQuery.data?.items.find((r) => r.userId === currentUser?.id)
+              return mine ? { rating: mine.rating, comment: mine.comment ?? '' } : undefined
+            })()}
+            onSubmit={(values) => reviewMutation.mutate(values)}
+            isSubmitting={reviewMutation.isPending}
+          />
+          {reviewMutation.isError && (
+            <p role="alert" className="mt-2 text-sm text-destructive">
+              {reviewMutation.error instanceof ApiRequestError
+                ? reviewMutation.error.message
+                : t('common.requestFailed')}
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

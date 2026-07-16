@@ -134,5 +134,15 @@
     "selectVenue": "Selecionar local",
     "empty": "Ainda não há reservas para este local.",
     "confirm": "Confirmar"
+  },
+  "review": {
+    "title": "Avaliações",
+    "empty": "Ainda não há avaliações.",
+    "ratingValue": "{{rating}}/5",
+    "rating": "Avaliação",
+    "comment": "Comentário",
+    "submit": "Enviar avaliação",
+    "addTitle": "Deixar uma avaliação",
+    "editTitle": "Atualizar sua avaliação"
   }
 }

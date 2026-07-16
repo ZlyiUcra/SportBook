@@ -279,10 +279,13 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
       Reviews section (depends on T055). Verified end-to-end via API: first POST -> 201,
       same-user repeat POST -> 200 with the same row updated (not duplicated),
       GET /venues/{id} reflects the new average rating, rating outside 1-5 -> 400.
-- [ ] T057 [US3] Frontend: review list + review submission form on `VenueDetail` page in
-      `frontend/src/pages/VenueDetail.tsx` (depends on T035, T038)
+- [X] T057 [US3] Frontend: review list + review submission form on `VenueDetail` page in
+      `frontend/src/pages/venue-detail/ui/VenueDetailPage.tsx` (depends on T035, T038). Same
+      form serves add and update (one review per user per venue); submitting invalidates both
+      the reviews list and the venue detail query so the average rating updates live.
 
-**Checkpoint**: All three user stories are independently functional.
+**Checkpoint**: All three user stories are independently functional. US3 backend verified
+end-to-end via API (2026-07-16); frontend build clean, dev server serves it without errors.
 
 ---
 
