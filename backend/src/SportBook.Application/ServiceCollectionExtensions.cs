@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<CourtService>();
         services.AddScoped<AvailabilityService>();
         services.AddScoped<BookingService>();
+        services.AddScoped<ReviewService>();
 
         return services;
     }

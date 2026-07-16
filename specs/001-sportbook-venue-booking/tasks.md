@@ -268,9 +268,12 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
 
 ### Implementation for User Story 3
 
-- [ ] T055 [US3] Implement `ReviewService` (list-by-venue paginated, create-or-replace,
+- [X] T055 [US3] Implement `ReviewService` (list-by-venue paginated, create-or-replace,
       average rating aggregate query) in
-      `backend/src/SportBook.Application/Services/ReviewService.cs` (depends on T011, T018)
+      `backend/src/SportBook.Application/Services/ReviewService.cs` (depends on T011, T018).
+      Average-rating aggregate already exists in `VenueService.GetByIdAsync` (T028); this
+      service returns the create-or-replace `bool Created` flag so the controller can pick
+      201 vs 200 per contracts/api.md.
 - [ ] T056 [US3] Implement `ReviewsController` GET/POST in
       `backend/src/SportBook.Api/Controllers/ReviewsController.cs` per contracts/api.md
       Reviews section (depends on T055)
