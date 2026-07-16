@@ -9,9 +9,14 @@ description: "Task list template for feature implementation"
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/api.md, quickstart.md
 
-**Tests**: Included - the consilium transfer artifact (`.specify/consilium/2026-07-15-sportbook.md`)
-and data-model.md make the booking-overlap and cancellation-cutoff behavior explicit test
-requirements, not optional polish, so contract/integration/unit tests are part of each story.
+**Tests**: The consilium transfer artifact (`.specify/consilium/2026-07-15-sportbook.md`) and
+data-model.md make booking-overlap and cancellation-cutoff behavior explicit test requirements -
+those are already implemented and passing for User Story 1 (T020-T025, 25 tests total: 11 unit
+via Sqlite, 14 integration via the real SQL Server container). **User-directed 2026-07-16**: for
+US2 and US3, tests are deferred to Phase 6 (Polish) instead of being written alongside each
+story's implementation, to get a working pilot faster - implementation for a story now comes
+first, its tests are written afterward in Polish. This does not touch the already-completed,
+consilium-flagged-critical US1 overlap/cutoff tests.
 
 **Organization**: Tasks are grouped by user story (from spec.md) to enable independent
 implementation and testing of each story.
@@ -109,10 +114,10 @@ implementation and testing of each story.
 - [X] T016 [P] Implement the error-handling middleware producing the
       `{ error: { code, message } }` shape in
       `backend/src/SportBook.Api/Middleware/ErrorHandlingMiddleware.cs`
-- [ ] T017 [P] Implement the shared ownership-check helpers (Venue/Court/Booking ownership
+- [X] T017 [P] Implement the shared ownership-check helpers (Venue/Court/Booking ownership
       chains from research.md Authorization checklist) in
       `backend/src/SportBook.Application/Authorization/OwnershipChecks.cs` (depends on T009)
-- [ ] T018 [P] Implement the shared `PagedResponse<T>` type and page/pageSize query-parameter
+- [X] T018 [P] Implement the shared `PagedResponse<T>` type and page/pageSize query-parameter
       binding in `backend/src/SportBook.Application/Common/PagedResponse.cs`
 - [X] T019 [P] Create `frontend/src/api/client.ts` (base fetch wrapper with auth header
       injection) and `frontend/src/context/AuthContext.tsx` (current user + token state)
@@ -133,22 +138,22 @@ is rejected, and verify cancellation before/after the 2-hour cutoff behaves per 
 
 ### Tests for User Story 1
 
-- [ ] T020 [P] [US1] Integration test: register, login, and refresh flow in
+- [X] T020 [P] [US1] Integration test: register, login, and refresh flow in
       `backend/tests/SportBook.IntegrationTests/AuthTests.cs`
-- [ ] T021 [P] [US1] Integration test: book an available slot end-to-end, price computed
+- [X] T021 [P] [US1] Integration test: book an available slot end-to-end, price computed
       server-side (spec Acceptance Scenario 1) in
       `backend/tests/SportBook.IntegrationTests/BookingCreationTests.cs`
-- [ ] T022 [P] [US1] Integration test: overlapping booking is rejected, including two
+- [X] T022 [P] [US1] Integration test: overlapping booking is rejected, including two
       concurrent requests for the same slot where only one may succeed (spec Acceptance
       Scenario 2, FR-004) in
       `backend/tests/SportBook.IntegrationTests/BookingOverlapTests.cs`
-- [ ] T023 [P] [US1] Integration test: cancellation is rejected inside the 2h cutoff and
+- [X] T023 [P] [US1] Integration test: cancellation is rejected inside the 2h cutoff and
       succeeds outside it (spec Acceptance Scenario 3, FR-005) in
       `backend/tests/SportBook.IntegrationTests/BookingCancellationTests.cs`
-- [ ] T024 [P] [US1] Unit test: `TotalPrice` computation from `PricePerHour` and duration,
+- [X] T024 [P] [US1] Unit test: `TotalPrice` computation from `PricePerHour` and duration,
       ignoring any client-supplied price, in
       `backend/tests/SportBook.UnitTests/BookingPricingTests.cs`
-- [ ] T025 [P] [US1] Unit test: overlap-check logic against a set of existing bookings
+- [X] T025 [P] [US1] Unit test: overlap-check logic against a set of existing bookings
       (including cancelled bookings, which must not block) in
       `backend/tests/SportBook.UnitTests/BookingOverlapCheckTests.cs`
 
@@ -160,42 +165,42 @@ is rejected, and verify cancellation before/after the 2-hour cutoff behaves per 
 - [X] T027 [US1] Implement `AuthController` in
       `backend/src/SportBook.Api/Controllers/AuthController.cs` per contracts/api.md Auth
       section (depends on T026)
-- [ ] T028 [P] [US1] Implement `VenueService.Search`/`GetById` (with `AsSplitQuery()` for
+- [X] T028 [P] [US1] Implement `VenueService.Search`/`GetById` (with `AsSplitQuery()` for
       Courts+Reviews per research.md) in
       `backend/src/SportBook.Application/Services/VenueService.cs` (depends on T011, T018)
-- [ ] T029 [P] [US1] Implement `VenuesController` GET endpoints (list, get-by-id) in
+- [X] T029 [P] [US1] Implement `VenuesController` GET endpoints (list, get-by-id) in
       `backend/src/SportBook.Api/Controllers/VenuesController.cs` per contracts/api.md Venues
       section (depends on T028)
-- [ ] T030 [P] [US1] Implement `CourtService.ListByVenue` and `CourtsController` GET
+- [X] T030 [P] [US1] Implement `CourtService.ListByVenue` and `CourtsController` GET
       list-by-venue in `backend/src/SportBook.Application/Services/CourtService.cs` and
       `backend/src/SportBook.Api/Controllers/CourtsController.cs` (depends on T011, T018)
-- [ ] T031 [US1] Implement `AvailabilityService` (whole-hour free-slot computation per
+- [X] T031 [US1] Implement `AvailabilityService` (whole-hour free-slot computation per
       research.md) and `AvailabilityController` in
       `backend/src/SportBook.Application/Services/AvailabilityService.cs` and
       `backend/src/SportBook.Api/Controllers/AvailabilityController.cs` per contracts/api.md
       Availability section (depends on T011)
-- [ ] T032 [US1] Implement `BookingService.Create` (server-computed `TotalPrice`,
+- [X] T032 [US1] Implement `BookingService.Create` (server-computed `TotalPrice`,
       concurrency-safe overlap enforcement via a serializable transaction with retry per
       data-model.md - backed by T012's index - and operating-hours validation) in
       `backend/src/SportBook.Application/Services/BookingService.cs` (depends on T011, T012)
-- [ ] T033 [US1] Implement `BookingService.Cancel` (2h cutoff, owner-of-booking check via
+- [X] T033 [US1] Implement `BookingService.Cancel` (2h cutoff, owner-of-booking check via
       T017) in `backend/src/SportBook.Application/Services/BookingService.cs` (depends on
       T032, T017)
-- [ ] T034 [US1] Implement `BookingsController` POST, GET (mine), GET-by-id (owner-of-booking
+- [X] T034 [US1] Implement `BookingsController` POST, GET (mine), GET-by-id (owner-of-booking
       check via T017 - spec FR-006), PUT cancel in
       `backend/src/SportBook.Api/Controllers/BookingsController.cs` per contracts/api.md
       Bookings section (depends on T032, T033, T017)
-- [ ] T035 [P] [US1] Frontend: typed request/response types + API calls for auth, venues,
+- [X] T035 [P] [US1] Frontend: typed request/response types + API calls for auth, venues,
       courts, availability, bookings in `frontend/src/api/` (depends on T019)
 - [X] T036 [P] [US1] Frontend: `Login`/`Register` pages wired to `AuthContext` in
       `frontend/src/pages/Login.tsx`, `frontend/src/pages/Register.tsx` (depends on T035).
       Built ahead of T035's full scope - only `frontend/src/api/auth.ts` (auth-only types/calls)
       exists so far, not the venues/courts/availability/bookings API surface.
-- [ ] T037 [US1] Frontend: `VenueSearch` page (city/sport filter, paginated list) in
+- [X] T037 [US1] Frontend: `VenueSearch` page (city/sport filter, paginated list) in
       `frontend/src/pages/VenueSearch.tsx` (depends on T035)
-- [ ] T038 [US1] Frontend: `VenueDetail` page with court list, availability picker, and
+- [X] T038 [US1] Frontend: `VenueDetail` page with court list, availability picker, and
       booking form in `frontend/src/pages/VenueDetail.tsx` (depends on T035, T037)
-- [ ] T039 [US1] Frontend: `MyBookings` page (list + cancel action) in
+- [X] T039 [US1] Frontend: `MyBookings` page (list + cancel action) in
       `frontend/src/pages/MyBookings.tsx` (depends on T035)
 
 **Checkpoint**: User Story 1 is fully functional and independently testable/demoable.
@@ -211,24 +216,8 @@ own venue's bookings, and confirm pending bookings - all scoped to their own res
 search; as a different venue owner, verify all write/read attempts on the first owner's
 resources return 403; confirm a pending booking and verify its status changes.
 
-### Tests for User Story 2
-
-- [ ] T040 [P] [US2] Integration test: venue owner creates a venue and court, which becomes
-      searchable/bookable (spec Acceptance Scenario 1) in
-      `backend/tests/SportBook.IntegrationTests/VenueManagementTests.cs`
-- [ ] T041 [P] [US2] Integration test: cross-owner access to venue/court/booking write and
-      read endpoints returns 403 (spec Acceptance Scenario 2, SC-004, research.md
-      Authorization checklist), INCLUDING customer-vs-customer booking access (Customer A
-      cannot `GET`/cancel a booking made by Customer B - spec FR-006, quickstart Scenario 5) in
-      `backend/tests/SportBook.IntegrationTests/OwnershipBoundaryTests.cs`
-- [ ] T042 [P] [US2] Integration test: owner confirms a pending booking; non-owner confirm
-      attempt is rejected (spec Acceptance Scenario 3, FR-011) in
-      `backend/tests/SportBook.IntegrationTests/BookingConfirmationTests.cs`
-- [ ] T043 [P] [US2] Integration test: deleting a venue/court with an upcoming non-cancelled
-      booking is rejected (FR-009) in
-      `backend/tests/SportBook.IntegrationTests/VenueDeletionTests.cs`
-- [ ] T044 [P] [US2] Unit test: ownership-check helpers for Venue/Court/Booking chains in
-      `backend/tests/SportBook.UnitTests/OwnershipChecksTests.cs`
+**Tests for this story** (T040-T044) are deferred to Phase 6 Polish - see "Deferred Tests"
+below - per user direction 2026-07-16 to prioritize a working pilot.
 
 ### Implementation for User Story 2
 
@@ -265,14 +254,8 @@ rating per venue.
 **Independent Test**: As any authenticated user, submit a rating/comment for a venue and
 verify it appears in that venue's review list and its average rating updates.
 
-### Tests for User Story 3
-
-- [ ] T053 [P] [US3] Integration test: submit a review, verify it appears in the venue's
-      review list and the venue's average rating updates (spec Acceptance Scenarios 1-2) in
-      `backend/tests/SportBook.IntegrationTests/ReviewTests.cs`
-- [ ] T054 [P] [US3] Integration test: a second review by the same user for the same venue
-      replaces the first rather than duplicating it (data-model.md Review validation rule) in
-      `backend/tests/SportBook.IntegrationTests/ReviewUpsertTests.cs`
+**Tests for this story** (T053-T054) are deferred to Phase 6 Polish - see "Deferred Tests"
+below - per user direction 2026-07-16 to prioritize a working pilot.
 
 ### Implementation for User Story 3
 
@@ -292,6 +275,37 @@ verify it appears in that venue's review list and its average rating updates.
 ## Phase 6: Polish & Cross-Cutting Concerns
 
 **Purpose**: Improvements that affect multiple user stories
+
+### Deferred Tests (US2, US3)
+
+Moved here from Phase 4/5 per user direction 2026-07-16 (velocity over test-first for these two
+stories) - now depend on the corresponding implementation tasks already existing, not the
+reverse.
+
+- [ ] T040 [P] Integration test: venue owner creates a venue and court, which becomes
+      searchable/bookable (spec Acceptance Scenario 1, US2) in
+      `backend/tests/SportBook.IntegrationTests/VenueManagementTests.cs` (depends on T045-T048)
+- [ ] T041 [P] Integration test: cross-owner access to venue/court/booking write and
+      read endpoints returns 403 (spec Acceptance Scenario 2, SC-004, research.md
+      Authorization checklist, US2), INCLUDING customer-vs-customer booking access (Customer A
+      cannot `GET`/cancel a booking made by Customer B - spec FR-006, quickstart Scenario 5) in
+      `backend/tests/SportBook.IntegrationTests/OwnershipBoundaryTests.cs` (depends on T045-T050)
+- [ ] T042 [P] Integration test: owner confirms a pending booking; non-owner confirm
+      attempt is rejected (spec Acceptance Scenario 3, FR-011, US2) in
+      `backend/tests/SportBook.IntegrationTests/BookingConfirmationTests.cs` (depends on T049-T050)
+- [ ] T043 [P] Integration test: deleting a venue/court with an upcoming non-cancelled
+      booking is rejected (FR-009, US2) in
+      `backend/tests/SportBook.IntegrationTests/VenueDeletionTests.cs` (depends on T045, T047)
+- [ ] T044 [P] Unit test: ownership-check helpers for Venue/Court/Booking chains (US2) in
+      `backend/tests/SportBook.UnitTests/OwnershipChecksTests.cs` (depends on T017)
+- [ ] T053 [P] Integration test: submit a review, verify it appears in the venue's
+      review list and the venue's average rating updates (spec Acceptance Scenarios 1-2, US3) in
+      `backend/tests/SportBook.IntegrationTests/ReviewTests.cs` (depends on T055-T056)
+- [ ] T054 [P] Integration test: a second review by the same user for the same venue
+      replaces the first rather than duplicating it (data-model.md Review validation rule, US3) in
+      `backend/tests/SportBook.IntegrationTests/ReviewUpsertTests.cs` (depends on T055-T056)
+
+### Cross-cutting polish
 
 - [ ] T058 [P] Run all `quickstart.md` validation scenarios end-to-end against a locally
       running stack (Docker SQL Server + backend + frontend)
@@ -330,7 +344,8 @@ verify it appears in that venue's review list and its average rating updates.
 
 ### Within Each User Story
 
-- Tests are written before implementation and MUST fail first
+- US1: tests were written alongside implementation (consilium-flagged overlap/cutoff behavior);
+  US2/US3: implementation first, tests deferred to Phase 6 Polish (user direction 2026-07-16)
 - Domain/Application services before Controllers
 - Controllers before frontend pages that consume them
 - Story complete before moving to next priority (for solo/sequential execution)
@@ -391,7 +406,10 @@ Task: "CourtService.ListByVenue in backend/src/SportBook.Application/Services/Co
 - [P] tasks touch different files with no unmet dependency
 - [Story] label maps each task to its user story for traceability
 - Booking overlap safety (T012, T022, T025, T032) is the single highest-priority item per the
-  consilium review - do not treat its tests as optional even under time pressure
-- Commit after each task or logical group, per `CLAUDE.md` git workflow (confirm each commit
-  with the user)
+  consilium review - already implemented and tested, unaffected by the US2/US3 test deferral
+  below
+- US2/US3 tests (T040-T044, T053-T054) are deferred to Phase 6 Polish per user direction
+  2026-07-16 - do not skip them once Polish is reached, they are moved, not dropped
+- Commit after each verified functional slice (build + run + check), per user-stated atomic-commit
+  preference - not mechanically per task or per phase
 - Stop at any checkpoint to validate a story independently before moving on
