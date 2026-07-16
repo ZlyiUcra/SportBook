@@ -43,7 +43,7 @@ implementation and testing of each story.
       `Microsoft.AspNetCore.Authentication.JwtBearer`,
       `Microsoft.AspNetCore.DataProtection` (pinned >=10.0.7, CVE-2026-40372), and built-in
       `Microsoft.AspNetCore.OpenApi`
-- [ ] T003 [P] Add `Npgsql.EntityFrameworkCore.PostgreSQL` and `Microsoft.EntityFrameworkCore`
+- [ ] T003 [P] Add `Microsoft.EntityFrameworkCore.SqlServer` and `Microsoft.EntityFrameworkCore`
       to `backend/src/SportBook.Infrastructure`; enable nullable reference types and
       file-scoped namespaces solution-wide per `CLAUDE.md`
 - [ ] T004 [P] Create `backend/tests/SportBook.UnitTests` (xUnit +
@@ -55,12 +55,14 @@ implementation and testing of each story.
       `@tanstack/react-query`
 - [ ] T006 [P] Add Vitest + `@testing-library/react` + `@testing-library/jest-dom` to
       `frontend/` and a `frontend/tests/` setup file
-- [ ] T007 [P] Verify `docker-compose.yml` Postgres service (host port 5434) starts cleanly
-      with `docker compose up -d` and is reachable; document the connection string shape in
+- [ ] T007 [P] Verify `docker-compose.yml` SQL Server service (loopback host port 14330) reaches
+      healthy with `docker compose up -d` (cold start takes tens of seconds - wait on the
+      healthcheck, do not race it); document the connection string shape in
       `backend/src/SportBook.Api/appsettings.Development.json` (read from configuration, not
-      hardcoded, per plan.md Storage constraint)
+      hardcoded; `TrustServerCertificate=True` is dev-only; the app uses a least-privilege login,
+      SA is bootstrap-only - per plan.md Storage constraint)
 
-**Checkpoint**: Solution builds, both projects run empty, Postgres container reachable.
+**Checkpoint**: Solution builds, both projects run empty, SQL Server container healthy.
 
 ---
 
@@ -78,15 +80,17 @@ implementation and testing of each story.
 - [ ] T010 Create `SportBookDbContext` in
       `backend/src/SportBook.Infrastructure/SportBookDbContext.cs` with entity configurations
       (depends on T009)
-- [ ] T011 Isolate Npgsql provider registration to a single DI extension method
+- [ ] T011 Isolate SqlServer provider registration to a single DI extension method
       `AddSportBookInfrastructure` in
       `backend/src/SportBook.Infrastructure/ServiceCollectionExtensions.cs`, called once from
-      `backend/src/SportBook.Api/Program.cs`, per research.md portability decision (depends on
-      T010)
+      `backend/src/SportBook.Api/Program.cs`, so test hosts can swap the provider (per plan.md
+      Storage constraint) (depends on T010)
 - [ ] T012 Create the initial EF Core migration in `backend/src/SportBook.Infrastructure/Migrations/`
-      including a concurrency-safe uniqueness/exclusion constraint preventing overlapping
-      `Booking` rows for the same `CourtId` (data-model.md concurrency requirement) (depends on
-      T010)
+      including the supporting index on `Booking(CourtId, StartTime, EndTime)` and explicit
+      `HasPrecision` for `decimal` columns; overlap safety itself is enforced by the serializable
+      transaction + retry in `BookingService.Create` (T032) - SQL Server has no exclusion
+      constraints and a unique index cannot express range overlap (data-model.md concurrency
+      requirement) (depends on T010)
 - [ ] T013 [P] Implement password hashing (`IPasswordHasher`) in
       `backend/src/SportBook.Application/Security/PasswordHasher.cs`
 - [ ] T014 [P] Implement JWT issuance/validation (access + refresh token generation, claims
@@ -163,9 +167,9 @@ is rejected, and verify cancellation before/after the 2-hour cutoff behaves per 
       `backend/src/SportBook.Api/Controllers/AvailabilityController.cs` per contracts/api.md
       Availability section (depends on T011)
 - [ ] T032 [US1] Implement `BookingService.Create` (server-computed `TotalPrice`,
-      concurrency-safe overlap enforcement per T012's DB constraint, operating-hours
-      validation) in `backend/src/SportBook.Application/Services/BookingService.cs` (depends
-      on T011, T012)
+      concurrency-safe overlap enforcement via a serializable transaction with retry per
+      data-model.md - backed by T012's index - and operating-hours validation) in
+      `backend/src/SportBook.Application/Services/BookingService.cs` (depends on T011, T012)
 - [ ] T033 [US1] Implement `BookingService.Cancel` (2h cutoff, owner-of-booking check via
       T017) in `backend/src/SportBook.Application/Services/BookingService.cs` (depends on
       T032, T017)
@@ -278,7 +282,7 @@ verify it appears in that venue's review list and its average rating updates.
 **Purpose**: Improvements that affect multiple user stories
 
 - [ ] T058 [P] Run all `quickstart.md` validation scenarios end-to-end against a locally
-      running stack (Docker Postgres + backend + frontend)
+      running stack (Docker SQL Server + backend + frontend)
 - [ ] T059 [P] Response-DTO whitelist audit across every controller - confirm
       `PasswordHash` and `Email` never appear in a response reachable by another user
       (security consilium finding)

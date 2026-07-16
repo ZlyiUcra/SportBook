@@ -7,25 +7,50 @@ resolved with rationale here.
 
 ## Database engine
 
-- **Decision**: PostgreSQL now, via `Npgsql.EntityFrameworkCore.PostgreSQL`.
-- **Rationale**: User-confirmed. Explicit plan for a later move to SQL Server, so all data access
-  code must avoid Postgres-only constructs (see Technical Context > Storage constraint).
-- **Alternatives considered**: SQL Server now (rejected - user wants Postgres first); SQLite for
-  production (rejected - inadequate for concurrent writers, only used for fast unit tests).
+- **Decision**: Microsoft SQL Server 2025 from day 1, via `Microsoft.EntityFrameworkCore.SqlServer`.
+  Development and all non-prod environments run Developer edition (free, licensed for
+  development/test/demo only - it MUST NOT back any internet-facing or production deployment).
+  The production edition/hosting/licensing decision (Express within its 10GB-per-DB/memory/CPU
+  caps, paid Standard/Enterprise, or Azure SQL) is explicitly deferred until a production
+  deployment is actually planned.
+- **Rationale**: User-confirmed 2026-07-16, superseding the 2026-07-15 user-confirmed "PostgreSQL
+  now, SQL Server later" decision (consilium artifact
+  `.specify/consilium/2026-07-16-mssql-day1.md`; the 2026-07-15 artifact stays unedited as
+  historical record). Driver: a Microsoft-licensed developer on the team works exclusively with
+  SQL Server. The previous plan already committed to SQL Server "later", so switching pre-code
+  deletes a mid-project engine migration instead of adding one. Minor technical gain: SQL Server's
+  default case-insensitive collation makes EF `Contains` searches match the city/sport search UX
+  with no extra code. Acknowledged tradeoff: PostgreSQL is free in production, SQL Server is not -
+  a zero-cost production path is deliberately traded away.
+- **Alternatives considered**: PostgreSQL now, SQL Server later (rejected - superseded by the team
+  constraint above; its "portable swap later" promise was also already broken at the
+  highest-priority item, the overlap constraint, which named a Postgres-only mechanism); SQLite
+  for production (rejected - inadequate for concurrent writers, only used for fast unit tests).
 
 ## Local database hosting
 
-- **Decision**: PostgreSQL runs in Docker for local development (and any non-prod environment
-  until a real hosting decision is made), via a `docker-compose.yml` at the repo root. Host port
-  `5434` maps to the container's `5432` - a non-default host port was chosen so this doesn't
-  collide with a Postgres instance a developer might already have installed natively on `5432`.
-- **Rationale**: User-confirmed. Keeps local setup to `docker compose up -d` with no native
-  Postgres install required, and matches the portability goal - the app only needs a connection
-  string, it does not care whether Postgres is containerized or not.
-- **Alternatives considered**: Native Postgres install (rejected - more setup friction, and ties
-  dev environment setup to the host OS rather than to a portable compose file); default port 5432
-  mapping (rejected - avoids a common local collision when a developer already runs Postgres
-  natively).
+- **Decision**: SQL Server 2025 runs in Docker for local development (and any non-prod environment
+  until a real hosting decision is made), via a `docker-compose.yml` at the repo root: image
+  `mcr.microsoft.com/mssql/server:2025-latest` (pinned major, tracks cumulative security updates),
+  `MSSQL_PID=Developer`, `ACCEPT_EULA=Y`, an SA password meeting SQL Server complexity policy,
+  `MSSQL_MEMORY_LIMIT_MB` set below the container memory limit, a healthcheck so dependent flows
+  wait for readiness (cold start takes tens of seconds), and a volume on `/var/opt/mssql`. Host
+  bind `127.0.0.1:14330` maps to the container's `1433` - loopback-only (no LAN exposure of a
+  sysadmin-credentialed dev database) and non-default so it doesn't collide with a natively
+  installed SQL Server default instance on `1433` (the same collision class the previous
+  5434-vs-5432 choice guarded against).
+- **Rationale**: User-confirmed. Keeps local setup to `docker compose up -d`; the app only needs a
+  connection string. The image creates no application database - the first
+  `dotnet ef database update` creates it, so the database name lives only in the connection
+  string. The dev connection string needs `TrustServerCertificate=True` (self-signed container
+  certificate); dev-only, never in a non-local connection string. The app connects as a
+  least-privilege login; SA is bootstrap-only. The old `sportbook-postgres-data` Docker volume, if
+  it exists locally, is left for the user to clean up - nothing deletes it.
+- **Alternatives considered**: Native SQL Server install (rejected - more setup friction, and ties
+  dev environment setup to the host OS rather than to a portable compose file); default `1433`
+  host mapping (rejected - collision with a local default instance is plausible for the SQL
+  Server-oriented teammate); `:latest` tag (rejected - unpinned major-version drift; `2025-latest`
+  tracks security CUs within the pinned major).
 
 ## API style: MVC Controllers vs Minimal APIs
 
@@ -60,14 +85,14 @@ resolved with rationale here.
   `SportBook.Infrastructure` (see plan.md Project Structure). File-scoped namespaces, nullable
   reference types enabled project-wide, per `CLAUDE.md` C#/.NET conventions.
 - **Rationale**: Closes the nitpicker/best-practices findings on undecided project structure and
-  Service-layer testability; four projects is the smallest split that keeps EF Core/Postgres
-  specifics out of Application/Domain (portability requirement) while keeping Application unit
-  testable without a live database.
+  Service-layer testability; four projects is the smallest split that keeps EF Core/SQL Server
+  specifics out of Application/Domain (Sqlite-test translatability requirement) while keeping
+  Application unit testable without a live database.
 - **Alternatives considered**: Single project with folders (rejected - would leak
-  `Npgsql`-specific EF Core configuration into code that must stay swappable to SQL Server);
-  Repository pattern on top of EF Core (rejected per consilium best-practices finding - no second
-  storage provider exists yet to justify the extra layer, DbContext is accessed directly from
-  Application services).
+  provider-specific EF Core configuration into code that must stay translatable under the Sqlite
+  test provider); Repository pattern on top of EF Core (rejected per consilium best-practices
+  finding - no second storage provider exists yet to justify the extra layer, DbContext is
+  accessed directly from Application services).
 
 ## Availability response contract and minimum booking increment
 

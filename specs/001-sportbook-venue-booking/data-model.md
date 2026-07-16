@@ -3,7 +3,11 @@
 Entities as agreed in the consilium artifact and spec Key Entities section, with fields,
 relationships, and validation rules derived from the functional requirements. Field names use C#
 PascalCase; no implementation types (EF Core attributes, SQL types) are specified here - those
-belong in the Infrastructure layer during implementation.
+belong in the Infrastructure layer during implementation. Two cross-cutting conventions bind that
+layer: every `DateTime (UTC)` field below is UTC by convention, enforced in code
+(`DateTime.UtcNow`, convert at the edges), since SQL Server's `datetime2` does not preserve
+`DateTime.Kind`; and every `decimal` field gets an explicit `HasPrecision` in entity
+configuration rather than relying on the provider default.
 
 ## User
 
@@ -116,10 +120,13 @@ Confirmed --(EndTime has passed)--> Completed   [computed on read, not a stored 
 
 **Validation rules**: No two Bookings for the same Court may have overlapping
 `[StartTime, EndTime)` ranges unless one of them is `Cancelled` (spec FR-004); this MUST be
-enforced with a mechanism safe under concurrent requests (e.g., a database-level exclusion
-constraint or a serializable transaction around the check-then-insert), not only an
-application-level check, given the confirmed consilium finding that this is the single
-highest-priority gap in the whole review.
+enforced with a mechanism safe under concurrent requests, not only an application-level check,
+given the confirmed consilium finding that this is the single highest-priority gap in the whole
+review. The default mechanism is a serializable transaction with retry around the
+check-then-insert (pure EF Core, no raw SQL); SQL Server has no exclusion constraints, and a
+plain unique index cannot express range overlap. `sp_getapplock` or T-SQL lock hints are an
+allowed Infrastructure-only fallback that requires explicit review (see the FromSqlRaw policy in
+plan.md Storage). A supporting index on `Booking(CourtId, StartTime, EndTime)` backs the check.
 
 ## Review
 

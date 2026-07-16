@@ -6,15 +6,17 @@ code - see `contracts/api.md` for exact request/response shapes and `data-model.
 ## Prerequisites
 
 - .NET 10 SDK
-- Docker (Desktop or Engine) - PostgreSQL runs via `docker-compose.yml` at the repo root, no
-  native Postgres install needed
+- Docker (Desktop or Engine) - SQL Server 2025 Developer edition runs via `docker-compose.yml` at
+  the repo root, no native SQL Server install needed (Developer edition is dev/test-only; see
+  research.md for the licensing boundary)
 - Node.js + yarn (per `CLAUDE.md` JS tooling preference)
 
 ## Setup
 
 ```powershell
-# Database (from repo root)
+# Database (from repo root); first start takes tens of seconds - wait for "healthy"
 docker compose up -d
+docker compose ps
 
 # Backend
 cd backend
@@ -25,6 +27,11 @@ dotnet ef database update --project src/SportBook.Infrastructure --startup-proje
 cd ../frontend
 yarn install
 ```
+
+The container creates no application database - the first `dotnet ef database update` creates it,
+so the database name lives only in the connection string. The dev connection string targets
+`127.0.0.1,14330` and needs `TrustServerCertificate=True` for the container's self-signed
+certificate - that flag is dev-only and must never appear in a non-local connection string.
 
 ## Run
 

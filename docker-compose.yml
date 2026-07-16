@@ -1,15 +1,23 @@
 services:
-  postgres:
-    image: postgres:17
-    container_name: sportbook-postgres
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: sportbook-mssql
     environment:
-      POSTGRES_DB: sportbook
-      POSTGRES_USER: sportbook
-      POSTGRES_PASSWORD: sportbook_dev_password
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: "SportBook_Dev_Passw0rd"
+      MSSQL_MEMORY_LIMIT_MB: "2048"
+    mem_limit: 3g
     ports:
-      - "5434:5432"
+      - "127.0.0.1:14330:1433"
     volumes:
-      - sportbook-postgres-data:/var/lib/postgresql/data
+      - sportbook-mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -b -Q \"SELECT 1\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
 
 volumes:
-  sportbook-postgres-data:
+  sportbook-mssql-data:
