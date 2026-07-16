@@ -124,6 +124,46 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
             items.Select(b => b.ToResponse(now)).ToList(), page.Page, page.PageSize, totalCount);
     }
 
+    /// <summary>Only bookings for the caller's own venue (spec FR-010); venue ownership is checked directly, not per row.</summary>
+    public async Task<PagedResponse<BookingResponse>> ListByVenueForOwnerAsync(
+        Guid ownerId, Guid venueId, PageRequest page, CancellationToken ct)
+    {
+        var venue = await db.Venues.AsNoTracking().SingleOrDefaultAsync(v => v.Id == venueId, ct)
+            ?? throw new ApiException(404, "VENUE_NOT_FOUND", "Venue not found.");
+        OwnershipChecks.EnsureVenueOwner(venue, ownerId);
+
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+        var query = db.Bookings.AsNoTracking().Where(b => b.Court!.VenueId == venueId);
+        var totalCount = await query.CountAsync(ct);
+        var items = await query
+            .OrderByDescending(b => b.StartTime)
+            .Skip(page.Skip)
+            .Take(page.PageSize)
+            .ToListAsync(ct);
+
+        return new PagedResponse<BookingResponse>(
+            items.Select(b => b.ToResponse(now)).ToList(), page.Page, page.PageSize, totalCount);
+    }
+
+    /// <summary>Pending -> Confirmed only (spec FR-011, data-model.md state transitions); owner via Court.Venue.OwnerId.</summary>
+    public async Task<BookingResponse> ConfirmAsync(Guid ownerId, Guid bookingId, CancellationToken ct)
+    {
+        var booking = await db.Bookings.Include(b => b.Court).ThenInclude(c => c!.Venue)
+            .SingleOrDefaultAsync(b => b.Id == bookingId, ct)
+            ?? throw new ApiException(404, "BOOKING_NOT_FOUND", "Booking not found.");
+
+        OwnershipChecks.EnsureBookingVenueOwner(booking, ownerId);
+
+        if (booking.Status != BookingStatus.Pending)
+        {
+            throw new ApiException(409, "NOT_PENDING", "Only a pending booking can be confirmed.");
+        }
+
+        booking.Status = BookingStatus.Confirmed;
+        await db.SaveChangesAsync(ct);
+        return booking.ToResponse(timeProvider.GetUtcNow().UtcDateTime);
+    }
+
     /// <summary>Whole-hour, in the future, inside operating hours, same calendar day (data-model.md Booking rules).</summary>
     private static void ValidateSlot(Court court, DateTime start, DateTime end, DateTime now)
     {
