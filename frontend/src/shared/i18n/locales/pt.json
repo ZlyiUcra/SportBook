@@ -1,0 +1,47 @@
+{
+  "app": {
+    "title": "SportBook"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Senha",
+    "name": "Nome",
+    "genericError": "Algo deu errado. Tente novamente.",
+    "validation": {
+      "emailInvalid": "Digite um endereço de email válido.",
+      "passwordRequired": "A senha é obrigatória.",
+      "passwordMin": "A senha deve ter pelo menos 8 caracteres.",
+      "nameRequired": "O nome é obrigatório."
+    },
+    "login": {
+      "title": "Entrar",
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "noAccount": "Ainda não tem uma conta?",
+      "registerLink": "Registrar-se"
+    },
+    "register": {
+      "title": "Registrar-se",
+      "submit": "Registrar-se",
+      "submitting": "Criando conta...",
+      "haveAccount": "Já tem uma conta?",
+      "loginLink": "Entrar"
+    }
+  },
+  "theme": {
+    "label": "Tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "blue": "Azul"
+  },
+  "language": {
+    "label": "Idioma"
+  },
+  "home": {
+    "registeredAs": "Registrado como: {{name}} ({{email}})",
+    "loading": "carregando...",
+    "error": "falha na requisição",
+    "confirmed": "Confirmado via GET /api/users/me autenticado: {{name}} - papel {{role}}",
+    "signOut": "Sair"
+  }
+}

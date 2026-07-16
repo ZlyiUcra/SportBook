@@ -1,0 +1,47 @@
+{
+  "app": {
+    "title": "SportBook"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "genericError": "Something went wrong. Please try again.",
+    "validation": {
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordMin": "Password must be at least 8 characters.",
+      "nameRequired": "Name is required."
+    },
+    "login": {
+      "title": "Log in",
+      "submit": "Log in",
+      "submitting": "Logging in...",
+      "noAccount": "No account yet?",
+      "registerLink": "Register"
+    },
+    "register": {
+      "title": "Register",
+      "submit": "Register",
+      "submitting": "Creating account...",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in"
+    }
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "blue": "Blue"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "home": {
+    "registeredAs": "Registered as: {{name}} ({{email}})",
+    "loading": "loading...",
+    "error": "request failed",
+    "confirmed": "Confirmed via authenticated GET /api/users/me: {{name}} - role {{role}}",
+    "signOut": "Sign out"
+  }
+}

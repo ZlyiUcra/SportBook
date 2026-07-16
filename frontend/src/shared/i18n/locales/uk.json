@@ -1,0 +1,47 @@
+{
+  "app": {
+    "title": "SportBook"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Пароль",
+    "name": "Ім'я",
+    "genericError": "Щось пішло не так. Спробуйте ще раз.",
+    "validation": {
+      "emailInvalid": "Введіть коректну email-адресу.",
+      "passwordRequired": "Пароль обов'язковий.",
+      "passwordMin": "Пароль має бути щонайменше 8 символів.",
+      "nameRequired": "Ім'я обов'язкове."
+    },
+    "login": {
+      "title": "Увійти",
+      "submit": "Увійти",
+      "submitting": "Вхід...",
+      "noAccount": "Ще немає акаунту?",
+      "registerLink": "Зареєструватися"
+    },
+    "register": {
+      "title": "Реєстрація",
+      "submit": "Зареєструватися",
+      "submitting": "Створення акаунту...",
+      "haveAccount": "Вже є акаунт?",
+      "loginLink": "Увійти"
+    }
+  },
+  "theme": {
+    "label": "Тема",
+    "light": "Світла",
+    "dark": "Темна",
+    "blue": "Синя"
+  },
+  "language": {
+    "label": "Мова"
+  },
+  "home": {
+    "registeredAs": "Зареєстровано як: {{name}} ({{email}})",
+    "loading": "завантаження...",
+    "error": "запит не вдався",
+    "confirmed": "Підтверджено через авторизований GET /api/users/me: {{name}} - роль {{role}}",
+    "signOut": "Вийти"
+  }
+}
