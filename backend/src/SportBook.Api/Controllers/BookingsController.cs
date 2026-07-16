@@ -35,4 +35,17 @@ public class BookingsController(BookingService bookingService) : ControllerBase
     {
         return Ok(await bookingService.CancelAsync(User.GetUserId(), id, ct));
     }
+
+    [HttpGet("/api/venues/{venueId:guid}/bookings")]
+    public async Task<ActionResult<PagedResponse<BookingResponse>>> ListByVenue(
+        Guid venueId, [FromQuery] PageRequest page, CancellationToken ct)
+    {
+        return Ok(await bookingService.ListByVenueForOwnerAsync(User.GetUserId(), venueId, page, ct));
+    }
+
+    [HttpPut("{id:guid}/confirm")]
+    public async Task<ActionResult<BookingResponse>> Confirm(Guid id, CancellationToken ct)
+    {
+        return Ok(await bookingService.ConfirmAsync(User.GetUserId(), id, ct));
+    }
 }

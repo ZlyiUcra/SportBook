@@ -237,7 +237,7 @@ below - per user direction 2026-07-16 to prioritize a working pilot.
 - [X] T049 [US2] Implement `BookingService.ListByVenueForOwner` and `Confirm` (owner-only via
       Court->Venue chain) in
       `backend/src/SportBook.Application/Services/BookingService.cs` (depends on T032, T017)
-- [ ] T050 [US2] Implement `BookingsController` GET `/venues/{id}/bookings` and PUT
+- [X] T050 [US2] Implement `BookingsController` GET `/venues/{id}/bookings` and PUT
       `/bookings/{id}/confirm` in
       `backend/src/SportBook.Api/Controllers/BookingsController.cs` (depends on T049, T034)
 - [ ] T051 [P] [US2] Frontend: `OwnerDashboard` page (venue/court create/edit/delete forms)
