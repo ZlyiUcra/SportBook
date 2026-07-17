@@ -10,17 +10,19 @@ US1 -> Feature: Customer Experience
 US3 -> Feature: Customer Experience
 US2 -> Feature: Platform Operations
 -->
+<!-- agile-tasks:substories
+US1 -> 1a: Tests (T020,T021,T022,T023,T024,T025) | 1b: Backend - auth/venue/court (T026,T027,T028,T029,T030) | 1c: Backend - booking/availability (T031,T032,T033,T034) | 1d: Frontend (T035,T036,T037,T038,T039)
+US2 -> 2a: Tests (T040,T041,T042,T043,T044) | 2b: Implementation (T045,T046,T047,T048,T049,T050,T051,T052)
+US4 -> 4a: Setup & scaffolding (T001,T002,T003,T004,T005,T006,T007) | 4b: Domain & data (T008,T009,T010,T011,T012) | 4c: Security & shared infra (T013,T014,T015,T016,T017,T018,T019) | 4d: Polish & verification (T058,T059,T060,T061,T062,T063)
+-->
 
 ## Feature: Customer Experience
 
 Progress: 25/25 tasks (100%)
 
-### User Story 1 - Book a sports court (Priority: P1)
+### User Story - Tests (Priority: P1, part of "Book a sports court")
 
-Progress: 20/20 tasks (100%)
-
-A customer searches for available sports venues by city and sport type, views available time
-slots for a chosen court, and completes a booking for a chosen time slot.
+Progress: 6/6 tasks (100%)
 
 - [x] T020 Integration test: register, login, and refresh flow [P]
 - [x] T021 Integration test: book an available slot end-to-end, price computed server-side [P]
@@ -28,22 +30,37 @@ slots for a chosen court, and completes a booking for a chosen time slot.
 - [x] T023 Integration test: cancellation rejected inside the 2h cutoff, succeeds outside it [P]
 - [x] T024 Unit test: TotalPrice computation from PricePerHour and duration [P]
 - [x] T025 Unit test: overlap-check logic against existing bookings [P]
+
+### User Story - Backend - auth/venue/court (Priority: P1, part of "Book a sports court")
+
+Progress: 5/5 tasks (100%)
+
 - [x] T026 Implement AuthService (register/login/refresh/logout)
 - [x] T027 Implement AuthController
 - [x] T028 Implement VenueService.Search/GetById [P]
 - [x] T029 Implement VenuesController GET endpoints (list, get-by-id) [P]
 - [x] T030 Implement CourtService.ListByVenue and CourtsController GET list-by-venue [P]
+
+### User Story - Backend - booking/availability (Priority: P1, part of "Book a sports court")
+
+Progress: 4/4 tasks (100%)
+
 - [x] T031 Implement AvailabilityService and AvailabilityController
 - [x] T032 Implement BookingService.Create (server-computed price, overlap-safe)
 - [x] T033 Implement BookingService.Cancel (2h cutoff, ownership check)
 - [x] T034 Implement BookingsController POST, GET (mine), GET-by-id, PUT cancel
+
+### User Story - Frontend (Priority: P1, part of "Book a sports court")
+
+Progress: 5/5 tasks (100%)
+
 - [x] T035 Frontend: typed request/response types + API calls for auth, venues, courts, availability, bookings [P]
 - [x] T036 Frontend: Login/Register pages wired to AuthContext [P]
 - [x] T037 Frontend: VenueSearch page (city/sport filter, paginated list)
 - [x] T038 Frontend: VenueDetail page with court list, availability picker, booking form
 - [x] T039 Frontend: MyBookings page (list + cancel action)
 
-### User Story 3 - Build trust through reviews (Priority: P3)
+### User Story - Build trust through reviews (Priority: P3)
 
 Progress: 5/5 tasks (100%)
 
@@ -60,18 +77,44 @@ their own rating and comment about a venue they have used.
 
 Progress: 38/38 tasks (100%)
 
-### User Story 2 - Manage venue and courts (Priority: P2)
+### User Story - Setup & scaffolding (part of "Cross-cutting tasks")
 
-Progress: 13/13 tasks (100%)
+Progress: 7/7 tasks (100%)
 
-A venue owner registers their sports facility, lists one or more courts with pricing and
-operating hours, and reviews and confirms bookings made against their venue.
+- [x] T001 Create backend solution layout (4 projects, add to SportBook.sln)
+- [x] T002 Initialize SportBook.Api as an ASP.NET Core 10 Web API project (MVC Controllers)
+- [x] T003 Add EF Core + SqlServer provider to SportBook.Infrastructure [P]
+- [x] T004 Create SportBook.UnitTests and SportBook.IntegrationTests projects [P]
+- [x] T005 Initialize frontend with Vite + React + TypeScript [P]
+- [x] T006 Add Vitest + Testing Library to frontend [P]
+- [x] T007 Verify docker-compose SQL Server service reaches healthy [P]
 
-- [x] T040 Integration test: venue owner creates a venue and court, which becomes searchable/bookable [P]
-- [x] T041 Integration test: cross-owner access returns 403, including customer-vs-customer booking access [P]
-- [x] T042 Integration test: owner confirms a pending booking; non-owner confirm attempt is rejected [P]
-- [x] T043 Integration test: deleting a venue/court with an upcoming non-cancelled booking is rejected [P]
-- [x] T044 Unit test: ownership-check helpers for Venue/Court/Booking chains [P]
+### User Story - Domain & data (part of "Cross-cutting tasks")
+
+Progress: 5/5 tasks (100%)
+
+- [x] T008 Create Domain enums (Role, SubscriptionTier, SportType, BookingStatus) [P]
+- [x] T009 Create Domain entities (User, RefreshToken, Venue, Court, Booking, Review) [P]
+- [x] T010 Create SportBookDbContext with entity configurations
+- [x] T011 Isolate SqlServer provider registration to a single DI extension method
+- [x] T012 Create the initial EF Core migration
+
+### User Story - Security & shared infra (part of "Cross-cutting tasks")
+
+Progress: 7/7 tasks (100%)
+
+- [x] T013 Implement password hashing (IPasswordHasher) [P]
+- [x] T014 Implement JWT issuance/validation [P]
+- [x] T015 Wire JWT bearer authentication + global fallback authorization policy
+- [x] T016 Implement the error-handling middleware [P]
+- [x] T017 Implement the shared ownership-check helpers [P]
+- [x] T018 Implement the shared PagedResponse<T> type and page/pageSize binding [P]
+- [x] T019 Create frontend api client + AuthContext [P]
+
+### User Story - Implementation (Priority: P2, part of "Manage venue and courts")
+
+Progress: 8/8 tasks (100%)
+
 - [x] T045 Implement VenueService.Create/Update/Delete (owner-only, FR-009 delete guard)
 - [x] T046 Implement VenuesController POST/PUT/DELETE
 - [x] T047 Implement CourtService.Create/Update/Delete (owner-only via Venue chain)
@@ -81,29 +124,20 @@ operating hours, and reviews and confirms bookings made against their venue.
 - [x] T051 Frontend: OwnerDashboard page (venue/court create/edit/delete forms) [P]
 - [x] T052 Frontend: OwnerBookings page (list own venue's bookings, confirm action)
 
-### User Story 4 - Cross-cutting tasks
+### User Story - Tests (Priority: P2, part of "Manage venue and courts")
 
-Progress: 25/25 tasks (100%)
+Progress: 5/5 tasks (100%)
 
-- [x] T001 Create backend solution layout (4 projects, add to SportBook.sln)
-- [x] T002 Initialize SportBook.Api as an ASP.NET Core 10 Web API project (MVC Controllers)
-- [x] T003 Add EF Core + SqlServer provider to SportBook.Infrastructure [P]
-- [x] T004 Create SportBook.UnitTests and SportBook.IntegrationTests projects [P]
-- [x] T005 Initialize frontend with Vite + React + TypeScript [P]
-- [x] T006 Add Vitest + Testing Library to frontend [P]
-- [x] T007 Verify docker-compose SQL Server service reaches healthy [P]
-- [x] T008 Create Domain enums (Role, SubscriptionTier, SportType, BookingStatus) [P]
-- [x] T009 Create Domain entities (User, RefreshToken, Venue, Court, Booking, Review) [P]
-- [x] T010 Create SportBookDbContext with entity configurations
-- [x] T011 Isolate SqlServer provider registration to a single DI extension method
-- [x] T012 Create the initial EF Core migration
-- [x] T013 Implement password hashing (IPasswordHasher) [P]
-- [x] T014 Implement JWT issuance/validation [P]
-- [x] T015 Wire JWT bearer authentication + global fallback authorization policy
-- [x] T016 Implement the error-handling middleware [P]
-- [x] T017 Implement the shared ownership-check helpers [P]
-- [x] T018 Implement the shared PagedResponse<T> type and page/pageSize binding [P]
-- [x] T019 Create frontend api client + AuthContext [P]
+- [x] T040 Integration test: venue owner creates a venue and court, which becomes searchable/bookable [P]
+- [x] T041 Integration test: cross-owner access returns 403, including customer-vs-customer booking access [P]
+- [x] T042 Integration test: owner confirms a pending booking; non-owner confirm attempt is rejected [P]
+- [x] T043 Integration test: deleting a venue/court with an upcoming non-cancelled booking is rejected [P]
+- [x] T044 Unit test: ownership-check helpers for Venue/Court/Booking chains [P]
+
+### User Story - Polish & verification (part of "Cross-cutting tasks")
+
+Progress: 6/6 tasks (100%)
+
 - [x] T058 Run all quickstart.md validation scenarios end-to-end [P]
 - [x] T059 Response-DTO whitelist audit across every controller [P]
 - [x] T060 Add OpenAPI document annotations to all controllers [P]
