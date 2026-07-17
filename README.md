@@ -7,6 +7,35 @@ users leave reviews on venues they have used. The product is designed to support
 monetization on both sides of the marketplace (see `specs/001-sportbook-venue-booking/spec.md` for
 the full specification).
 
+## About
+
+SportBook exists to solve one problem: a sports venue (a padel court, a tennis club, a football
+field) needs a simple way to publish its availability and let people book a specific hour without
+a phone call, and the venue's staff need a simple way to see who is coming and confirm it. The
+product is two-sided by design - the same account model and the same UI serve both sides, there is
+no separate "business" signup:
+
+- **As a customer**, you search venues by city and sport, see a court's free hourly slots for a
+  given day, and book one. The price is always computed server-side from the court's
+  `pricePerHour` - the app never trusts a client-supplied price. A booking can be cancelled up
+  until 2 hours before its start; inside that window cancellation is refused so a venue is not
+  left with an empty, unbillable slot at the last minute.
+- **As a venue owner**, you list your own venues and courts (name, address, sport type, price per
+  hour, opening/closing hours), see the bookings made against them, and confirm each pending
+  booking. A venue or court cannot be deleted while it still has an upcoming, non-cancelled
+  booking against it, so a customer's booking can never silently disappear.
+- **Reviews** are open to any authenticated user who wants to rate a venue (1-5 stars plus an
+  optional comment): one review per user per venue - submitting again replaces your previous
+  rating and comment rather than creating a duplicate, and the venue's average rating updates
+  immediately.
+
+Every account can act as both a customer and a venue owner at the same time - registration always
+creates a plain account, and there is currently no separate "become a venue owner" step or
+approval process; whether you use the customer-facing search/booking pages or the owner dashboard
+is simply a matter of which nav link you click. Everything in the app requires being logged in
+(there is no anonymous browsing) - see `specs/001-sportbook-venue-booking/spec.md` (FR-014) for
+why that's a deliberate constraint, not an oversight.
+
 ## Current status
 
 All three planned user stories are implemented end to end (backend + frontend):
@@ -162,6 +191,56 @@ yarn dev
 
 The dev server listens on `http://localhost:5173` and expects the API at
 `http://localhost:5217/api` (see `frontend/.env.development`).
+
+## Using the application
+
+Once both the backend (`http://localhost:5217`) and frontend (`http://localhost:5173`) are
+running (see "Local setup" above), open the frontend URL in a browser. Every screen except
+Login/Register requires being signed in - you're redirected to Login if you aren't.
+
+### Account and settings
+
+- **Register** (`/register`): name, email, password. This is the only way to create an account -
+  there is no separate "sign up as a venue owner" flow (see "About" above). You're signed in
+  immediately after registering.
+- **Login** (`/login`): email + password. A successful login (or registration) stores an access
+  token and a refresh token; the access token is attached to every API request automatically, and
+  is refreshed transparently when it expires - you don't need to log in again mid-session.
+- **Settings menu** (top-right on every screen, including the anonymous Login/Register pages): a
+  combined language and theme switcher. Language: English, Ukrainian, or Portuguese. Theme: light,
+  dark (the default), or blue. Both choices persist across reloads (stored in the browser).
+- On narrow screens (below the `md` breakpoint) the top navigation collapses into a hamburger menu;
+  the current page is always highlighted, in both the desktop nav and the mobile drawer.
+
+### Booking a court (customer flow)
+
+1. The home page (`/`) is venue search: filter by city and/or sport type, browse the paginated
+   results.
+2. Open a venue (`/venues/:id`) to see its address, description, average rating and existing
+   reviews, and its list of courts (name, sport, price per hour, opening/closing hours).
+3. Pick a court and a date; the page fetches that court's free whole-hour slots for the day (slots
+   already booked - by anyone, Pending or Confirmed - don't appear).
+4. Pick a free slot and book it. The booking is created as **Pending** with its price already
+   computed (`pricePerHour x hours`) - nothing about the price is entered by you.
+5. **My Bookings** (`/bookings`) lists every booking you've made, with its current status
+   (Pending, Confirmed, Cancelled) and price. You can cancel a booking from here as long as it
+   starts more than 2 hours from now; inside that window the cancel action is refused.
+6. From a venue's page you can also leave a review (1-5 stars + an optional comment) once you're
+   signed in - submitting a second review for the same venue overwrites your first one instead of
+   adding a new one, and the venue's average rating updates right away.
+
+### Managing your own venues (owner flow)
+
+1. **Owner Dashboard** (`/owner/venues`): create a venue (name, city, address, optional
+   description), then add one or more courts to it (name, sport type, price per hour, opening and
+   closing time). Existing venues/courts can be edited here too, and a court can be deactivated
+   (`isActive`) without deleting it if it's temporarily out of service.
+2. Deleting a venue or a court is blocked while it still has an upcoming, non-cancelled booking
+   against it - cancel or wait out those bookings first if you need to remove it.
+3. **Owner Bookings** (`/owner/bookings`): see every booking made against your own venues (any
+   court, any customer) and confirm each **Pending** one, moving it to **Confirmed**. Only the
+   owner of the venue a booking belongs to can see or confirm it - another owner's dashboard never
+   shows it.
 
 ## Running tests
 
