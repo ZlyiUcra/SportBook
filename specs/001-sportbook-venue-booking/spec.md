@@ -84,7 +84,7 @@ An authenticated user reads reviews left by other users on a venue before bookin
 - **FR-011**: System MUST allow venue owners to confirm a pending booking, transitioning it to a confirmed status. Venue owners cannot cancel a customer's booking; cancellation is customer-initiated only (see FR-005).
 - **FR-012**: System MUST allow authenticated users to leave one rating and comment per venue they choose to review.
 - **FR-013**: System MUST display the list of reviews and an average rating for each venue.
-- **FR-014**: System MUST require account registration and authentication for all interaction with the platform, including venue search and browsing; there is no unauthenticated access.
+- **FR-014**: System MUST require account registration and authentication for all interaction with the platform, including venue search and browsing; there is no unauthenticated access. Exception: a static `/about` page describing the product is deliberately public (user 2026-07-17), so a prospective user can read what the app does before registering - it carries no venue/booking data.
 - **FR-015**: System MUST record a subscription tier (free or premium) on each user account as a foundation for future monetization; this iteration does not restrict any feature based on tier.
 
 ### Key Entities *(include if feature involves data)*

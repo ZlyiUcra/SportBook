@@ -38,6 +38,10 @@ function isOwnerBookingsRoute(pathname: string) {
   return pathname.startsWith('/owner/bookings')
 }
 
+function isAboutRoute(pathname: string) {
+  return pathname === '/about'
+}
+
 /** Underline-style active indicator for the inline desktop nav. */
 function DesktopNavLink({
   to,
@@ -95,6 +99,10 @@ function MobileNavLink({
  * carrying the same links and actions - avoids the header wrapping into a cramped multi-row
  * mess on narrow viewports. Both variants mark the current route (underline on desktop, filled
  * pill on mobile) so it's clear which nav option is active.
+ *
+ * Also renders on the public `/about` route, where there is no signed-in user - the
+ * name/sign-out block is swapped for a "Log in" link in that case rather than showing an empty
+ * name and a sign-out button with nothing to sign out of.
  */
 export function AppHeader() {
   const { t } = useTranslation()
@@ -107,6 +115,7 @@ export function AppHeader() {
   const bookingsActive = isBookingsRoute(location.pathname)
   const ownerVenuesActive = isOwnerVenuesRoute(location.pathname)
   const ownerBookingsActive = isOwnerBookingsRoute(location.pathname)
+  const aboutActive = isAboutRoute(location.pathname)
 
   return (
     <header className="flex items-center justify-between gap-2 border-b px-4 py-2">
@@ -127,15 +136,29 @@ export function AppHeader() {
           <DesktopNavLink to="/owner/bookings" isActive={ownerBookingsActive}>
             {t('nav.venueBookings')}
           </DesktopNavLink>
+          <DesktopNavLink to="/about" isActive={aboutActive}>
+            {t('nav.about')}
+          </DesktopNavLink>
         </nav>
       </div>
 
       <div className="hidden items-center gap-3 md:flex">
-        <span className="text-sm text-muted-foreground">{user?.name}</span>
-        <SettingsMenu />
-        <Button variant="outline" size="sm" onClick={logout}>
-          {t('nav.signOut')}
-        </Button>
+        {user ? (
+          <>
+            <span className="text-sm text-muted-foreground">{user.name}</span>
+            <SettingsMenu />
+            <Button variant="outline" size="sm" onClick={logout}>
+              {t('nav.signOut')}
+            </Button>
+          </>
+        ) : (
+          <>
+            <SettingsMenu />
+            <Button asChild variant="outline" size="sm">
+              <Link to="/login">{t('nav.logIn')}</Link>
+            </Button>
+          </>
+        )}
       </div>
 
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
@@ -162,14 +185,30 @@ export function AppHeader() {
             <MobileNavLink to="/owner/bookings" isActive={ownerBookingsActive}>
               {t('nav.venueBookings')}
             </MobileNavLink>
+            <MobileNavLink to="/about" isActive={aboutActive}>
+              {t('nav.about')}
+            </MobileNavLink>
           </nav>
 
           <div className="mt-auto flex flex-col gap-3 border-t pt-4">
-            <span className="text-sm text-muted-foreground">{user?.name}</span>
-            <SettingsMenu />
-            <Button variant="outline" size="sm" onClick={logout}>
-              {t('nav.signOut')}
-            </Button>
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground">{user.name}</span>
+                <SettingsMenu />
+                <Button variant="outline" size="sm" onClick={logout}>
+                  {t('nav.signOut')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <SettingsMenu />
+                <SheetClose asChild>
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/login">{t('nav.logIn')}</Link>
+                  </Button>
+                </SheetClose>
+              </>
+            )}
           </div>
         </SheetContent>
       </Sheet>

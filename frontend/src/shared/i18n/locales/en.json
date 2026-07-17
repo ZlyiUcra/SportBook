@@ -7,7 +7,9 @@
     "myBookings": "My bookings",
     "myVenues": "My venues",
     "venueBookings": "Venue bookings",
+    "about": "About",
     "signOut": "Sign out",
+    "logIn": "Log in",
     "openMenu": "Open menu"
   },
   "common": {
@@ -144,5 +146,19 @@
     "submit": "Submit review",
     "addTitle": "Leave a review",
     "editTitle": "Update your review"
+  },
+  "about": {
+    "title": "About SportBook",
+    "intro": "SportBook is a two-sided platform for booking sports venues (courts and fields). A venue publishes its availability and lets people book a specific hour without a phone call; the venue's staff sees who is coming and confirms it.",
+    "oneAccountTitle": "One account, both sides",
+    "oneAccount": "Every account can act as both a customer and a venue owner - registration always creates a plain account, and there is currently no separate \"become a venue owner\" step. Whether you use the customer-facing search/booking pages or the owner dashboard is simply a matter of which nav link you choose.",
+    "customerTitle": "As a customer",
+    "customer": "Search venues by city and sport, see a court's free hourly slots for a given day, and book one. The price is always computed from the court's price per hour - the app never trusts a client-supplied price. A booking can be cancelled up until 2 hours before its start; inside that window cancellation is refused.",
+    "ownerTitle": "As a venue owner",
+    "owner": "List your own venues and courts (name, address, sport type, price per hour, opening/closing hours), see the bookings made against them, and confirm each pending booking. A venue or court cannot be deleted while it still has an upcoming, non-cancelled booking against it.",
+    "reviewsTitle": "Reviews",
+    "reviews": "Any authenticated user can rate a venue (1-5 stars plus an optional comment): one review per user per venue - submitting again replaces your previous rating and comment rather than creating a duplicate, and the venue's average rating updates immediately.",
+    "loginPrompt": "Most of the app requires an account.",
+    "registerCta": "Register"
   }
 }

@@ -7,7 +7,9 @@
     "myBookings": "Minhas reservas",
     "myVenues": "Meus locais",
     "venueBookings": "Reservas do local",
+    "about": "Sobre",
     "signOut": "Sair",
+    "logIn": "Entrar",
     "openMenu": "Abrir menu"
   },
   "common": {
@@ -144,5 +146,19 @@
     "submit": "Enviar avaliação",
     "addTitle": "Deixar uma avaliação",
     "editTitle": "Atualizar sua avaliação"
+  },
+  "about": {
+    "title": "Sobre o SportBook",
+    "intro": "O SportBook é uma plataforma de dois lados para reservar locais esportivos (quadras e campos). Um local publica sua disponibilidade e permite que as pessoas reservem um horário específico sem precisar telefonar; a equipe do local vê quem vai chegar e confirma a reserva.",
+    "oneAccountTitle": "Uma conta, os dois lados",
+    "oneAccount": "Toda conta pode atuar tanto como cliente quanto como proprietário de um local - o registro sempre cria uma conta comum, e atualmente não existe uma etapa separada para \"se tornar proprietário\". Usar as páginas de busca/reserva voltadas ao cliente ou o painel do proprietário é apenas uma questão de qual link de navegação você escolhe.",
+    "customerTitle": "Como cliente",
+    "customer": "Busque locais por cidade e esporte, veja os horários livres de uma quadra em uma data e reserve um deles. O preço é sempre calculado a partir do preço por hora da quadra - o aplicativo nunca confia em um preço enviado pelo cliente. Uma reserva pode ser cancelada até 2 horas antes do início; dentro dessa janela o cancelamento é recusado.",
+    "ownerTitle": "Como proprietário de um local",
+    "owner": "Cadastre seus próprios locais e quadras (nome, endereço, esporte, preço por hora, horário de funcionamento), veja as reservas feitas neles e confirme cada reserva pendente. Um local ou quadra não pode ser excluído enquanto tiver uma reserva futura e não cancelada.",
+    "reviewsTitle": "Avaliações",
+    "reviews": "Qualquer usuário autenticado pode avaliar um local (1 a 5 estrelas mais um comentário opcional): uma avaliação por usuário por local - enviar novamente substitui sua avaliação e comentário anteriores em vez de criar uma duplicata, e a avaliação média do local é atualizada imediatamente.",
+    "loginPrompt": "A maior parte do aplicativo requer uma conta.",
+    "registerCta": "Registrar-se"
   }
 }
