@@ -100,9 +100,10 @@ function MobileNavLink({
  * mess on narrow viewports. Both variants mark the current route (underline on desktop, filled
  * pill on mobile) so it's clear which nav option is active.
  *
- * Also renders on the public `/about` route, where there is no signed-in user - the
- * name/sign-out block is swapped for a "Log in" link in that case rather than showing an empty
- * name and a sign-out button with nothing to sign out of.
+ * Also renders on the public `/about` route, where there is no signed-in user. In that case the
+ * nav only shows "About" - every other link (Venues, My bookings, My venues, Venue bookings)
+ * requires auth and would just bounce an anonymous visitor to Login, so showing them would be
+ * misleading. The name/sign-out block is likewise swapped for a "Log in" link.
  */
 export function AppHeader() {
   const { t } = useTranslation()
@@ -120,22 +121,26 @@ export function AppHeader() {
   return (
     <header className="flex items-center justify-between gap-2 border-b px-4 py-2">
       <div className="flex items-center gap-4">
-        <Link to="/" className="font-semibold">
+        <Link to={user ? '/' : '/about'} className="font-semibold">
           {t('app.title')}
         </Link>
         <nav className="hidden items-center gap-4 md:flex">
-          <DesktopNavLink to="/" isActive={venuesActive}>
-            {t('nav.venues')}
-          </DesktopNavLink>
-          <DesktopNavLink to="/bookings" isActive={bookingsActive}>
-            {t('nav.myBookings')}
-          </DesktopNavLink>
-          <DesktopNavLink to="/owner/venues" isActive={ownerVenuesActive}>
-            {t('nav.myVenues')}
-          </DesktopNavLink>
-          <DesktopNavLink to="/owner/bookings" isActive={ownerBookingsActive}>
-            {t('nav.venueBookings')}
-          </DesktopNavLink>
+          {user && (
+            <>
+              <DesktopNavLink to="/" isActive={venuesActive}>
+                {t('nav.venues')}
+              </DesktopNavLink>
+              <DesktopNavLink to="/bookings" isActive={bookingsActive}>
+                {t('nav.myBookings')}
+              </DesktopNavLink>
+              <DesktopNavLink to="/owner/venues" isActive={ownerVenuesActive}>
+                {t('nav.myVenues')}
+              </DesktopNavLink>
+              <DesktopNavLink to="/owner/bookings" isActive={ownerBookingsActive}>
+                {t('nav.venueBookings')}
+              </DesktopNavLink>
+            </>
+          )}
           <DesktopNavLink to="/about" isActive={aboutActive}>
             {t('nav.about')}
           </DesktopNavLink>
@@ -173,18 +178,22 @@ export function AppHeader() {
           </SheetHeader>
 
           <nav className="flex flex-col gap-1">
-            <MobileNavLink to="/" isActive={venuesActive}>
-              {t('nav.venues')}
-            </MobileNavLink>
-            <MobileNavLink to="/bookings" isActive={bookingsActive}>
-              {t('nav.myBookings')}
-            </MobileNavLink>
-            <MobileNavLink to="/owner/venues" isActive={ownerVenuesActive}>
-              {t('nav.myVenues')}
-            </MobileNavLink>
-            <MobileNavLink to="/owner/bookings" isActive={ownerBookingsActive}>
-              {t('nav.venueBookings')}
-            </MobileNavLink>
+            {user && (
+              <>
+                <MobileNavLink to="/" isActive={venuesActive}>
+                  {t('nav.venues')}
+                </MobileNavLink>
+                <MobileNavLink to="/bookings" isActive={bookingsActive}>
+                  {t('nav.myBookings')}
+                </MobileNavLink>
+                <MobileNavLink to="/owner/venues" isActive={ownerVenuesActive}>
+                  {t('nav.myVenues')}
+                </MobileNavLink>
+                <MobileNavLink to="/owner/bookings" isActive={ownerBookingsActive}>
+                  {t('nav.venueBookings')}
+                </MobileNavLink>
+              </>
+            )}
             <MobileNavLink to="/about" isActive={aboutActive}>
               {t('nav.about')}
             </MobileNavLink>
