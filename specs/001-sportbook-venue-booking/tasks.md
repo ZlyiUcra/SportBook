@@ -324,14 +324,14 @@ reverse.
 
 ### Cross-cutting polish
 
-- [ ] T058 [P] Run all `quickstart.md` validation scenarios end-to-end against a locally
+- [x] T058 [P] Run all `quickstart.md` validation scenarios end-to-end against a locally
       running stack (Docker SQL Server + backend + frontend)
-- [ ] T059 [P] Response-DTO whitelist audit across every controller - confirm
+- [x] T059 [P] Response-DTO whitelist audit across every controller - confirm
       `PasswordHash` and `Email` never appear in a response reachable by another user
       (security consilium finding)
-- [ ] T060 [P] Add `Microsoft.AspNetCore.OpenApi` document annotations to all controllers for
+- [x] T060 [P] Add `Microsoft.AspNetCore.OpenApi` document annotations to all controllers for
       API documentation
-- [ ] T061 Verify EF Core query plans for `GET /venues/{id}` (confirms `AsSplitQuery()` avoids
+- [x] T061 Verify EF Core query plans for `GET /venues/{id}` (confirms `AsSplitQuery()` avoids
       the cartesian-explosion pattern from the performance consilium finding) and for
       `GET /courts/{id}/availability` (confirms an index exists on
       `Booking(CourtId, StartTime, EndTime)`)
@@ -342,11 +342,18 @@ reverse.
       the `sportbook_app` SQL login (container only bootstraps `sa`) and `dotnet user-secrets`
       for `Jwt:Key`/`ConnectionStrings:DefaultConnection` (nothing secret is committed). Both
       commands verified to actually work against the live container.
-- [ ] T063 Verify SC-005 (500 concurrent `GET /venues` requests, p95 latency under 500ms and
+- [x] T063 Verify SC-005 (500 concurrent `GET /venues` requests, p95 latency under 500ms and
       under 2x single-user baseline) via a load test; confirm tooling choice with the user
       before adding any new test dependency (e.g. NBomber, k6, or a simple concurrent
       `HttpClient` harness inside `SportBook.IntegrationTests`) per `CLAUDE.md` dependency
-      sign-off rule
+      sign-off rule. **Result: FAILS on this local dev setup** - a throwaway custom
+      `HttpClient` harness (200 seeded venues, 20-request sequential baseline, then 500
+      concurrent `GET /venues`) measured baseline p50 ~6.5ms vs. loaded p95 ~3736ms against
+      both thresholds. Likely cause: the dev connection string does not set `Max Pool Size`,
+      so ADO.NET defaults to a 100-connection pool - well under the 500 concurrent
+      DB-touching requests - compounded by the memory-capped, single-instance dev SQL Server
+      container. Recorded as a local-environment artifact per user direction 2026-07-17, not
+      pursued further (no code or connection-string change made).
 
 ---
 

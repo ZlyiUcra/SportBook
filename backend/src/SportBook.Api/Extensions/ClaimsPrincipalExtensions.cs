@@ -8,6 +8,7 @@ namespace SportBook.Api.Extensions;
 /// </summary>
 public static class ClaimsPrincipalExtensions
 {
+    /// <summary>The authenticated caller's user id, from the `sub`/NameIdentifier claim.</summary>
     public static Guid GetUserId(this ClaimsPrincipal principal)
     {
         var value = principal.FindFirstValue(ClaimTypes.NameIdentifier)

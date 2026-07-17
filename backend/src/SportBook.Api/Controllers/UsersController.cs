@@ -6,10 +6,12 @@ using SportBook.Infrastructure;
 
 namespace SportBook.Api.Controllers;
 
+/// <summary>The authenticated caller's own account data.</summary>
 [ApiController]
 [Route("api/users")]
 public class UsersController(SportBookDbContext db) : ControllerBase
 {
+    /// <summary>Returns the caller's own profile, resolved from the JWT - never another user's.</summary>
     [HttpGet("me")]
     public async Task<ActionResult<UserResponse>> GetMe(CancellationToken ct)
     {

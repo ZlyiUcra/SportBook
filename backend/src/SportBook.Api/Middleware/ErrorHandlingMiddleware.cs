@@ -9,6 +9,7 @@ namespace SportBook.Api.Middleware;
 /// </summary>
 public class ErrorHandlingMiddleware(RequestDelegate next)
 {
+    /// <summary>Runs the rest of the pipeline, converting any exception that escapes it into the JSON error contract.</summary>
     public async Task InvokeAsync(HttpContext context)
     {
         try

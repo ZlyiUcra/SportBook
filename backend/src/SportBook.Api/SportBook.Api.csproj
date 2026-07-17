@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>089a6c44-bcb4-4881-852b-2ba3e3598327</UserSecretsId>
+    <!-- Lets the OpenAPI generator (AddOpenApi) pick up action summaries from XML doc comments (T060). -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
