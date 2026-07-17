@@ -315,10 +315,10 @@ reverse.
       `backend/tests/SportBook.IntegrationTests/VenueDeletionTests.cs` (depends on T045, T047)
 - [x] T044 [P] Unit test: ownership-check helpers for Venue/Court/Booking chains (US2) in
       `backend/tests/SportBook.UnitTests/OwnershipChecksTests.cs` (depends on T017)
-- [ ] T053 [P] Integration test: submit a review, verify it appears in the venue's
+- [x] T053 [P] Integration test: submit a review, verify it appears in the venue's
       review list and the venue's average rating updates (spec Acceptance Scenarios 1-2, US3) in
       `backend/tests/SportBook.IntegrationTests/ReviewTests.cs` (depends on T055-T056)
-- [ ] T054 [P] Integration test: a second review by the same user for the same venue
+- [x] T054 [P] Integration test: a second review by the same user for the same venue
       replaces the first rather than duplicating it (data-model.md Review validation rule, US3) in
       `backend/tests/SportBook.IntegrationTests/ReviewUpsertTests.cs` (depends on T055-T056)
 
