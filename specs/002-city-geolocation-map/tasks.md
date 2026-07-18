@@ -306,11 +306,19 @@ the venue.
       tool (k6/hey), matching 001's original T063 environment - out of scope for this pass
 - [X] T041 [P] Run all quickstart.md validation scenarios end-to-end against a locally running
       stack. Backend API scenarios (sections 1-4: city autocomplete, nearest city, search by
-      city/nearby, venue write path) all verified via curl against a real migrated SQL Server
-      instance. Frontend manual browser scenarios (combobox typing, geolocation permission
-      prompt, visual map rendering, lazy-chunk Network tab) require a human in an actual browser
-      and were handed off to the user (decision 2026-07-18) - both backend and frontend dev
-      servers were left running against the real, migrated `SportBookDb` for that check
+      city/nearby, venue write path) verified via curl against a real migrated SQL Server
+      instance. Frontend scenarios verified end to end in a real headless Chromium (Playwright,
+      added and removed as a one-off dev dependency, user-approved 2026-07-18): registered a
+      user, created a venue with a map pin via the owner form's lazy pin-picker, confirmed the
+      venue detail page's single-marker map and the search results map both render real OSM
+      tiles with correct attribution, and confirmed "my city" (with a mocked Kyiv geolocation
+      permission) pre-selects a real directory city. Throwaway test venues/accounts created
+      during the run were deleted afterward. One product-level observation, not a defect: "my
+      city" can resolve to a hyper-local neighborhood (e.g. "Stare Misto") rather than the
+      parent city a venue is actually tagged with, so a customer standing in that neighborhood
+      can see "no venues found" even though nearby venues exist under "Kyiv" - an accepted
+      consequence of the directory's neighborhood-level granularity (research.md), not
+      something this pass changed
 - [X] T042 [P] Response-DTO whitelist audit for the new/changed DTOs (`CityResponse`, reshaped
       Venue DTOs) - confirm `Population` never leaks and no new `[AllowAnonymous]` was
       introduced (contract MUST, spec FR-014). Confirmed by inspection: `CityResponse` has no

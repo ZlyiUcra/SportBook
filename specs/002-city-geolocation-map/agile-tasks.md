@@ -220,9 +220,10 @@ Progress: 7/7 tasks (100%)
       500-concurrent burst result reflects the local container's resource ceiling, not the
       feature)
 - [X] T041 Run all quickstart.md validation scenarios end-to-end against a locally running stack
-      [P] - backend API scenarios verified directly; frontend browser scenarios handed off to
-      the user per decision 2026-07-18, both dev servers left running against the real,
-      migrated `SportBookDb`
+      [P] - backend API scenarios verified via curl; frontend scenarios verified end to end in
+      a real headless Chromium (Playwright, one-off dev dependency, removed after use) - map
+      pin creation, venue detail/search maps, and "my city" geolocation all confirmed working
+      against the real, migrated `SportBookDb` (see tasks.md notes)
 - [X] T042 Response-DTO whitelist audit for the new/changed DTOs (`CityResponse`, reshaped Venue
       DTOs) - confirm `Population` never leaks and no new `[AllowAnonymous]` was introduced
       (contract MUST, spec FR-014) [P]
