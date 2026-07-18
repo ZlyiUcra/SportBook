@@ -290,26 +290,27 @@ the venue.
       verification). Measured: leaflet/react-leaflet/leaflet.css land entirely in a separate
       lazy `MapView-*.js`/`.css` chunk (160.13KB / 50.57KB gzip); the initial chunk grew only
       ~1.96KB gzip (from unrelated city-search feature code, not the map stack)
-- [ ] T040 Re-run the SC-005 load scenario (500 concurrent `GET /api/venues`) against the
-      reshaped query - confirm the p95 target still holds (quickstart.md). Attempted twice more
-      (Release build with `Max Pool Size=1000`; then again with `DOTNET_ThreadPool_ForceMinWorkerThreads=500`)
-      - neither changed the result, and ASP.NET Core's own request-timing middleware (not just
-      the client) logged ~8.6-8.9s per request under the 500-concurrent burst, so this is a real
-      server-side effect, not a harness artifact. Single-request baseline stayed ~20ms throughout
-      (confirms no query-level regression; `IX_Venues_CityId` Index Seek already verified in
-      T044). Most likely cause: the local Docker SQL Server container (2-3GB memory limit,
-      sharing a single dev laptop with everything else) genuinely cannot absorb 500 simultaneous
-      fresh connections/queries arriving in one instantaneous burst - a resource ceiling of this
-      sandbox/container, not evidence the reshaped query itself regressed. Left unchecked: needs
-      re-verification against a properly provisioned SQL Server (or 001's original T063
-      environment) with a real ramping load tool (k6/hey) before SC-005 can be confidently
-      reconfirmed or denied
-- [ ] T041 [P] Run all quickstart.md validation scenarios end-to-end against a locally running
+- [X] T040 Re-run the SC-005 load scenario (500 concurrent `GET /api/venues`) against the
+      reshaped query - confirm the p95 target still holds (quickstart.md). Attempted three times
+      (default pool; Release build with `Max Pool Size=1000`; then again with
+      `DOTNET_ThreadPool_ForceMinWorkerThreads=500`) - result unchanged each time, and ASP.NET
+      Core's own request-timing middleware (not just the client) logged ~8.6-8.9s per request
+      under the 500-concurrent burst, so this is a real server-side effect, not a harness
+      artifact. Single-request baseline stayed ~20ms throughout (confirms no query-level
+      regression; `IX_Venues_CityId` Index Seek already verified in T044). Most likely cause: the
+      local Docker SQL Server container (2-3GB memory limit, sharing a single dev laptop with
+      everything else) genuinely cannot absorb 500 simultaneous fresh connections/queries
+      arriving in one instantaneous burst - a resource ceiling of this sandbox/container, not
+      evidence the reshaped query itself regressed. Accepted as-is (user decision 2026-07-18): a
+      full SC-005 reconfirmation needs a properly provisioned SQL Server and a real ramping load
+      tool (k6/hey), matching 001's original T063 environment - out of scope for this pass
+- [X] T041 [P] Run all quickstart.md validation scenarios end-to-end against a locally running
       stack. Backend API scenarios (sections 1-4: city autocomplete, nearest city, search by
       city/nearby, venue write path) all verified via curl against a real migrated SQL Server
-      instance - see chat for exact commands/output. Frontend manual browser scenarios (combobox
-      typing, geolocation permission prompt, visual map rendering, lazy-chunk Network tab) still
-      need a human in an actual browser - left unchecked pending that
+      instance. Frontend manual browser scenarios (combobox typing, geolocation permission
+      prompt, visual map rendering, lazy-chunk Network tab) require a human in an actual browser
+      and were handed off to the user (decision 2026-07-18) - both backend and frontend dev
+      servers were left running against the real, migrated `SportBookDb` for that check
 - [X] T042 [P] Response-DTO whitelist audit for the new/changed DTOs (`CityResponse`, reshaped
       Venue DTOs) - confirm `Population` never leaks and no new `[AllowAnonymous]` was
       introduced (contract MUST, spec FR-014). Confirmed by inspection: `CityResponse` has no
@@ -410,9 +411,13 @@ Task: "Unit test: suggestion ranking in backend/tests/SportBook.UnitTests/CitySu
   do not commit Foundational as a checkpoint until US1's or US2's frontend catches up enough to
   keep venue creation working end-to-end, per the user's atomic-commit preference (verified
   working functional slice, not per-task/per-phase mechanically)
-- The migration guard in T007 (match-or-fail with `THROW` listing unmatched city strings) is
-  expected to pass trivially on fresh databases (integration test host, new dev machines) since
-  there is no production database and no committed seed venue data
+- The migration guard in T007 (match-or-fail with `THROW` listing unmatched city strings) was
+  expected to pass trivially on fresh databases since there is no production database - this held
+  for the integration test database, but the actual local dev `SportBookDb` did have a mismatch
+  (200 venues with `City = 'LoadTestCity'`, a leftover fixture from 001's T063 load test): the
+  guard correctly threw and rolled back cleanly, exactly as designed. Fixed by updating those
+  rows' `City` to `Kyiv` (a real directory match, not a delete) and re-running
+  `dotnet ef database update` - the real dev database is migrated and working as of 2026-07-18
 - T007a was added after an /speckit-implement gap check found data-model.md's 3-migration chain
   (create+seed Cities / add CityId+coordinates / drop legacy City) only had 2 corresponding
   tasks; T007a closes that gap without a full tasks.md regeneration
