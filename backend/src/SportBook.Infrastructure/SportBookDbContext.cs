@@ -14,6 +14,8 @@ public class SportBookDbContext(DbContextOptions<SportBookDbContext> options) : 
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
+    public DbSet<City> Cities => Set<City>();
+
     public DbSet<Venue> Venues => Set<Venue>();
 
     public DbSet<Court> Courts => Set<Court>();
@@ -34,9 +36,24 @@ public class SportBookDbContext(DbContextOptions<SportBookDbContext> options) : 
             entity.HasOne(rt => rt.User).WithMany().HasForeignKey(rt => rt.UserId);
         });
 
+        modelBuilder.Entity<City>(entity =>
+        {
+            // Natural key = GeoNames geonameid (data-model.md) - no IDENTITY, so the seed
+            // migration can insert explicit, stable IDs instead of letting SQL Server assign them.
+            entity.Property(c => c.Id).ValueGeneratedNever();
+            entity.Property(c => c.Latitude).HasPrecision(9, 6);
+            entity.Property(c => c.Longitude).HasPrecision(9, 6);
+        });
+
         modelBuilder.Entity<Venue>(entity =>
         {
             entity.HasOne(v => v.Owner).WithMany().HasForeignKey(v => v.OwnerId);
+            // Restrict, not Cascade: Cities are read-only reference data (never deleted by
+            // application code), but a Cascade default would silently wipe every venue of a city
+            // if a City row were ever removed by hand - Restrict fails loudly instead.
+            entity.HasOne(v => v.City).WithMany().HasForeignKey(v => v.CityId).OnDelete(DeleteBehavior.Restrict);
+            entity.Property(v => v.Latitude).HasPrecision(9, 6);
+            entity.Property(v => v.Longitude).HasPrecision(9, 6);
         });
 
         modelBuilder.Entity<Court>(entity =>

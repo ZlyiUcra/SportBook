@@ -23,3 +23,12 @@ dotnet ef database update --project src/SportBook.Infrastructure --startup-proje
 dotnet test tests/SportBook.UnitTests/SportBook.UnitTests.csproj
 dotnet test tests/SportBook.IntegrationTests/SportBook.IntegrationTests.csproj
 ```
+
+## City reference data
+
+`src/SportBook.Infrastructure/Data/cities.csv` is a committed, pre-converted GeoNames extract
+(Ukrainian settlements, population >= 500) that the `CreateAndSeedCities` migration reads at
+migration-run time - regular setup never needs to touch it, `dotnet ef database update` seeds it
+automatically. Regenerate it only when refreshing the dataset (new country, updated population
+figures) via the root `scripts/convert-geonames-cities.ps1` script - see that script's header
+comment for the raw GeoNames files it expects and where to download them.

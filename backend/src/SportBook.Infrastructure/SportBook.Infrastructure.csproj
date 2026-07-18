@@ -5,6 +5,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Read by CreateAndSeedCities.Up() at migration time - never HasData (research.md Seeding mechanism). -->
+    <EmbeddedResource Include="Data\cities.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
   </ItemGroup>

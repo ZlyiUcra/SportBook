@@ -12,14 +12,19 @@ namespace SportBook.Api.Controllers;
 [Route("api/venues")]
 public class VenuesController(VenueService venueService) : ControllerBase
 {
-    /// <summary>Paginated venue search by city and/or sport type; `mine=true` scopes results to the caller's own venues (owner dashboard).</summary>
+    /// <summary>
+    /// Paginated venue search by city and/or sport type; `mine=true` scopes results to the
+    /// caller's own venues (owner dashboard). `includeNearby` (default false) only applies
+    /// together with `cityId` and widens results to cities within the fixed 150km radius (spec
+    /// US4) - the radius itself is not client-configurable.
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<PagedResponse<VenueSummaryResponse>>> List(
-        [FromQuery] string? city, [FromQuery] SportType? sportType, [FromQuery] bool mine,
-        [FromQuery] PageRequest page, CancellationToken ct)
+        [FromQuery] int? cityId, [FromQuery] bool includeNearby, [FromQuery] SportType? sportType,
+        [FromQuery] bool mine, [FromQuery] PageRequest page, CancellationToken ct)
     {
         var ownerId = mine ? User.GetUserId() : (Guid?)null;
-        return Ok(await venueService.SearchAsync(city, sportType, ownerId, page, ct));
+        return Ok(await venueService.SearchAsync(cityId, includeNearby, sportType, ownerId, page, ct));
     }
 
     /// <summary>A single venue with its courts and aggregate review rating.</summary>

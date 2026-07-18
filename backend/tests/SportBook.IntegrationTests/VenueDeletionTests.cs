@@ -49,7 +49,7 @@ public class VenueDeletionTests(ApiFixture fixture)
         var owner = await ownerClient.RegisterAsync("Owner");
         ownerClient.UseBearer(owner.AccessToken);
         var venue = (await (await ownerClient.PostAsJsonAsync("/api/venues",
-            new CreateVenueRequest("Disposable Venue", "Kyiv", "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+            new CreateVenueRequest("Disposable Venue", ApiClientExtensions.KyivCityId, "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
         var court = (await (await ownerClient.PostAsJsonAsync($"/api/venues/{venue.Id}/courts",
             new CreateCourtRequest("Disposable Court", SportType.Tennis, 100m, new TimeOnly(8, 0), new TimeOnly(20, 0))))
             .Content.ReadFromJsonAsync<CourtResponse>())!;

@@ -59,6 +59,55 @@ namespace SportBook.Infrastructure.Migrations
                     b.ToTable("Bookings");
                 });
 
+            modelBuilder.Entity("SportBook.Domain.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Latitude")
+                        .HasPrecision(9, 6)
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasPrecision(9, 6)
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NamePt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameUk")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Population")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegionEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RegionPt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RegionUk")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cities");
+                });
+
             modelBuilder.Entity("SportBook.Domain.Entities.Court", b =>
                 {
                     b.Property<Guid>("Id")
@@ -203,15 +252,22 @@ namespace SportBook.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasPrecision(9, 6)
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasPrecision(9, 6)
+                        .HasColumnType("decimal(9,6)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -221,6 +277,8 @@ namespace SportBook.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
 
                     b.HasIndex("OwnerId");
 
@@ -289,11 +347,19 @@ namespace SportBook.Infrastructure.Migrations
 
             modelBuilder.Entity("SportBook.Domain.Entities.Venue", b =>
                 {
+                    b.HasOne("SportBook.Domain.Entities.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SportBook.Domain.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("City");
 
                     b.Navigation("Owner");
                 });

@@ -15,10 +15,15 @@ import { listReviews } from '@/entities/review/api/reviewApi'
 import { createReview } from '@/features/review/create/api/createReview'
 import { ReviewForm } from '@/features/review/create/ui/ReviewForm'
 import { useSessionStore } from '@/entities/session/model/store'
+import { cityName } from '@/entities/city/model/types'
+
+// Lazy so leaflet/react-leaflet never land in the initial route chunk (spec SC-006) - this
+// import only fires when a venue actually has a precise location to show.
+const MapView = React.lazy(() => import('@/shared/ui/map/MapView'))
 
 /** T038: venue detail with court list, availability picker, and booking action. */
 export function VenueDetailPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
   const [selectedCourtId, setSelectedCourtId] = React.useState<string | null>(null)
@@ -74,7 +79,7 @@ export function VenueDetailPage() {
       <div>
         <h1 className="text-2xl font-semibold">{venue.name}</h1>
         <p className="text-sm text-muted-foreground">
-          {venue.city}, {venue.address}
+          {cityName(venue.city, i18n.language)}, {venue.address}
         </p>
         {venue.averageRating !== null && (
           <p className="text-sm text-muted-foreground">
@@ -83,6 +88,29 @@ export function VenueDetailPage() {
         )}
         {venue.description && <p className="mt-2">{venue.description}</p>}
       </div>
+
+      {venue.latitude !== null && venue.longitude !== null && (
+        <React.Suspense fallback={<p className="text-sm text-muted-foreground">{t('common.loading')}</p>}>
+          <MapView
+            className="h-64 w-full rounded-md"
+            center={{ lat: venue.latitude, lng: venue.longitude }}
+            markers={[
+              {
+                id: venue.id,
+                position: { lat: venue.latitude, lng: venue.longitude },
+                // JSX children only - never bindPopup/setContent with strings (research.md Map
+                // content safety); venue.name/description are unvalidated user input.
+                popup: (
+                  <div>
+                    <p className="font-medium">{venue.name}</p>
+                    {venue.description && <p className="text-sm">{venue.description}</p>}
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </React.Suspense>
+      )}
 
       <h2 className="text-lg font-medium">{t('venueDetail.courts')}</h2>
       {activeCourts.length === 0 && <p className="text-muted-foreground">{t('venueDetail.noCourts')}</p>}

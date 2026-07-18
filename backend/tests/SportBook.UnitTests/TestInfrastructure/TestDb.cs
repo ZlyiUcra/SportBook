@@ -27,7 +27,7 @@ public sealed class TestDb : IDisposable
         Db.Database.EnsureCreated();
     }
 
-    /// <summary>Seeds the minimum graph a booking needs: one owner, one venue, one court.</summary>
+    /// <summary>Seeds the minimum graph a booking needs: one owner, one city, one venue, one court.</summary>
     public (User Customer, Court Court) SeedCustomerAndCourt(
         decimal pricePerHour = 100m,
         TimeOnly? openingTime = null,
@@ -35,12 +35,13 @@ public sealed class TestDb : IDisposable
     {
         var owner = NewUser("owner@example.com", Role.VenueOwner);
         var customer = NewUser("customer@example.com", Role.Customer);
+        var city = TestCity();
         var venue = new Venue
         {
             Id = Guid.NewGuid(),
             OwnerId = owner.Id,
             Name = "Test Venue",
-            City = "Kyiv",
+            CityId = city.Id,
             Address = "1 Test St",
             CreatedAt = DateTime.UtcNow,
         };
@@ -57,11 +58,28 @@ public sealed class TestDb : IDisposable
         };
 
         Db.Users.AddRange(owner, customer);
+        Db.Cities.Add(city);
         Db.Venues.Add(venue);
         Db.Courts.Add(court);
         Db.SaveChanges();
         return (customer, court);
     }
+
+    /// <summary>A single reference city (real Kyiv geonameid, so haversine-based tests using this fixture get realistic coordinates).</summary>
+    public static City TestCity(int id = 703448) => new()
+    {
+        Id = id,
+        NameEn = "Kyiv",
+        NameUk = "Київ",
+        NamePt = "Kyiv",
+        CountryCode = "UA",
+        RegionEn = "Kyiv City",
+        RegionUk = "Місто Київ",
+        RegionPt = "Cidade de Kyiv",
+        Latitude = 50.45466m,
+        Longitude = 30.5238m,
+        Population = 2952301,
+    };
 
     public Booking SeedBooking(Guid courtId, Guid userId, DateTime start, DateTime end, BookingStatus status)
     {

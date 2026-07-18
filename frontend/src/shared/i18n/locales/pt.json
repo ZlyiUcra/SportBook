@@ -81,7 +81,19 @@
     "cityPlaceholder": "Cidade",
     "sportLabel": "Esporte",
     "allSports": "Todos os esportes",
-    "noResults": "Nenhum local encontrado."
+    "noResults": "Nenhum local encontrado.",
+    "includeNearby": "Incluir cidades próximas (150km)",
+    "showMap": "Mostrar mapa",
+    "hideMap": "Ocultar mapa"
+  },
+  "citySelect": {
+    "placeholder": "Selecionar uma cidade",
+    "searchPlaceholder": "Digite o nome de uma cidade...",
+    "typeMore": "Digite pelo menos 2 caracteres.",
+    "noResults": "Nenhuma cidade encontrada.",
+    "myCity": "Minha cidade",
+    "locating": "Localizando...",
+    "myCityError": "Não foi possível detectar sua cidade. Selecione manualmente."
   },
   "venueDetail": {
     "courts": "Quadras",
@@ -116,7 +128,13 @@
       "nameRequired": "O nome é obrigatório.",
       "cityRequired": "A cidade é obrigatória.",
       "addressRequired": "O endereço é obrigatório.",
-      "deleteConfirm": "Excluir o local \"{{name}}\"? Isso também remove suas quadras e avaliações."
+      "deleteConfirm": "Excluir o local \"{{name}}\"? Isso também remove suas quadras e avaliações.",
+      "pin": {
+        "label": "Marcador de localização (opcional)",
+        "place": "Colocar marcador",
+        "move": "Mover marcador",
+        "remove": "Remover marcador"
+      }
     },
     "court": {
       "name": "Nome",
@@ -158,6 +176,10 @@
     "owner": "Cadastre seus próprios locais e quadras (nome, endereço, esporte, preço por hora, horário de funcionamento), veja as reservas feitas neles e confirme cada reserva pendente. Um local ou quadra não pode ser excluído enquanto tiver uma reserva futura e não cancelada.",
     "reviewsTitle": "Avaliações",
     "reviews": "Qualquer usuário autenticado pode avaliar um local (1 a 5 estrelas mais um comentário opcional): uma avaliação por usuário por local - enviar novamente substitui sua avaliação e comentário anteriores em vez de criar uma duplicata, e a avaliação média do local é atualizada imediatamente.",
+    "mapDataTitle": "Dados do mapa e atribuição",
+    "mapDataIntro": "O diretório de cidades usado na busca vem do",
+    "mapDataLicense": "(CC BY 4.0). As imagens do mapa são (c)",
+    "mapDataContributors": "e colaboradores.",
     "loginPrompt": "A maior parte do aplicativo requer uma conta.",
     "registerCta": "Registrar-se"
   }

@@ -12,8 +12,13 @@ public static class Mapping
     public static UserResponse ToResponse(this User user) =>
         new(user.Id, user.Name, user.Email, user.Role.ToString(), user.SubscriptionTier.ToString(), user.CreatedAt);
 
+    public static CityResponse ToResponse(this City city) =>
+        new(city.Id, city.NameEn, city.NameUk, city.NamePt, city.RegionEn, city.RegionUk, city.RegionPt,
+            city.Latitude, city.Longitude);
+
+    /// <summary><see cref="Venue.City"/> must already be loaded (Include) before calling this.</summary>
     public static VenueSummaryResponse ToSummaryResponse(this Venue venue) =>
-        new(venue.Id, venue.Name, venue.City, venue.Address, venue.Description);
+        new(venue.Id, venue.Name, venue.City!.ToResponse(), venue.Address, venue.Description, venue.Latitude, venue.Longitude);
 
     public static CourtResponse ToResponse(this Court court) =>
         new(court.Id, court.VenueId, court.Name, court.SportType.ToString(), court.PricePerHour,

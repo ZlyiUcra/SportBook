@@ -81,7 +81,19 @@
     "cityPlaceholder": "City",
     "sportLabel": "Sport",
     "allSports": "All sports",
-    "noResults": "No venues found."
+    "noResults": "No venues found.",
+    "includeNearby": "Include nearby cities (150km)",
+    "showMap": "Show map",
+    "hideMap": "Hide map"
+  },
+  "citySelect": {
+    "placeholder": "Select a city",
+    "searchPlaceholder": "Type a city name...",
+    "typeMore": "Type at least 2 characters.",
+    "noResults": "No matching city.",
+    "myCity": "My city",
+    "locating": "Locating...",
+    "myCityError": "Couldn't detect your city. Pick one manually."
   },
   "venueDetail": {
     "courts": "Courts",
@@ -116,7 +128,13 @@
       "nameRequired": "Name is required.",
       "cityRequired": "City is required.",
       "addressRequired": "Address is required.",
-      "deleteConfirm": "Delete venue \"{{name}}\"? This also removes its courts and reviews."
+      "deleteConfirm": "Delete venue \"{{name}}\"? This also removes its courts and reviews.",
+      "pin": {
+        "label": "Location pin (optional)",
+        "place": "Place pin",
+        "move": "Move pin",
+        "remove": "Remove pin"
+      }
     },
     "court": {
       "name": "Name",
@@ -158,6 +176,10 @@
     "owner": "List your own venues and courts (name, address, sport type, price per hour, opening/closing hours), see the bookings made against them, and confirm each pending booking. A venue or court cannot be deleted while it still has an upcoming, non-cancelled booking against it.",
     "reviewsTitle": "Reviews",
     "reviews": "Any authenticated user can rate a venue (1-5 stars plus an optional comment): one review per user per venue - submitting again replaces your previous rating and comment rather than creating a duplicate, and the venue's average rating updates immediately.",
+    "mapDataTitle": "Map data and attribution",
+    "mapDataIntro": "The city directory used for search comes from",
+    "mapDataLicense": "(CC BY 4.0). Map imagery is (c)",
+    "mapDataContributors": "contributors.",
     "loginPrompt": "Most of the app requires an account.",
     "registerCta": "Register"
   }

@@ -3,7 +3,9 @@ import type { PagedResponse } from '@/shared/api/types'
 import type { SportType, VenueDetail, VenueSummary } from '../model/types'
 
 export type VenueSearchParams = {
-  city?: string
+  cityId?: number
+  /** Only has an effect together with `cityId` (spec US4) - the 150km radius is server-side, not client-configurable. */
+  includeNearby?: boolean
   sportType?: SportType
   mine?: boolean
   page?: number
@@ -12,7 +14,8 @@ export type VenueSearchParams = {
 export async function searchVenues(params: VenueSearchParams): Promise<PagedResponse<VenueSummary>> {
   const { data } = await axiosInstance.get<PagedResponse<VenueSummary>>('/venues', {
     params: {
-      city: params.city || undefined,
+      cityId: params.cityId,
+      includeNearby: params.includeNearby || undefined,
       sportType: params.sportType,
       mine: params.mine || undefined,
       page: params.page ?? 1,

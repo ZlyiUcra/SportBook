@@ -38,7 +38,7 @@ why that's a deliberate constraint, not an oversight.
 
 ## Current status
 
-All three planned user stories are implemented end to end (backend + frontend):
+All three `001` user stories are implemented end to end (backend + frontend):
 
 - Book a court: search venues, view availability, book, cancel (2-hour cutoff).
 - Manage venue and courts: venue owners create/edit/delete their own venues and courts, confirm
@@ -46,9 +46,17 @@ All three planned user stories are implemented end to end (backend + frontend):
 - Build trust through reviews: authenticated users rate and review a venue (one review per user
   per venue), see the venue's average rating.
 
-Automated tests currently cover the booking flow (25 tests: 11 unit, 14 integration against a
-real SQL Server instance). Tests for venue management and reviews are deferred to the polish
-phase - see `specs/001-sportbook-venue-booking/tasks.md`.
+`002` replaces free-text city search with a structured, GeoNames-backed city directory: customers
+pick a city from suggestions (typeable in any of the app's three languages) instead of typing free
+text, can detect their nearest city from the browser's geolocation, and can widen search to venues
+within 150km. Venue owners pick their venue's city from the same directory and can optionally place
+a precise map pin; the search results page and a pinned venue's own page show it on a lazily loaded
+map - see `specs/002-city-geolocation-map/spec.md`.
+
+Automated tests cover the booking flow (25 tests: 11 unit, 14 integration against a real SQL Server
+instance) plus the city/map feature's suggestion ranking, nearest-city resolution, nearby-radius
+enforcement, and venue location validation. Tests for venue management and reviews (001) are
+deferred to that feature's polish phase - see `specs/001-sportbook-venue-booking/tasks.md`.
 
 ## Components
 
@@ -58,7 +66,8 @@ backend/
     SportBook.Api             ASP.NET Core Web API - controllers, JWT auth, DI wiring
     SportBook.Application     Services (business logic), DTOs, request/response mapping
     SportBook.Domain          Entities, enums - no framework dependencies
-    SportBook.Infrastructure  EF Core DbContext, migrations, SQL Server provider registration
+    SportBook.Infrastructure  EF Core DbContext, migrations, SQL Server provider registration,
+                              committed City reference data (Data/cities.csv, GeoNames CC BY 4.0)
   tests/
     SportBook.UnitTests         xUnit + EF Core Sqlite in-memory - no real database needed
     SportBook.IntegrationTests  xUnit + WebApplicationFactory - runs against the real SQL Server
@@ -68,20 +77,28 @@ frontend/
   src/                       Feature-Sliced Design layering
     app/                     Routes, layouts, providers
     pages/                   One folder per route (ui/<Route>Page.tsx)
-    features/                One user action per slice (ui + model + api)
-    entities/                Domain data (types, read API calls)
-    shared/                  UI kit (shadcn/ui), Axios instance, i18n, theme store, utils
+    features/                One user action per slice (ui + model + api), including
+                              city-select (directory combobox, "my city" geolocation)
+    entities/                Domain data (types, read API calls), including city
+    shared/                  UI kit (shadcn/ui), Axios instance, i18n, theme store, utils, and
+                              ui/map (the only module importing leaflet/react-leaflet, always
+                              lazy-loaded)
 
+scripts/convert-geonames-cities.ps1
+                             One-time GeoNames-to-cities.csv dataset conversion (see backend/README.md)
 docker-compose.yml           SQL Server 2025 Developer edition for local development
 specs/001-sportbook-venue-booking/
                              Full spec, plan, data model, API contracts, task breakdown
+specs/002-city-geolocation-map/
+                             City directory, geolocation and venue map - spec, plan, task breakdown
 ```
 
 **Backend stack**: C# / .NET 10, ASP.NET Core Web API (MVC controllers), EF Core 10 +
 `Microsoft.EntityFrameworkCore.SqlServer`, JWT bearer authentication, xUnit.
 
 **Frontend stack**: React 19, Vite, TypeScript, TanStack Query, Zustand, React Hook Form + Zod,
-Axios, Tailwind CSS + shadcn/ui, i18next (English, Ukrainian, Portuguese), Vitest.
+Axios, Tailwind CSS + shadcn/ui, i18next (English, Ukrainian, Portuguese), Vitest, Leaflet +
+react-leaflet (lazy-loaded map), `cmdk` (city combobox).
 
 ## Prerequisites
 
@@ -214,10 +231,13 @@ Login/Register requires being signed in - you're redirected to Login if you aren
 
 ### Booking a court (customer flow)
 
-1. The home page (`/`) is venue search: filter by city and/or sport type, browse the paginated
-   results.
+1. The home page (`/`) is venue search: pick a city from the directory combobox (type in any of
+   the three app languages, or tap "My city" to detect it from the browser's location) and/or a
+   sport type, optionally widen results to cities within 150km, browse the paginated results, and
+   open a map of the pinned venues on the current page.
 2. Open a venue (`/venues/:id`) to see its address, description, average rating and existing
-   reviews, and its list of courts (name, sport, price per hour, opening/closing hours).
+   reviews, its list of courts (name, sport, price per hour, opening/closing hours), and a map
+   with its pin if the owner has set one.
 3. Pick a court and a date; the page fetches that court's free whole-hour slots for the day (slots
    already booked - by anyone, Pending or Confirmed - don't appear).
 4. Pick a free slot and book it. The booking is created as **Pending** with its price already
@@ -231,10 +251,12 @@ Login/Register requires being signed in - you're redirected to Login if you aren
 
 ### Managing your own venues (owner flow)
 
-1. **Owner Dashboard** (`/owner/venues`): create a venue (name, city, address, optional
-   description), then add one or more courts to it (name, sport type, price per hour, opening and
-   closing time). Existing venues/courts can be edited here too, and a court can be deactivated
-   (`isActive`) without deleting it if it's temporarily out of service.
+1. **Owner Dashboard** (`/owner/venues`): create a venue (name, a city picked from the same
+   directory combobox customers search with, address, optional description, and an optional
+   precise location pin placed on a map), then add one or more courts to it (name, sport type,
+   price per hour, opening and closing time). Existing venues/courts can be edited here too
+   (including moving or removing the location pin), and a court can be deactivated (`isActive`)
+   without deleting it if it's temporarily out of service.
 2. Deleting a venue or a court is blocked while it still has an upcoming, non-cancelled booking
    against it - cancel or wait out those bookings first if you need to remove it.
 3. **Owner Bookings** (`/owner/bookings`): see every booking made against your own venues (any
@@ -260,3 +282,10 @@ need the SQL Server container from step 1 running and reachable - they create an
 - `specs/001-sportbook-venue-booking/data-model.md` - entity definitions and validation rules.
 - `specs/001-sportbook-venue-booking/contracts/api.md` - HTTP API contract.
 - `specs/001-sportbook-venue-booking/tasks.md` - full task breakdown and current progress.
+- `specs/002-city-geolocation-map/spec.md` - city directory, geolocation and venue map spec.
+- `specs/002-city-geolocation-map/plan.md` - technical plan (map loading boundary, seeding
+  strategy, coordinate modeling).
+- `specs/002-city-geolocation-map/data-model.md` - City entity, Venue changes, migration chain.
+- `specs/002-city-geolocation-map/contracts/api.md` - Cities endpoints and the reshaped Venues
+  contract (supersedes `001`'s venue endpoints).
+- `specs/002-city-geolocation-map/tasks.md` - full task breakdown and current progress.

@@ -17,14 +17,14 @@ public class OwnershipBoundaryTests(ApiFixture fixture)
         var owner = await ownerClient.RegisterAsync("Owner");
         ownerClient.UseBearer(owner.AccessToken);
         var venue = (await (await ownerClient.PostAsJsonAsync("/api/venues",
-            new CreateVenueRequest("Venue", "Kyiv", "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+            new CreateVenueRequest("Venue", ApiClientExtensions.KyivCityId, "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
 
         var strangerClient = fixture.Factory.CreateClient();
         var stranger = await strangerClient.RegisterAsync("Stranger");
         strangerClient.UseBearer(stranger.AccessToken);
 
         var update = await strangerClient.PutAsJsonAsync($"/api/venues/{venue.Id}",
-            new UpdateVenueRequest("Hijacked", "Lviv", "2 St", null));
+            new UpdateVenueRequest("Hijacked", ApiClientExtensions.LvivCityId, "2 St", null));
         Assert.Equal(HttpStatusCode.Forbidden, update.StatusCode);
 
         var delete = await strangerClient.DeleteAsync($"/api/venues/{venue.Id}");
@@ -38,7 +38,7 @@ public class OwnershipBoundaryTests(ApiFixture fixture)
         var owner = await ownerClient.RegisterAsync("Owner");
         ownerClient.UseBearer(owner.AccessToken);
         var venue = (await (await ownerClient.PostAsJsonAsync("/api/venues",
-            new CreateVenueRequest("Venue", "Kyiv", "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+            new CreateVenueRequest("Venue", ApiClientExtensions.KyivCityId, "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
         var court = (await (await ownerClient.PostAsJsonAsync($"/api/venues/{venue.Id}/courts",
             new CreateCourtRequest("Court", SportType.Tennis, 100m, new TimeOnly(8, 0), new TimeOnly(20, 0))))
             .Content.ReadFromJsonAsync<CourtResponse>())!;

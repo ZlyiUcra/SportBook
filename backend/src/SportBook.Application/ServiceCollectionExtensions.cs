@@ -15,6 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenService, TokenService>();
         services.AddScoped<AuthService>();
+        services.AddSingleton<CityDirectoryCache>();
+        services.AddScoped<CityService>();
         services.AddScoped<VenueService>();
         services.AddScoped<CourtService>();
         services.AddScoped<AvailabilityService>();

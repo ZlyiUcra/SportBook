@@ -13,7 +13,7 @@ public class OwnershipChecksTests
     [Fact]
     public void EnsureVenueOwner_allows_the_owning_user()
     {
-        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", City = "C", Address = "A" };
+        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", CityId = 1, Address = "A" };
 
         OwnershipChecks.EnsureVenueOwner(venue, OwnerId);
     }
@@ -21,7 +21,7 @@ public class OwnershipChecksTests
     [Fact]
     public void EnsureVenueOwner_rejects_a_different_user()
     {
-        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", City = "C", Address = "A" };
+        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", CityId = 1, Address = "A" };
 
         var ex = Assert.Throws<ApiException>(() => OwnershipChecks.EnsureVenueOwner(venue, StrangerId));
         Assert.Equal(403, ex.StatusCode);
@@ -30,7 +30,7 @@ public class OwnershipChecksTests
     [Fact]
     public void EnsureCourtOwner_allows_the_owner_of_the_courts_venue()
     {
-        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", City = "C", Address = "A" };
+        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", CityId = 1, Address = "A" };
         var court = new Court { Id = Guid.NewGuid(), VenueId = venue.Id, Venue = venue, Name = "C" };
 
         OwnershipChecks.EnsureCourtOwner(court, OwnerId);
@@ -39,7 +39,7 @@ public class OwnershipChecksTests
     [Fact]
     public void EnsureCourtOwner_rejects_a_different_user()
     {
-        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", City = "C", Address = "A" };
+        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", CityId = 1, Address = "A" };
         var court = new Court { Id = Guid.NewGuid(), VenueId = venue.Id, Venue = venue, Name = "C" };
 
         var ex = Assert.Throws<ApiException>(() => OwnershipChecks.EnsureCourtOwner(court, StrangerId));
@@ -74,7 +74,7 @@ public class OwnershipChecksTests
     [Fact]
     public void EnsureBookingVenueOwner_allows_the_owner_of_the_bookings_venue()
     {
-        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", City = "C", Address = "A" };
+        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", CityId = 1, Address = "A" };
         var court = new Court { Id = Guid.NewGuid(), VenueId = venue.Id, Venue = venue, Name = "C" };
         var booking = new Booking { Id = Guid.NewGuid(), CourtId = court.Id, Court = court, UserId = StrangerId };
 
@@ -84,7 +84,7 @@ public class OwnershipChecksTests
     [Fact]
     public void EnsureBookingVenueOwner_rejects_a_different_owner()
     {
-        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", City = "C", Address = "A" };
+        var venue = new Venue { Id = Guid.NewGuid(), OwnerId = OwnerId, Name = "V", CityId = 1, Address = "A" };
         var court = new Court { Id = Guid.NewGuid(), VenueId = venue.Id, Venue = venue, Name = "C" };
         var booking = new Booking { Id = Guid.NewGuid(), CourtId = court.Id, Court = court, UserId = StrangerId };
 

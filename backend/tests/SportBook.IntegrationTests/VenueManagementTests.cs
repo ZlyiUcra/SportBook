@@ -17,10 +17,9 @@ public class VenueManagementTests(ApiFixture fixture)
         var client = fixture.Factory.CreateClient();
         var owner = await client.RegisterAsync("Owner");
         client.UseBearer(owner.AccessToken);
-        var city = $"City-{Guid.NewGuid():N}";
 
         var venueResponse = await client.PostAsJsonAsync("/api/venues",
-            new CreateVenueRequest("Test Venue", city, "1 Main St", "A nice venue"));
+            new CreateVenueRequest("Test Venue", ApiClientExtensions.KyivCityId, "1 Main St", "A nice venue", null, null));
         Assert.Equal(HttpStatusCode.Created, venueResponse.StatusCode);
         var venue = (await venueResponse.Content.ReadFromJsonAsync<VenueDetailResponse>())!;
 
@@ -30,7 +29,7 @@ public class VenueManagementTests(ApiFixture fixture)
         var court = (await courtResponse.Content.ReadFromJsonAsync<CourtResponse>())!;
 
         var searchResponse = await client.GetFromJsonAsync<PagedResponse<VenueSummaryResponse>>(
-            $"/api/venues?city={city}");
+            $"/api/venues?cityId={ApiClientExtensions.KyivCityId}");
         Assert.NotNull(searchResponse);
         Assert.Contains(searchResponse.Items, v => v.Id == venue.Id);
 
@@ -55,14 +54,15 @@ public class VenueManagementTests(ApiFixture fixture)
         client.UseBearer(owner.AccessToken);
 
         var venue = (await (await client.PostAsJsonAsync("/api/venues",
-            new CreateVenueRequest("Old Name", "Kyiv", "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+            new CreateVenueRequest("Old Name", ApiClientExtensions.KyivCityId, "1 St", null, null, null)))
+            .Content.ReadFromJsonAsync<VenueDetailResponse>())!;
 
         var updateResponse = await client.PutAsJsonAsync($"/api/venues/{venue.Id}",
-            new UpdateVenueRequest("New Name", "Lviv", "2 St", "Updated"));
+            new UpdateVenueRequest("New Name", ApiClientExtensions.LvivCityId, "2 St", "Updated", null, null));
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         var updated = (await updateResponse.Content.ReadFromJsonAsync<VenueDetailResponse>())!;
         Assert.Equal("New Name", updated.Name);
-        Assert.Equal("Lviv", updated.City);
+        Assert.Equal(ApiClientExtensions.LvivCityId, updated.City.Id);
 
         var court = (await (await client.PostAsJsonAsync($"/api/venues/{venue.Id}/courts",
             new CreateCourtRequest("Court", SportType.Padel, 100m, new TimeOnly(8, 0), new TimeOnly(20, 0))))

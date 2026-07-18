@@ -35,6 +35,21 @@ export function AboutPage() {
         <p className="mt-1 text-sm text-muted-foreground">{t('about.reviews')}</p>
       </section>
 
+      <section>
+        <h2 className="font-medium">{t('about.mapDataTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t('about.mapDataIntro')}{' '}
+          <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" className="underline">
+            GeoNames
+          </a>{' '}
+          {t('about.mapDataLicense')}{' '}
+          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer" className="underline">
+            OpenStreetMap
+          </a>{' '}
+          {t('about.mapDataContributors')}
+        </p>
+      </section>
+
       {!user && (
         <div className="flex items-center gap-3 border-t pt-4">
           <p className="text-sm text-muted-foreground">{t('about.loginPrompt')}</p>

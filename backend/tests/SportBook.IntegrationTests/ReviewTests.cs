@@ -17,7 +17,7 @@ public class ReviewTests(ApiFixture fixture)
         var owner = await ownerClient.RegisterAsync("Owner");
         ownerClient.UseBearer(owner.AccessToken);
         var venue = (await (await ownerClient.PostAsJsonAsync("/api/venues",
-            new CreateVenueRequest("Reviewed Venue", "Kyiv", "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+            new CreateVenueRequest("Reviewed Venue", ApiClientExtensions.KyivCityId, "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
 
         var firstReviewerClient = fixture.Factory.CreateClient();
         var firstReviewer = await firstReviewerClient.RegisterAsync("Reviewer1");

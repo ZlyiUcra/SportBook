@@ -12,10 +12,11 @@ import type { VenueFormValues } from '@/features/venue-management/venue/model/sc
 import { CourtForm } from '@/features/venue-management/court/ui/CourtForm'
 import { createCourt, updateCourt, deleteCourt } from '@/features/venue-management/court/api/courtManagementApi'
 import type { EditCourtFormValues } from '@/features/venue-management/court/model/schema'
+import { cityName } from '@/entities/city/model/types'
 
 /** T051: create/edit/delete own venues and their courts. */
 export function OwnerDashboardPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const queryClient = useQueryClient()
 
   const [creatingVenue, setCreatingVenue] = React.useState(false)
@@ -141,7 +142,7 @@ export function OwnerDashboardPage() {
             <CardHeader>
               <CardTitle className="flex flex-wrap items-center justify-between gap-2">
                 <span>
-                  {venue.name} - {venue.city}
+                  {venue.name} - {cityName(venue.city, i18n.language)}
                 </span>
                 <div className="flex gap-2">
                   <Button
@@ -168,10 +169,13 @@ export function OwnerDashboardPage() {
                   <VenueForm
                     defaultValues={{
                       name: venue.name,
-                      city: venue.city,
+                      cityId: venue.city.id,
                       address: venue.address,
                       description: venue.description ?? '',
+                      latitude: venue.latitude ?? undefined,
+                      longitude: venue.longitude ?? undefined,
                     }}
+                    defaultCity={venue.city}
                     onSubmit={(values) => updateVenueMutation.mutate({ id: venue.id, values })}
                     onCancel={() => setEditingVenueId(null)}
                     isSubmitting={updateVenueMutation.isPending}

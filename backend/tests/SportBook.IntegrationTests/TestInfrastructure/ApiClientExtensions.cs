@@ -9,6 +9,15 @@ namespace SportBook.IntegrationTests.TestInfrastructure;
 /// <summary>Shared register/seed helpers so each test reads as scenario steps, not plumbing.</summary>
 public static class ApiClientExtensions
 {
+    /// <summary>Kyiv's GeoNames geonameid - always present via the CreateAndSeedCities migration that every test database applies (SportBookApiFactory.ResetDatabase).</summary>
+    public const int KyivCityId = 703448;
+
+    /// <summary>Lviv's GeoNames geonameid - more than 150km from Kyiv, used to prove the nearby-search radius is enforced.</summary>
+    public const int LvivCityId = 702550;
+
+    /// <summary>Irpin's GeoNames geonameid - within 150km of Kyiv, used to prove nearby-city search expansion.</summary>
+    public const int IrpinCityId = 707565;
+
     /// <summary>Registers a fresh account (unique email per call) and returns the auth payload.</summary>
     public static async Task<AuthResponse> RegisterAsync(this HttpClient client, string? name = null)
     {
@@ -37,7 +46,7 @@ public static class ApiClientExtensions
                 Id = Guid.NewGuid(),
                 OwnerId = ownerUserId,
                 Name = $"Venue {Guid.NewGuid():N}",
-                City = "Kyiv",
+                CityId = KyivCityId,
                 Address = "1 Test St",
                 CreatedAt = DateTime.UtcNow,
             };

@@ -8,10 +8,11 @@ import { formatDateTime, formatTime } from '@/shared/lib/datetime'
 import { searchVenues } from '@/entities/venue/api/venueApi'
 import { listBookingsByVenue } from '@/entities/booking/api/bookingApi'
 import { confirmBooking } from '@/features/booking/confirm/api/confirmBooking'
+import { cityName } from '@/entities/city/model/types'
 
 /** T052: bookings for one of the caller's own venues, with a confirm action on Pending ones. */
 export function OwnerBookingsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const queryClient = useQueryClient()
   const [selectedVenueId, setSelectedVenueId] = React.useState<string | null>(null)
 
@@ -58,7 +59,7 @@ export function OwnerBookingsPage() {
       >
         {myVenuesQuery.data.items.map((venue) => (
           <option key={venue.id} value={venue.id}>
-            {venue.name} - {venue.city}
+            {venue.name} - {cityName(venue.city, i18n.language)}
           </option>
         ))}
       </select>
