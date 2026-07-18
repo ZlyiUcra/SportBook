@@ -16,11 +16,11 @@ US2 -> 2a: Tests (T040,T041,T042,T043,T044) | 2b: Implementation (T045,T046,T047
 US4 -> 4a: Setup & scaffolding (T001,T002,T003,T004,T005,T006,T007) | 4b: Domain & data (T008,T009,T010,T011,T012) | 4c: Security & shared infra (T013,T014,T015,T016,T017,T018,T019) | 4d: Polish & verification (T058,T059,T060,T061,T062,T063)
 -->
 
-## Feature: Customer Experience
+## Feature 001: Customer Experience
 
 Progress: 25/25 tasks (100%)
 
-### User Story - Tests (Priority: P1, part of "Book a sports court")
+### User Story 001 - Tests (Priority: P1, part of "Book a sports court")
 
 Progress: 6/6 tasks (100%)
 
@@ -31,7 +31,7 @@ Progress: 6/6 tasks (100%)
 - [x] T024 Unit test: TotalPrice computation from PricePerHour and duration [P]
 - [x] T025 Unit test: overlap-check logic against existing bookings [P]
 
-### User Story - Backend - auth/venue/court (Priority: P1, part of "Book a sports court")
+### User Story 002 - Backend - auth/venue/court (Priority: P1, part of "Book a sports court")
 
 Progress: 5/5 tasks (100%)
 
@@ -41,7 +41,7 @@ Progress: 5/5 tasks (100%)
 - [x] T029 Implement VenuesController GET endpoints (list, get-by-id) [P]
 - [x] T030 Implement CourtService.ListByVenue and CourtsController GET list-by-venue [P]
 
-### User Story - Backend - booking/availability (Priority: P1, part of "Book a sports court")
+### User Story 003 - Backend - booking/availability (Priority: P1, part of "Book a sports court")
 
 Progress: 4/4 tasks (100%)
 
@@ -50,7 +50,7 @@ Progress: 4/4 tasks (100%)
 - [x] T033 Implement BookingService.Cancel (2h cutoff, ownership check)
 - [x] T034 Implement BookingsController POST, GET (mine), GET-by-id, PUT cancel
 
-### User Story - Frontend (Priority: P1, part of "Book a sports court")
+### User Story 004 - Frontend (Priority: P1, part of "Book a sports court")
 
 Progress: 5/5 tasks (100%)
 
@@ -60,7 +60,7 @@ Progress: 5/5 tasks (100%)
 - [x] T038 Frontend: VenueDetail page with court list, availability picker, booking form
 - [x] T039 Frontend: MyBookings page (list + cancel action)
 
-### User Story - Build trust through reviews (Priority: P3)
+### User Story 005 - Build trust through reviews (Priority: P3)
 
 Progress: 5/5 tasks (100%)
 
@@ -73,11 +73,11 @@ their own rating and comment about a venue they have used.
 - [x] T056 Implement ReviewsController GET/POST
 - [x] T057 Frontend: review list + review submission form on VenueDetail page
 
-## Feature: Platform Operations
+## Feature 002: Platform Operations
 
 Progress: 38/38 tasks (100%)
 
-### User Story - Setup & scaffolding (part of "Cross-cutting tasks")
+### User Story 001 - Setup & scaffolding (part of "Cross-cutting tasks")
 
 Progress: 7/7 tasks (100%)
 
@@ -89,7 +89,7 @@ Progress: 7/7 tasks (100%)
 - [x] T006 Add Vitest + Testing Library to frontend [P]
 - [x] T007 Verify docker-compose SQL Server service reaches healthy [P]
 
-### User Story - Domain & data (part of "Cross-cutting tasks")
+### User Story 002 - Domain & data (part of "Cross-cutting tasks")
 
 Progress: 5/5 tasks (100%)
 
@@ -99,7 +99,7 @@ Progress: 5/5 tasks (100%)
 - [x] T011 Isolate SqlServer provider registration to a single DI extension method
 - [x] T012 Create the initial EF Core migration
 
-### User Story - Security & shared infra (part of "Cross-cutting tasks")
+### User Story 003 - Security & shared infra (part of "Cross-cutting tasks")
 
 Progress: 7/7 tasks (100%)
 
@@ -111,7 +111,7 @@ Progress: 7/7 tasks (100%)
 - [x] T018 Implement the shared PagedResponse<T> type and page/pageSize binding [P]
 - [x] T019 Create frontend api client + AuthContext [P]
 
-### User Story - Implementation (Priority: P2, part of "Manage venue and courts")
+### User Story 004 - Implementation (Priority: P2, part of "Manage venue and courts")
 
 Progress: 8/8 tasks (100%)
 
@@ -124,7 +124,7 @@ Progress: 8/8 tasks (100%)
 - [x] T051 Frontend: OwnerDashboard page (venue/court create/edit/delete forms) [P]
 - [x] T052 Frontend: OwnerBookings page (list own venue's bookings, confirm action)
 
-### User Story - Tests (Priority: P2, part of "Manage venue and courts")
+### User Story 005 - Tests (Priority: P2, part of "Manage venue and courts")
 
 Progress: 5/5 tasks (100%)
 
@@ -134,7 +134,7 @@ Progress: 5/5 tasks (100%)
 - [x] T043 Integration test: deleting a venue/court with an upcoming non-cancelled booking is rejected [P]
 - [x] T044 Unit test: ownership-check helpers for Venue/Court/Booking chains [P]
 
-### User Story - Polish & verification (part of "Cross-cutting tasks")
+### User Story 006 - Polish & verification (part of "Cross-cutting tasks")
 
 Progress: 6/6 tasks (100%)
 
