@@ -9,8 +9,15 @@ export async function getAvailability(courtId: string, date: string): Promise<Av
   return data
 }
 
-export async function listMyBookings(page = 1): Promise<PagedResponse<Booking>> {
-  const { data } = await axiosInstance.get<PagedResponse<Booking>>('/bookings', { params: { page } })
+/** The status groups a customer can filter their bookings by (005) - mirrors the backend BookingStatusFilter. */
+export const bookingStatusFilters = ['All', 'Upcoming', 'Completed', 'Cancelled'] as const
+
+export type BookingStatusFilter = (typeof bookingStatusFilters)[number]
+
+export async function listMyBookings(status: BookingStatusFilter = 'All', page = 1): Promise<PagedResponse<Booking>> {
+  const { data } = await axiosInstance.get<PagedResponse<Booking>>('/bookings', {
+    params: { status: status === 'All' ? undefined : status, page },
+  })
   return data
 }
 

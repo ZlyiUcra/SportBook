@@ -110,8 +110,15 @@
   "bookings": {
     "title": "Minhas reservas",
     "empty": "Você ainda não tem reservas.",
+    "noneInFilter": "Nenhuma reserva corresponde a este filtro.",
     "total": "Total: {{price}}",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "filter": {
+      "All": "Todas",
+      "Upcoming": "Futuras",
+      "Completed": "Concluídas",
+      "Cancelled": "Canceladas"
+    }
   },
   "owner": {
     "title": "Meus locais",

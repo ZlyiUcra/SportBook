@@ -110,8 +110,15 @@
   "bookings": {
     "title": "My bookings",
     "empty": "You have no bookings yet.",
+    "noneInFilter": "No bookings match this filter.",
     "total": "Total: {{price}}",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "filter": {
+      "All": "All",
+      "Upcoming": "Upcoming",
+      "Completed": "Completed",
+      "Cancelled": "Cancelled"
+    }
   },
   "owner": {
     "title": "My venues",

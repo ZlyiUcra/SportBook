@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { ApiRequestError } from '@/shared/api/axiosInstance'
-import { formatDateTime, formatTime } from '@/shared/lib/datetime'
 import { searchVenues } from '@/entities/venue/api/venueApi'
 import { listBookingsByVenue } from '@/entities/booking/api/bookingApi'
+import { BookingSummary } from '@/entities/booking/ui/BookingSummary'
 import { confirmBooking } from '@/features/booking/confirm/api/confirmBooking'
 import { cityName } from '@/entities/city/model/types'
 
@@ -82,14 +82,7 @@ export function OwnerBookingsPage() {
         {bookingsQuery.data?.items.map((booking) => (
           <Card key={booking.id}>
             <CardContent className="flex flex-wrap items-center justify-between gap-4 py-4">
-              <div className="min-w-0">
-                <p className="font-medium break-words">
-                  {formatDateTime(booking.startTime)} - {formatTime(booking.endTime)}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {t(`status.${booking.status}`)} - {t('bookings.total', { price: booking.totalPrice })}
-                </p>
-              </div>
+              <BookingSummary booking={booking} />
               {booking.status === 'Pending' && (
                 <Button
                   variant="outline"
