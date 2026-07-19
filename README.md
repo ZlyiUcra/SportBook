@@ -60,6 +60,12 @@ in-range venues clustered (nearest emphasized, auto-framed to fit), and the resu
 shows the same set, nearest first. No map is shown when there is neither a granted location nor a
 selected city - see `specs/003-venue-radius-map/spec.md`.
 
+`004` makes that search a place you can leave and return to: a venue page offers a one-action
+"back to search" that restores the reference point, sport filter, and results (session-only state,
+never persisted - no repeated location prompt), the results list follows the map viewport (zoom in
+to narrow it, zoom out to widen it), and long lists page at 10 venues - see
+`specs/004-search-return-viewport-list/spec.md`.
+
 Automated tests cover the booking flow (25 tests: 11 unit, 14 integration against a real SQL Server
 instance) plus the city/map feature's suggestion ranking, nearest-city resolution, nearby-radius
 enforcement, and venue location validation, plus the venue radius feature's distance/order/cap
@@ -246,7 +252,12 @@ Login/Register requires being signed in - you're redirected to Login if you aren
    the three app languages) and/or a sport type, or tap "Near me" to center the search on your
    device's location instead. Either way you get the same fixed 75km radius view - a clustered map
    (the nearest venue emphasized, all pins auto-framed to fit) plus a distance-ordered results list
-   of the same in-range venues; no map is shown until you pick a city or use "Near me".
+   of the venues currently visible on the map: zoom in and the list narrows to what is on screen,
+   zoom out and it widens again, and lists longer than 10 venues page with Previous/Next. No map is
+   shown until you pick a city or use "Near me". Opening a venue and coming back (its "back to
+   search" link or the browser's back) restores the same search - reference point, sport filter,
+   results - without asking for your location again; the state lives only for the session and is
+   never written to storage.
 2. Open a venue (`/venues/:id`) to see its address, description, average rating and existing
    reviews, its list of courts (name, sport, price per hour, opening/closing hours), and a map
    with its pin if the owner has set one.
@@ -308,3 +319,8 @@ need the SQL Server container from step 1 running and reachable - they create an
   computation shape.
 - `specs/003-venue-radius-map/contracts/api.md` - nearby endpoint contract and consilium MUSTs.
 - `specs/003-venue-radius-map/tasks.md` - full task breakdown and current progress.
+- `specs/004-search-return-viewport-list/spec.md` - return-to-search navigation, viewport-synced
+  list, and pagination spec.
+- `specs/004-search-return-viewport-list/plan.md` - technical plan (session store, viewport
+  reporting, client-side paging).
+- `specs/004-search-return-viewport-list/tasks.md` - full task breakdown and current progress.

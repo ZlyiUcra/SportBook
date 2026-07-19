@@ -35,18 +35,18 @@ tooling (yarn, Vitest, Zustand, react-leaflet) covers everything.
 **Purpose**: The session store and the viewport-reporting map boundary - every user story depends
 on at least one of these. No user story work can begin until this phase is complete.
 
-- [ ] T001 [P] Create the search-state store in `frontend/src/pages/venues/model/searchStore.ts`:
+- [X] T001 [P] Create the search-state store in `frontend/src/pages/venues/model/searchStore.ts`:
       an in-memory Zustand store (explicitly NO `persist` middleware - contract MUST, spec FR-006)
       holding `city: City | null`, `sportType: SportType | ''`, `deviceCoords: {lat,lng} | null`,
       with setters and a derived reference-point selector implementing 003's precedence
       (deviceCoords -> city coords -> none) per data-model.md "Search state"
-- [ ] T002 [P] Extend `frontend/src/shared/ui/map/MapView.tsx`: export a plain
+- [X] T002 [P] Extend `frontend/src/shared/ui/map/MapView.tsx`: export a plain
       `MapBounds = { south, west, north, east }` type and add an optional
       `onViewportChange(bounds)` prop backed by a `useMapEvents({ moveend, zoomend })` helper
       (same pattern as the existing `ClickHandler`), converting `map.getBounds()` to `MapBounds`;
       fires once after the initial framing (leaflet emits `moveend` after `fitBounds` - research.md)
       and never during a gesture. No Leaflet type crosses the module boundary (contract MUST)
-- [ ] T003 Rework `frontend/src/shared/lib/useReferencePoint.ts` to be store-backed: it reads
+- [X] T003 Rework `frontend/src/shared/lib/useReferencePoint.ts` to be store-backed: it reads
       `city`/`deviceCoords` from the search store, keeps `useGeolocation` as the permission/error
       machine, and writes granted rounded coords into the store - so a remount restores the
       reference without any Geolocation API call (spec FR-003; depends on T001)
@@ -67,16 +67,16 @@ state.
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Wire `frontend/src/pages/venues/ui/VenueSearchPage.tsx` to the search store:
+- [X] T004 [US1] Wire `frontend/src/pages/venues/ui/VenueSearchPage.tsx` to the search store:
       `city` and `sportType` read/write the store instead of `React.useState`, the reference point
       comes from the store-backed `useReferencePoint`; a fresh mount with stored state shows the
       same results and the default full-radius framing via the existing `fitBoundsKey` mount
       behavior (spec FR-002, FR-004; depends on T001, T003)
-- [ ] T005 [P] [US1] Add the always-visible "back to search" action to
+- [X] T005 [P] [US1] Add the always-visible "back to search" action to
       `frontend/src/pages/venue-detail/ui/VenueDetailPage.tsx` as a route link to `/` (research.md:
       not history-dependent navigation), with new i18n keys in
       `frontend/src/shared/i18n/locales/{en,uk,pt}.json` (spec FR-001, FR-005)
-- [ ] T006 [US1] Frontend test in `frontend/tests/pages/VenueSearchReturn.test.tsx`: state
+- [X] T006 [US1] Frontend test in `frontend/tests/pages/VenueSearchReturn.test.tsx`: state
       restores across unmount/remount of the search page with NO Geolocation API call; an empty
       store yields the default prompt state (store reset between tests) (depends on T004, T005)
 
@@ -95,14 +95,14 @@ venues within 75 km"); verify the emphasized marker never changes with the viewp
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Viewport filtering in `frontend/src/pages/venues/ui/VenueSearchPage.tsx`: hold
+- [X] T007 [US2] Viewport filtering in `frontend/src/pages/venues/ui/VenueSearchPage.tsx`: hold
       the latest `MapBounds` from `onViewportChange` in page state (NOT in the search store -
       spec FR-004), filter the list to venues whose point lies within bounds (numeric comparison,
       research.md), full set before the first report (spec FR-009); add the "no venues in view"
       empty state with i18n keys in `frontend/src/shared/i18n/locales/{en,uk,pt}.json` (spec
       FR-010); the map keeps rendering the full in-range set and the emphasized marker stays the
       first element of the FULL set (spec FR-011, FR-014; depends on T002, T004)
-- [ ] T008 [US2] Frontend test in `frontend/tests/pages/VenueRadiusView.test.tsx`: the MapView
+- [X] T008 [US2] Frontend test in `frontend/tests/pages/VenueRadiusView.test.tsx`: the MapView
       mock emits `MapBounds`; verify the list filters to in-bounds venues nearest-first, the
       "no venues in view" state appears for an empty viewport while "no venues within 75 km"
       remains for an empty in-range set, and emphasis stays on the overall-nearest venue
@@ -123,12 +123,12 @@ the map regardless of the list page.
 
 ### Implementation for User Story 3
 
-- [ ] T009 [US3] Pagination in `frontend/src/pages/venues/ui/VenueSearchPage.tsx`: a
+- [X] T009 [US3] Pagination in `frontend/src/pages/venues/ui/VenueSearchPage.tsx`: a
       `searchPageSize = 10` named constant (raisable later - spec FR-012), Prev/Next controls
       (same pattern 002 used), page state resets to 1 whenever the visible set changes (viewport,
       sport filter, or reference change - spec FR-013), controls hidden when only one page;
       pagination slices ONLY the list - map markers are untouched (spec FR-014; depends on T007)
-- [ ] T010 [US3] Frontend test in `frontend/tests/pages/VenueRadiusView.test.tsx`: 11+ visible
+- [X] T010 [US3] Frontend test in `frontend/tests/pages/VenueRadiusView.test.tsx`: 11+ visible
       venues page at 10 nearest-first, Prev/Next work, bounds change and sport-filter change reset
       to page 1, no controls at <= 10 visible (depends on T009)
 
@@ -140,14 +140,14 @@ the map regardless of the list page.
 
 **Purpose**: Contract audits and end-to-end validation across the stories
 
-- [ ] T011 [P] No-storage audit (contract MUST, spec FR-006/SC-005): confirm the search state
+- [X] T011 [P] No-storage audit (contract MUST, spec FR-006/SC-005): confirm the search state
       never reaches `persist`/localStorage/sessionStorage/cookies/URL - code search over
       `frontend/src/` plus a devtools Application check while exercising near-me, per
       quickstart.md scenario 4
-- [ ] T012 [P] Update root `README.md` (search description in "Using the application" and the
+- [X] T012 [P] Update root `README.md` (search description in "Using the application" and the
       spec listing in "Further reading") for the return action, viewport-synced list, and
       pagination
-- [ ] T013 Run all quickstart.md validation scenarios end-to-end against a locally running stack,
+- [X] T013 Run all quickstart.md validation scenarios end-to-end against a locally running stack,
       plus non-regression: full `yarn test`, backend `dotnet test`, and a `yarn build`
       initial-chunk comparison (must be unchanged - no new dependencies)
 
