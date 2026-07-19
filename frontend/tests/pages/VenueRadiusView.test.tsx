@@ -206,4 +206,52 @@ describe('VenueSearchPage - reference-point radius view', () => {
     expect(screen.queryByText('No venues found.')).not.toBeInTheDocument()
     expect(screen.queryByText('Venue near-1')).not.toBeInTheDocument()
   })
+
+  it('T010: 11+ visible venues page at 10 nearest-first and viewport change resets to page 1', async () => {
+    const many = Array.from({ length: 12 }, (_, i) => makeNearby(`v-${String(i + 1).padStart(2, '0')}`, i + 1))
+    vi.mocked(getNearbyVenues).mockResolvedValue(many)
+    stubGeolocation(50.45466, 30.5238)
+
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /near me/i }))
+    await waitFor(() => expect(screen.getByTestId('mock-map-markers')).toBeInTheDocument())
+
+    // Page 1: the 10 nearest; the map still shows all 12 markers (spec FR-014).
+    expect(screen.getByText('Venue v-01')).toBeInTheDocument()
+    expect(screen.getByText('Venue v-10')).toBeInTheDocument()
+    expect(screen.queryByText('Venue v-11')).not.toBeInTheDocument()
+    expect(screen.getByText('v-12')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    expect(screen.getByText('Venue v-11')).toBeInTheDocument()
+    expect(screen.getByText('Venue v-12')).toBeInTheDocument()
+    expect(screen.queryByText('Venue v-01')).not.toBeInTheDocument()
+
+    // A completed gesture resets to page 1 (spec FR-013).
+    emitViewport({ south: 50.0, north: 51.0, west: 30.0, east: 31.0 })
+    expect(screen.getByText('Venue v-01')).toBeInTheDocument()
+    expect(screen.queryByText('Venue v-11')).not.toBeInTheDocument()
+  })
+
+  it('T010: changing the sport filter resets to page 1 and 10 or fewer venues show no controls', async () => {
+    const many = Array.from({ length: 12 }, (_, i) => makeNearby(`v-${String(i + 1).padStart(2, '0')}`, i + 1))
+    vi.mocked(getNearbyVenues).mockResolvedValue(many)
+    stubGeolocation(50.45466, 30.5238)
+
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /near me/i }))
+    await waitFor(() => expect(screen.getByTestId('mock-map-markers')).toBeInTheDocument())
+
+    fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    expect(screen.getByText('Venue v-11')).toBeInTheDocument()
+
+    // Sport change refetches (fewer results) and resets to page 1 - controls disappear at <= 10.
+    vi.mocked(getNearbyVenues).mockResolvedValue(many.slice(0, 3))
+    fireEvent.change(screen.getByRole('combobox', { name: /sport/i }), { target: { value: 'Tennis' } })
+    await waitFor(() => expect(getNearbyVenues).toHaveBeenLastCalledWith(50.45, 30.52, 'Tennis'))
+
+    expect(await screen.findByText('Venue v-01')).toBeInTheDocument()
+    expect(screen.queryByText('Venue v-11')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument()
+  })
 })

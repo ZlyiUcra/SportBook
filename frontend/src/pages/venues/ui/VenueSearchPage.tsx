@@ -2,6 +2,7 @@ import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { getNearbyVenues } from '@/entities/venue/api/venueApi'
 import { sportTypes, type SportType } from '@/entities/venue/model/types'
@@ -17,6 +18,9 @@ import { useSearchStore } from '../model/searchStore'
 const MapView = React.lazy(() => import('@/shared/ui/map/MapView'))
 import type { MapBounds } from '@/shared/ui/map/MapView'
 import type { NearbyVenue } from '@/entities/venue/model/types'
+
+/** Client-side list page size (004 spec FR-012) - a single constant, raise here if ever needed. */
+const searchPageSize = 10
 
 /** A venue is in view when its point lies within the reported bounds (004 research.md "Visibility test"). */
 function isInBounds(venue: NearbyVenue, bounds: MapBounds): boolean {
@@ -76,6 +80,15 @@ export function VenueSearchPage() {
   // The list shows the viewport-visible subset (004 spec FR-007, supersedes 003 FR-013); the map
   // keeps rendering the FULL in-range set and emphasis stays the overall nearest (FR-011, FR-014).
   const visibleVenues = viewportBounds ? venues.filter((venue) => isInBounds(venue, viewportBounds)) : venues
+
+  // List pagination (004 US3) - slices ONLY the list, never the map markers (spec FR-014). Any
+  // change of the visible set (viewport, sport filter, reference) resets to page 1 (spec FR-013).
+  const [page, setPage] = React.useState(1)
+  React.useEffect(() => {
+    setPage(1)
+  }, [viewportBounds, sportType, referenceKey])
+  const totalPages = Math.max(1, Math.ceil(visibleVenues.length / searchPageSize))
+  const pagedVenues = visibleVenues.slice((page - 1) * searchPageSize, page * searchPageSize)
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
@@ -137,7 +150,7 @@ export function VenueSearchPage() {
       )}
 
       <div className="flex flex-col gap-3">
-        {visibleVenues.map((venue) => (
+        {pagedVenues.map((venue) => (
           <Link key={venue.id} to={`/venues/${venue.id}`}>
             <Card className="transition-colors hover:bg-accent/50">
               <CardHeader>
@@ -153,6 +166,25 @@ export function VenueSearchPage() {
           </Link>
         ))}
       </div>
+
+      {visibleVenues.length > searchPageSize && (
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+            {t('common.prev')}
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            {page} / {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            {t('common.next')}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
