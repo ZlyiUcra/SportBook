@@ -13,9 +13,9 @@ public class CourtsController(CourtService courtService) : ControllerBase
     /// <summary>Paginated list of a venue's courts.</summary>
     [HttpGet("api/venues/{venueId:guid}/courts")]
     public async Task<ActionResult<PagedResponse<CourtResponse>>> ListByVenue(
-        Guid venueId, [FromQuery] PageRequest page, CancellationToken ct)
+        Guid venueId, [FromQuery] PageRequest paging, CancellationToken ct)
     {
-        return Ok(await courtService.ListByVenueAsync(venueId, page, ct));
+        return Ok(await courtService.ListByVenueAsync(venueId, paging, ct));
     }
 
     /// <summary>Creates a court under a venue; only the venue's owner may call this.</summary>

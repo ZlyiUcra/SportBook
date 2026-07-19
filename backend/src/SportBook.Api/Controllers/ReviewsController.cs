@@ -13,9 +13,9 @@ public class ReviewsController(ReviewService reviewService) : ControllerBase
     /// <summary>Paginated list of a venue's reviews, newest first.</summary>
     [HttpGet("api/venues/{venueId:guid}/reviews")]
     public async Task<ActionResult<PagedResponse<ReviewResponse>>> ListByVenue(
-        Guid venueId, [FromQuery] PageRequest page, CancellationToken ct)
+        Guid venueId, [FromQuery] PageRequest paging, CancellationToken ct)
     {
-        return Ok(await reviewService.ListByVenueAsync(venueId, page, ct));
+        return Ok(await reviewService.ListByVenueAsync(venueId, paging, ct));
     }
 
     /// <summary>Submits a review; a second submission by the same user for the same venue replaces the first (201 vs 200 signals which).</summary>

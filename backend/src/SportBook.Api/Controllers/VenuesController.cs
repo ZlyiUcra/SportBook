@@ -21,10 +21,10 @@ public class VenuesController(VenueService venueService) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<PagedResponse<VenueSummaryResponse>>> List(
         [FromQuery] int? cityId, [FromQuery] bool includeNearby, [FromQuery] SportType? sportType,
-        [FromQuery] bool mine, [FromQuery] PageRequest page, CancellationToken ct)
+        [FromQuery] bool mine, [FromQuery] PageRequest paging, CancellationToken ct)
     {
         var ownerId = mine ? User.GetUserId() : (Guid?)null;
-        return Ok(await venueService.SearchAsync(cityId, includeNearby, sportType, ownerId, page, ct));
+        return Ok(await venueService.SearchAsync(cityId, includeNearby, sportType, ownerId, paging, ct));
     }
 
     /// <summary>
