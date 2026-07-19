@@ -170,7 +170,11 @@ export default function MapView({
   ))
 
   return (
-    <MapContainer center={[center.lat, center.lng]} zoom={zoom} className={className ?? 'h-64 w-full'}>
+    // `isolate` (isolation: isolate) confines Leaflet's internal z-indexes - its panes (400-700)
+    // and controls (1000) - to the map's own stacking context. Without it those escape into the
+    // root context and paint over page overlays like the city combobox popover (z-50), hiding it
+    // behind the map. This keeps the map a self-contained layer that any page overlay sits above.
+    <MapContainer center={[center.lat, center.lng]} zoom={zoom} className={`isolate ${className ?? 'h-64 w-full'}`}>
       <TileLayer url={mapTiles.tileUrl} attribution={mapTiles.attribution} />
       {onPick && <ClickHandler onPick={onPick} />}
       {onViewportChange && <ViewportReporter onViewportChange={onViewportChange} />}
