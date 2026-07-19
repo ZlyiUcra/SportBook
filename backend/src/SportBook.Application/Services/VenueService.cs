@@ -13,6 +13,15 @@ namespace SportBook.Application.Services;
 public class VenueService(SportBookDbContext db, TimeProvider timeProvider, CityService cityService)
 {
     /// <summary>
+    /// Fixed radius for `GET /api/venues/nearby` (003 research.md "Fixed 75 km radius") - a
+    /// server-side constant, never a request parameter. Kept beside its only consumer rather than
+    /// on <see cref="CityDistance"/>: that class's 150km `NearbyRadiusKm` is a city-to-city
+    /// neighbor radius, a different concept, and the two must stay visually un-confusable.
+    /// </summary>
+    public const decimal VenueRadiusKm = 75;
+
+
+    /// <summary>
     /// <paramref name="ownerId"/> is server-derived from the caller's JWT when `mine=true`
     /// (VenuesController), never client-supplied - this is the read side of the owner dashboard
     /// (T051), added alongside it since a "manage my venues" page has no other way to list them.
@@ -58,6 +67,46 @@ public class VenueService(SportBookDbContext db, TimeProvider timeProvider, City
 
         return new PagedResponse<VenueSummaryResponse>(
             items.Select(v => v.ToSummaryResponse()).ToList(), page.Page, page.PageSize, totalCount);
+    }
+
+    /// <summary>
+    /// `GET /api/venues/nearby` (003 data-model.md): venues within <see cref="VenueRadiusKm"/> of
+    /// `(lat, lng)`, nearest first, capped at 100. The only server-side query work is the
+    /// translatable `Latitude != null` (+ optional sport) filter (research.md "Distance
+    /// computation") - distance itself is computed in C# over the materialized candidates via the
+    /// existing pure <see cref="CityDistance.DistanceKm"/>, so no trigonometry is pushed into SQL
+    /// and the logic stays unit-testable on the Sqlite provider.
+    /// </summary>
+    public async Task<IReadOnlyList<NearbyVenueResponse>> SearchNearbyAsync(
+        decimal lat, decimal lng, SportType? sportType, CancellationToken ct)
+    {
+        if (lat is < -90 or > 90)
+        {
+            throw new ApiException(400, "INVALID_LATITUDE", "lat must be between -90 and 90.");
+        }
+
+        if (lng is < -180 or > 180)
+        {
+            throw new ApiException(400, "INVALID_LONGITUDE", "lng must be between -180 and 180.");
+        }
+
+        IQueryable<Venue> query = db.Venues.AsNoTracking().Include(v => v.City)
+            .Where(v => v.Latitude != null);
+
+        if (sportType is not null)
+        {
+            query = query.Where(v => v.Courts.Any(c => c.SportType == sportType && c.IsActive));
+        }
+
+        var candidates = await query.ToListAsync(ct);
+
+        return candidates
+            .Select(v => new { Venue = v, Distance = (decimal)CityDistance.DistanceKm((double)lat, (double)lng, (double)v.Latitude!.Value, (double)v.Longitude!.Value) })
+            .Where(x => x.Distance <= VenueRadiusKm)
+            .OrderBy(x => x.Distance)
+            .Take(100)
+            .Select(x => x.Venue.ToNearbyResponse(x.Distance))
+            .ToList();
     }
 
     public async Task<VenueDetailResponse> GetByIdAsync(Guid id, CancellationToken ct)

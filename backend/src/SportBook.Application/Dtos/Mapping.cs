@@ -20,6 +20,15 @@ public static class Mapping
     public static VenueSummaryResponse ToSummaryResponse(this Venue venue) =>
         new(venue.Id, venue.Name, venue.City!.ToResponse(), venue.Address, venue.Description, venue.Latitude, venue.Longitude);
 
+    /// <summary>
+    /// <see cref="Venue.City"/> must already be loaded (Include) and `Latitude`/`Longitude` must
+    /// be non-null before calling this - callers (VenueService.SearchNearbyAsync) only pass
+    /// coordinate-bearing venues (003 data-model.md).
+    /// </summary>
+    public static NearbyVenueResponse ToNearbyResponse(this Venue venue, decimal distanceKm) =>
+        new(venue.Id, venue.Name, venue.City!.ToResponse(), venue.Address, venue.Description,
+            venue.Latitude!.Value, venue.Longitude!.Value, distanceKm);
+
     public static CourtResponse ToResponse(this Court court) =>
         new(court.Id, court.VenueId, court.Name, court.SportType.ToString(), court.PricePerHour,
             court.OpeningTime, court.ClosingTime, court.IsActive);

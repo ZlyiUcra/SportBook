@@ -27,6 +27,20 @@ public class VenuesController(VenueService venueService) : ControllerBase
         return Ok(await venueService.SearchAsync(cityId, includeNearby, sportType, ownerId, page, ct));
     }
 
+    /// <summary>
+    /// Venues within the fixed <see cref="VenueService.VenueRadiusKm"/> of `(lat, lng)`, nearest
+    /// first (003 contracts/api.md). Contract MUSTs (consilium security verdict): `lat`/`lng` are
+    /// range-validated (VenueService, 400 on out-of-range) and never persisted or logged - this
+    /// action must not gain request logging without excluding its query string, same rule as
+    /// `GET /api/cities/nearest`.
+    /// </summary>
+    [HttpGet("nearby")]
+    public async Task<ActionResult<IReadOnlyList<NearbyVenueResponse>>> Nearby(
+        [FromQuery] decimal lat, [FromQuery] decimal lng, [FromQuery] SportType? sportType, CancellationToken ct)
+    {
+        return Ok(await venueService.SearchNearbyAsync(lat, lng, sportType, ct));
+    }
+
     /// <summary>A single venue with its courts and aggregate review rating.</summary>
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<VenueDetailResponse>> GetById(Guid id, CancellationToken ct)

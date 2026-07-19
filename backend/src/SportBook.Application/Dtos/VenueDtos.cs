@@ -33,6 +33,13 @@ public record CourtResponse(
     TimeOnly ClosingTime,
     bool IsActive);
 
+/// <summary>
+/// Item shape for `GET /api/venues/nearby` (003 data-model.md) - the venue summary fields plus
+/// the computed great-circle distance from the request's reference point. `Latitude`/`Longitude`
+/// are non-null here by construction: only coordinate-bearing venues are ever returned.
+/// </summary>
+public record NearbyVenueResponse(Guid Id, string Name, CityResponse City, string Address, string? Description, decimal Latitude, decimal Longitude, decimal DistanceKm);
+
 /// <summary>`Latitude`/`Longitude` are null when the owner has not set a pin - no city-centre fallback (spec FR-010).</summary>
 public record VenueDetailResponse(
     Guid Id,
