@@ -50,6 +50,18 @@ export function CityCombobox({ value, onChange, placeholder, onClear }: CityComb
   const suggestions = suggestionsQuery.data ?? []
   const showClear = value !== null && onClear !== undefined
 
+  // Every close resets the in-dropdown search, so reopening always starts fresh rather than
+  // showing the previous query and its stale cmdk highlight - which otherwise swallowed the next
+  // click (the item cmdk still considered "active" did not re-fire onSelect on real pointer
+  // input). An effect (not the onOpenChange handler) because selecting a city closes via a direct
+  // setOpen(false) that bypasses onOpenChange - this catches every close path.
+  React.useEffect(() => {
+    if (!open) {
+      setQuery('')
+      setDebouncedQuery('')
+    }
+  }, [open])
+
   return (
     // Relative wrapper so the clear control can overlay the trigger's right edge - it must be a
     // sibling of the trigger, not a child, since a <button> cannot nest inside the trigger button.
