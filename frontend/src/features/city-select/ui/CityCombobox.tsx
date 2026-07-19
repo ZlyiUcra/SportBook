@@ -1,7 +1,7 @@
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown, X } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/shared/ui/command'
@@ -16,6 +16,12 @@ type CityComboboxProps = {
   value: City | null
   onChange: (city: City) => void
   placeholder?: string
+  /**
+   * When provided and a city is selected, a clear (X) control appears that resets the selection.
+   * Omitted where a city is mandatory (the owner venue form) - clearing only makes sense on the
+   * search page, where no reference point is a valid state (004 spec US3).
+   */
+  onClear?: () => void
 }
 
 /**
@@ -24,7 +30,7 @@ type CityComboboxProps = {
  * server-side lookups; the full city list is never shipped to the browser (research.md City
  * selection UI).
  */
-export function CityCombobox({ value, onChange, placeholder }: CityComboboxProps) {
+export function CityCombobox({ value, onChange, placeholder, onClear }: CityComboboxProps) {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState('')
@@ -42,23 +48,27 @@ export function CityCombobox({ value, onChange, placeholder }: CityComboboxProps
   })
 
   const suggestions = suggestionsQuery.data ?? []
+  const showClear = value !== null && onClear !== undefined
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-56 justify-between font-normal"
-        >
-          <span className="truncate">
-            {value ? cityName(value, i18n.language) : (placeholder ?? t('citySelect.placeholder'))}
-          </span>
-          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-56 p-0">
+    // Relative wrapper so the clear control can overlay the trigger's right edge - it must be a
+    // sibling of the trigger, not a child, since a <button> cannot nest inside the trigger button.
+    <div className="relative w-56">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn('w-full justify-between font-normal', showClear && 'pr-8')}
+          >
+            <span className="truncate">
+              {value ? cityName(value, i18n.language) : (placeholder ?? t('citySelect.placeholder'))}
+            </span>
+            {!showClear && <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-0">
         <Command shouldFilter={false}>
           <CommandInput
             value={query}
@@ -91,6 +101,17 @@ export function CityCombobox({ value, onChange, placeholder }: CityComboboxProps
           </CommandList>
         </Command>
       </PopoverContent>
-    </Popover>
+      </Popover>
+      {showClear && (
+        <button
+          type="button"
+          onClick={onClear}
+          aria-label={t('citySelect.clear')}
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm opacity-60 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
   )
 }

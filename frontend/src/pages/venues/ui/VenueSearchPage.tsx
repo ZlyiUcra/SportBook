@@ -95,7 +95,12 @@ export function VenueSearchPage() {
       <h1 className="text-2xl font-semibold">{t('venues.title')}</h1>
 
       <div className="flex flex-wrap gap-2">
-        <CityCombobox value={city} onChange={setCity} placeholder={t('venues.cityPlaceholder')} />
+        <CityCombobox
+          value={city}
+          onChange={setCity}
+          onClear={() => setCity(null)}
+          placeholder={t('venues.cityPlaceholder')}
+        />
         <NearMeButton status={geolocationStatus} onActivate={requestDeviceLocation} />
         <select
           value={sportType}

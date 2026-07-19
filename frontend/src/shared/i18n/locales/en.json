@@ -90,6 +90,7 @@
     "searchPlaceholder": "Type a city name...",
     "typeMore": "Type at least 2 characters.",
     "noResults": "No matching city.",
+    "clear": "Clear selected city",
     "locating": "Locating...",
     "nearMe": "Near me",
     "nearMeError": "Couldn't detect your location. Pick a city instead."

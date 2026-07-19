@@ -90,6 +90,7 @@
     "searchPlaceholder": "Digite o nome de uma cidade...",
     "typeMore": "Digite pelo menos 2 caracteres.",
     "noResults": "Nenhuma cidade encontrada.",
+    "clear": "Limpar cidade selecionada",
     "locating": "Localizando...",
     "nearMe": "Perto de mim",
     "nearMeError": "Não foi possível detectar sua localização. Selecione uma cidade."
