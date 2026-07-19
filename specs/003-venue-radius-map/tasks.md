@@ -28,7 +28,7 @@ implementation and testing of each story.
 
 **Purpose**: Dependencies needed before any map-clustering code
 
-- [ ] T001 [P] Add frontend dependencies `react-leaflet-cluster` (~4.1.3) and dev
+- [X] T001 [P] Add frontend dependencies `react-leaflet-cluster` (~4.1.3) and dev
       `@types/leaflet.markercluster` (~1.5.6) to `frontend/package.json` per plan.md Primary
       Dependencies (user-approved via the clustering choice in /speckit-clarify); confirm
       `leaflet.markercluster` is pulled transitively
@@ -43,27 +43,27 @@ implementation and testing of each story.
 extensions - every user story depends on these. No user story work can begin until this phase is
 complete.
 
-- [ ] T002 [P] Add `NearbyVenueResponse` DTO (venue summary fields + `decimal DistanceKm`) in
+- [X] T002 [P] Add `NearbyVenueResponse` DTO (venue summary fields + `decimal DistanceKm`) in
       `backend/src/SportBook.Application/Dtos/VenueDtos.cs` per data-model.md
-- [ ] T003 Implement `VenueService.SearchNearbyAsync(decimal lat, decimal lng, SportType? sportType,
+- [X] T003 Implement `VenueService.SearchNearbyAsync(decimal lat, decimal lng, SportType? sportType,
       CancellationToken)` in `backend/src/SportBook.Application/Services/VenueService.cs`: a
       `VenueRadiusKm = 75` server-side constant (declared beside `VenueService`, NOT on
       `CityDistance`); query `Venues` where `Latitude != null` (+ the existing active-court sport
       predicate when `sportType` is set), `Include(v => v.City)`; then in C# compute
       `CityDistance.DistanceKm` per row, filter `<= 75`, order by distance ascending, `Take(100)`,
       project to `NearbyVenueResponse` (depends on T002)
-- [ ] T004 Implement `VenuesController` `GET /api/venues/nearby` (`lat`, `lng`, optional
+- [X] T004 Implement `VenuesController` `GET /api/venues/nearby` (`lat`, `lng`, optional
       `sportType`) per contracts/api.md - range-validate `lat`/`lng`, never persist or log received
       coordinates - in `backend/src/SportBook.Api/Controllers/VenuesController.cs` (depends on T003)
-- [ ] T005 [P] Extract a `useGeolocation` hook (browser Geolocation API, 2-decimal rounding,
+- [X] T005 [P] Extract a `useGeolocation` hook (browser Geolocation API, 2-decimal rounding,
       permission/denied/error state) from the inline logic in `MyCityButton` into
       `frontend/src/shared/lib/` (depends on nothing)
-- [ ] T006 [P] Implement a `useReferencePoint` resolver (precedence: granted device location via
+- [X] T006 [P] Implement a `useReferencePoint` resolver (precedence: granted device location via
       `useGeolocation` -> explicitly selected city coordinates -> none) as the single source of
       truth for the map center and the nearby query, in `frontend/src/shared/lib/` (depends on T005)
-- [ ] T007 [P] Frontend: `NearbyVenue` type (+`distanceKm`) and `getNearbyVenues(lat, lng,
+- [X] T007 [P] Frontend: `NearbyVenue` type (+`distanceKm`) and `getNearbyVenues(lat, lng,
       sportType?)` API call in `frontend/src/entities/venue/` (depends on T004)
-- [ ] T008 Extend `frontend/src/shared/ui/map/MapView.tsx`: marker clustering via
+- [X] T008 Extend `frontend/src/shared/ui/map/MapView.tsx`: marker clustering via
       `react-leaflet-cluster` (the only new leaflet consumer, still lazy), a `fitBounds` mode (a
       `useMap` effect keyed on the reference/venue-id set so it fits once per reference change and a
       max-zoom cap prevents over-zoom, never re-fitting on unrelated renders), and a per-marker
@@ -86,27 +86,27 @@ list shows the same venues nearest-first, with none beyond 75 km.
 
 ### Tests for User Story 1
 
-- [ ] T009 [P] [US1] Integration test: `GET /api/venues/nearby` returns venues within 75 km ordered
+- [X] T009 [P] [US1] Integration test: `GET /api/venues/nearby` returns venues within 75 km ordered
       nearest-first with `distanceKm`, excludes venues beyond 75 km, rejects out-of-range `lat`/`lng`
       (400), honors `sportType`, and requires auth (spec Acceptance Scenarios) in
       `backend/tests/SportBook.IntegrationTests/VenueNearbyPointTests.cs`
-- [ ] T010 [P] [US1] Unit test: the nearby distance/order/cap over materialized rows (Sqlite path)
+- [X] T010 [P] [US1] Unit test: the nearby distance/order/cap over materialized rows (Sqlite path)
       in `backend/tests/SportBook.UnitTests/VenueNearbyDistanceTests.cs`
-- [ ] T011 [P] [US1] Unit test: `ToQueryString()` proves the `Latitude != null` (+ optional sport)
+- [X] T011 [P] [US1] Unit test: `ToQueryString()` proves the `Latitude != null` (+ optional sport)
       candidate query translates to SQL and pushes NO trigonometry server-side in
       `backend/tests/SportBook.UnitTests/VenueNearbyQueryTranslationTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Frontend: "near me" action in `frontend/src/features/city-select/` using
+- [X] T012 [US1] Frontend: "near me" action in `frontend/src/features/city-select/` using
       `useGeolocation` to set the device-location reference point (rounds coords to 2 decimals before
       any request) (depends on T005, T006)
-- [ ] T013 [US1] Frontend: reshape `frontend/src/pages/venues/ui/VenueSearchPage.tsx` to the
+- [X] T013 [US1] Frontend: reshape `frontend/src/pages/venues/ui/VenueSearchPage.tsx` to the
       reference-point radius view - when a reference is active, call `getNearbyVenues` and render the
       clustered `MapView` (nearest emphasized, auto-framed) plus a distance-ordered results list from
       the same in-range set; remove the `VenueSearchMap` usage and the `includeNearby` toggle
       (depends on T006, T007, T008, T012)
-- [ ] T014 [US1] Frontend smoke test (map + geolocation mocked, per research.md testing stance): the
+- [X] T014 [US1] Frontend smoke test (map + geolocation mocked, per research.md testing stance): the
       near-me flow shows the in-range venues on the map and in the list nearest-first in
       `frontend/tests/pages/VenueRadiusView.test.tsx`
 
@@ -125,10 +125,10 @@ on it and the same 75 km behavior and list appear.
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Frontend: wire city selection into `useReferencePoint` (a selected city's
+- [X] T015 [US2] Frontend: wire city selection into `useReferencePoint` (a selected city's
       coordinates become the reference when no device location is active) so the combobox drives the
       same radius map + list in `frontend/src/pages/venues/ui/VenueSearchPage.tsx` (depends on T013)
-- [ ] T016 [US2] Frontend test: selecting a city with no geolocation drives the radius map and the
+- [X] T016 [US2] Frontend test: selecting a city with no geolocation drives the radius map and the
       distance-ordered list; device location takes precedence over a selected city when both exist,
       in `frontend/tests/pages/VenueRadiusView.test.tsx`
 
@@ -147,11 +147,11 @@ and the list shows a prompt to pick a city or use "near me".
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Frontend: the no-reference state in
+- [X] T017 [US3] Frontend: the no-reference state in
       `frontend/src/pages/venues/ui/VenueSearchPage.tsx` - render no map block at all (not an empty
       map), and show a results-list prompt to pick a city or use "near me"; removing the reference
       (revoke/deselect) removes the map block rather than showing it empty (depends on T013)
-- [ ] T018 [US3] Frontend test: no geolocation and no selected city renders no map block and shows
+- [X] T018 [US3] Frontend test: no geolocation and no selected city renders no map block and shows
       the prompt in `frontend/tests/pages/VenueRadiusView.test.tsx`
 
 **Checkpoint**: All three user stories independently functional - full feature deliverable.
@@ -162,22 +162,22 @@ and the list shows a prompt to pick a city or use "near me".
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T019 [P] Add near-me / no-reference-prompt / cluster-related i18n keys in
+- [X] T019 [P] Add near-me / no-reference-prompt / cluster-related i18n keys in
       `frontend/src/shared/i18n/locales/{en,uk,pt}.json` (all three locales)
-- [ ] T020 Remove the superseded "My city" button (its geolocation role is replaced by "near me")
+- [X] T020 Remove the superseded "My city" button (its geolocation role is replaced by "near me")
       and any now-dead `includeNearby` wiring left on the search page; confirm no dead code or unused
       imports in `frontend/src/features/city-select/` and `frontend/src/pages/venues/`
-- [ ] T021 Measure `yarn build` output before/after the clustering libs land from `frontend/` -
+- [X] T021 Measure `yarn build` output before/after the clustering libs land from `frontend/` -
       confirm the initial JS chunk delta is 0 (leaflet/react-leaflet/react-leaflet-cluster/
       leaflet.markercluster all in the lazy `MapView` chunk; spec SC-006, quickstart.md)
-- [ ] T022 [P] Response-DTO whitelist audit for `NearbyVenueResponse` - confirm `Population` never
+- [X] T022 [P] Response-DTO whitelist audit for `NearbyVenueResponse` - confirm `Population` never
       leaks and no new `[AllowAnonymous]` was introduced (contract MUST, spec FR-011)
-- [ ] T023 [P] Update `backend/README.md`/`frontend/README.md`/root `README.md` with the nearby
+- [X] T023 [P] Update `backend/README.md`/`frontend/README.md`/root `README.md` with the nearby
       endpoint, the clustering dependency, and the "near me" action
-- [ ] T024 Verify the EF Core query plan for `GET /api/venues/nearby` - confirm the only server-side
+- [X] T024 Verify the EF Core query plan for `GET /api/venues/nearby` - confirm the only server-side
       work is the `Latitude != null` (+ sport) filter and that no trigonometric full-table scan is
       generated (performance consilium finding)
-- [ ] T025 [P] Run all quickstart.md validation scenarios end-to-end against a locally running stack
+- [X] T025 [P] Run all quickstart.md validation scenarios end-to-end against a locally running stack
 
 ---
 
