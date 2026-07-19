@@ -53,10 +53,19 @@ within 150km. Venue owners pick their venue's city from the same directory and c
 a precise map pin; the search results page and a pinned venue's own page show it on a lazily loaded
 map - see `specs/002-city-geolocation-map/spec.md`.
 
+`003` replaces that page-based results map and the 150km city-neighbor toggle with a single
+reference-point radius view: a customer's device location (via an explicit "near me" action) or
+their selected directory city becomes the center of a fixed 75km search - the map shows the
+in-range venues clustered (nearest emphasized, auto-framed to fit), and the results list below
+shows the same set, nearest first. No map is shown when there is neither a granted location nor a
+selected city - see `specs/003-venue-radius-map/spec.md`.
+
 Automated tests cover the booking flow (25 tests: 11 unit, 14 integration against a real SQL Server
 instance) plus the city/map feature's suggestion ranking, nearest-city resolution, nearby-radius
-enforcement, and venue location validation. Tests for venue management and reviews (001) are
-deferred to that feature's polish phase - see `specs/001-sportbook-venue-booking/tasks.md`.
+enforcement, and venue location validation, plus the venue radius feature's distance/order/cap
+logic, SQL-translation guard, and the nearby endpoint's range validation and radius enforcement.
+Tests for venue management and reviews (001) are deferred to that feature's polish phase - see
+`specs/001-sportbook-venue-booking/tasks.md`.
 
 ## Components
 
@@ -78,11 +87,11 @@ frontend/
     app/                     Routes, layouts, providers
     pages/                   One folder per route (ui/<Route>Page.tsx)
     features/                One user action per slice (ui + model + api), including
-                              city-select (directory combobox, "my city" geolocation)
+                              city-select (directory combobox, "near me" geolocation)
     entities/                Domain data (types, read API calls), including city
     shared/                  UI kit (shadcn/ui), Axios instance, i18n, theme store, utils, and
-                              ui/map (the only module importing leaflet/react-leaflet, always
-                              lazy-loaded)
+                              ui/map (the only module importing leaflet/react-leaflet/clustering,
+                              always lazy-loaded)
 
 scripts/convert-geonames-cities.ps1
                              One-time GeoNames-to-cities.csv dataset conversion (see backend/README.md)
@@ -91,6 +100,8 @@ specs/001-sportbook-venue-booking/
                              Full spec, plan, data model, API contracts, task breakdown
 specs/002-city-geolocation-map/
                              City directory, geolocation and venue map - spec, plan, task breakdown
+specs/003-venue-radius-map/
+                             Reference-point radius map of nearby venues - spec, plan, task breakdown
 ```
 
 **Backend stack**: C# / .NET 10, ASP.NET Core Web API (MVC controllers), EF Core 10 +
@@ -98,7 +109,7 @@ specs/002-city-geolocation-map/
 
 **Frontend stack**: React 19, Vite, TypeScript, TanStack Query, Zustand, React Hook Form + Zod,
 Axios, Tailwind CSS + shadcn/ui, i18next (English, Ukrainian, Portuguese), Vitest, Leaflet +
-react-leaflet (lazy-loaded map), `cmdk` (city combobox).
+react-leaflet + react-leaflet-cluster (lazy-loaded map), `cmdk` (city combobox).
 
 ## Prerequisites
 
@@ -232,9 +243,10 @@ Login/Register requires being signed in - you're redirected to Login if you aren
 ### Booking a court (customer flow)
 
 1. The home page (`/`) is venue search: pick a city from the directory combobox (type in any of
-   the three app languages, or tap "My city" to detect it from the browser's location) and/or a
-   sport type, optionally widen results to cities within 150km, browse the paginated results, and
-   open a map of the pinned venues on the current page.
+   the three app languages) and/or a sport type, or tap "Near me" to center the search on your
+   device's location instead. Either way you get the same fixed 75km radius view - a clustered map
+   (the nearest venue emphasized, all pins auto-framed to fit) plus a distance-ordered results list
+   of the same in-range venues; no map is shown until you pick a city or use "Near me".
 2. Open a venue (`/venues/:id`) to see its address, description, average rating and existing
    reviews, its list of courts (name, sport, price per hour, opening/closing hours), and a map
    with its pin if the owner has set one.
@@ -289,3 +301,10 @@ need the SQL Server container from step 1 running and reachable - they create an
 - `specs/002-city-geolocation-map/contracts/api.md` - Cities endpoints and the reshaped Venues
   contract (supersedes `001`'s venue endpoints).
 - `specs/002-city-geolocation-map/tasks.md` - full task breakdown and current progress.
+- `specs/003-venue-radius-map/spec.md` - reference-point radius map of nearby venues spec.
+- `specs/003-venue-radius-map/plan.md` - technical plan (in-memory haversine, clustering library
+  choice, fitBounds behaviour).
+- `specs/003-venue-radius-map/data-model.md` - `NearbyVenueResponse` DTO and the distance
+  computation shape.
+- `specs/003-venue-radius-map/contracts/api.md` - nearby endpoint contract and consilium MUSTs.
+- `specs/003-venue-radius-map/tasks.md` - full task breakdown and current progress.
