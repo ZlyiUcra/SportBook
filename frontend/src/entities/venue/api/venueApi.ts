@@ -1,6 +1,6 @@
 import { axiosInstance } from '@/shared/api/axiosInstance'
 import type { PagedResponse } from '@/shared/api/types'
-import type { SportType, VenueDetail, VenueSummary } from '../model/types'
+import type { NearbyVenue, SportType, VenueDetail, VenueSummary } from '../model/types'
 
 export type VenueSearchParams = {
   cityId?: number
@@ -27,5 +27,16 @@ export async function searchVenues(params: VenueSearchParams): Promise<PagedResp
 
 export async function getVenue(id: string): Promise<VenueDetail> {
   const { data } = await axiosInstance.get<VenueDetail>(`/venues/${id}`)
+  return data
+}
+
+/**
+ * Venues within the fixed 75km radius of `(lat, lng)`, nearest first (003 contracts/api.md). The
+ * radius itself is not a parameter here - it is a server-side constant.
+ */
+export async function getNearbyVenues(lat: number, lng: number, sportType?: SportType): Promise<NearbyVenue[]> {
+  const { data } = await axiosInstance.get<NearbyVenue[]>('/venues/nearby', {
+    params: { lat, lng, sportType },
+  })
   return data
 }

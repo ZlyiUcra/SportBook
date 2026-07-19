@@ -24,6 +24,22 @@ export type VenueSummary = {
   longitude: number | null
 }
 
+/**
+ * Item shape for `GET /api/venues/nearby` (003 data-model.md) - the venue summary fields plus the
+ * server-computed distance from the reference point. `latitude`/`longitude` are non-null here by
+ * construction: only coordinate-bearing venues are ever returned.
+ */
+export type NearbyVenue = {
+  id: string
+  name: string
+  city: City
+  address: string
+  description: string | null
+  latitude: number
+  longitude: number
+  distanceKm: number
+}
+
 export type Court = {
   id: string
   venueId: string

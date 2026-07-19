@@ -1,7 +1,10 @@
 import React from 'react'
-import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet'
+import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet'
+import MarkerClusterGroup from 'react-leaflet-cluster'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
@@ -19,6 +22,19 @@ const defaultIcon = L.icon({
   shadowSize: [41, 41],
 })
 
+// The nearest-venue emphasis marker (003 research.md "Marker emphasis for the nearest venue") -
+// a second, larger `L.icon` using the same asset, never `L.divIcon({ html })` fed from venue
+// fields (stored-XSS avoidance, contracts/api.md Frontend contract MUSTs).
+const emphasizedIcon = L.icon({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+  iconSize: [37, 61],
+  iconAnchor: [18, 61],
+  popupAnchor: [1, -50],
+  shadowSize: [61, 61],
+})
+
 export type LatLng = { lat: number; lng: number }
 
 export type MapMarker = {
@@ -26,6 +42,8 @@ export type MapMarker = {
   position: LatLng
   /** Rendered as react-leaflet JSX children only - never raw HTML (contract MUST, research.md Map content safety). */
   popup?: React.ReactNode
+  /** Renders this marker with the larger `emphasizedIcon` (e.g. the nearest venue in a radius view). */
+  emphasized?: boolean
 }
 
 type MapViewProps = {
@@ -35,6 +53,17 @@ type MapViewProps = {
   /** When set, clicking the map reports the clicked position - used by the owner pin-picker (US2). */
   onPick?: (position: LatLng) => void
   className?: string
+  /** Groups nearby markers into an expanding count bubble via react-leaflet-cluster (003 US1). */
+  cluster?: boolean
+  /**
+   * When set, the map frames all current markers to fit the view once per change of this key
+   * (e.g. an identity string combining the reference point and the returned venue-id set) -
+   * never on unrelated re-renders, which would fight manual zoom/pan (research.md fitBounds
+   * behaviour).
+   */
+  fitBoundsKey?: string
+  /** Caps how far `fitBoundsKey` framing may zoom in, so a tight cluster of markers does not over-zoom. */
+  maxFitZoom?: number
 }
 
 function ClickHandler({ onPick }: { onPick: (position: LatLng) => void }) {
@@ -47,20 +76,57 @@ function ClickHandler({ onPick }: { onPick: (position: LatLng) => void }) {
 }
 
 /**
+ * `MapContainer` only reads `center`/`zoom` at mount, so framing all pins on a later
+ * reference-point change needs an imperative effect. Markers are read via a ref (updated every
+ * render) so the effect itself only re-runs when `fitBoundsKey` changes, not on every render.
+ */
+function FitBounds({ markers, fitBoundsKey, maxFitZoom }: { markers: MapMarker[]; fitBoundsKey: string; maxFitZoom: number }) {
+  const map = useMap()
+  const markersRef = React.useRef(markers)
+  markersRef.current = markers
+
+  React.useEffect(() => {
+    const current = markersRef.current
+    if (current.length === 0) return
+    const bounds = L.latLngBounds(current.map((marker): [number, number] => [marker.position.lat, marker.position.lng]))
+    map.fitBounds(bounds, { maxZoom: maxFitZoom })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fitBoundsKey])
+
+  return null
+}
+
+/**
  * Typed Leaflet wrapper - the only module in the app importing `leaflet`/`react-leaflet`
  * (plan.md Project Structure). Consumers must always load this via `React.lazy`/dynamic
  * `import()` so the map stack never lands in an initial route chunk (spec SC-006).
  */
-export default function MapView({ center, zoom = 13, markers = [], onPick, className }: MapViewProps) {
+export default function MapView({
+  center,
+  zoom = 13,
+  markers = [],
+  onPick,
+  className,
+  cluster = false,
+  fitBoundsKey,
+  maxFitZoom = 16,
+}: MapViewProps) {
+  const markerElements = markers.map((marker) => (
+    <Marker
+      key={marker.id}
+      position={[marker.position.lat, marker.position.lng]}
+      icon={marker.emphasized ? emphasizedIcon : defaultIcon}
+    >
+      {marker.popup && <Popup>{marker.popup}</Popup>}
+    </Marker>
+  ))
+
   return (
     <MapContainer center={[center.lat, center.lng]} zoom={zoom} className={className ?? 'h-64 w-full'}>
       <TileLayer url={mapTiles.tileUrl} attribution={mapTiles.attribution} />
       {onPick && <ClickHandler onPick={onPick} />}
-      {markers.map((marker) => (
-        <Marker key={marker.id} position={[marker.position.lat, marker.position.lng]} icon={defaultIcon}>
-          {marker.popup && <Popup>{marker.popup}</Popup>}
-        </Marker>
-      ))}
+      {fitBoundsKey !== undefined && <FitBounds markers={markers} fitBoundsKey={fitBoundsKey} maxFitZoom={maxFitZoom} />}
+      {cluster ? <MarkerClusterGroup>{markerElements}</MarkerClusterGroup> : markerElements}
     </MapContainer>
   )
 }
