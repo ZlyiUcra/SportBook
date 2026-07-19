@@ -21,6 +21,14 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
     private const int CancellationCutoffHours = 2;
     private const int MaxCreateAttempts = 3;
 
+    /// <summary>
+    /// The `Court -> Venue -> City` chain every booking-response path must load so
+    /// <see cref="Dtos.Mapping.ToResponse(Booking, DateTime)"/> can fill the venue/city/sport/court
+    /// labels (005 data-model.md). Kept in one place so no response path forgets a level.
+    /// </summary>
+    private static IQueryable<Booking> IncludeDetail(IQueryable<Booking> query) =>
+        query.Include(b => b.Court!).ThenInclude(c => c.Venue!).ThenInclude(v => v.City);
+
     public async Task<BookingResponse> CreateAsync(Guid userId, CreateBookingRequest request, CancellationToken ct)
     {
         var start = AsUtc(request.StartTime);
@@ -28,6 +36,7 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
         var now = timeProvider.GetUtcNow().UtcDateTime;
 
         var court = await db.Courts.AsNoTracking()
+            .Include(c => c.Venue!).ThenInclude(v => v.City)
             .SingleOrDefaultAsync(c => c.Id == request.CourtId && c.IsActive, ct)
             ?? throw new ApiException(404, "COURT_NOT_FOUND", "Court not found.");
 
@@ -65,6 +74,9 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
                 db.Bookings.Add(booking);
                 await db.SaveChangesAsync(ct);
                 await transaction.CommitAsync(ct);
+                // Attach the already-loaded court graph for mapping only (after save, so EF never
+                // tries to insert the detached court); the response needs venue/city/sport/court.
+                booking.Court = court;
                 return booking.ToResponse(now);
             }
             catch (Exception ex) when (IsDeadlock(ex) && attempt < MaxCreateAttempts)
@@ -79,7 +91,7 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
     public async Task<BookingResponse> CancelAsync(Guid userId, Guid bookingId, CancellationToken ct)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
-        var booking = await db.Bookings.SingleOrDefaultAsync(b => b.Id == bookingId, ct)
+        var booking = await IncludeDetail(db.Bookings).SingleOrDefaultAsync(b => b.Id == bookingId, ct)
             ?? throw new ApiException(404, "BOOKING_NOT_FOUND", "Booking not found.");
 
         OwnershipChecks.EnsureBookingCustomer(booking, userId);
@@ -102,19 +114,21 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
 
     public async Task<BookingResponse> GetByIdAsync(Guid userId, Guid bookingId, CancellationToken ct)
     {
-        var booking = await db.Bookings.AsNoTracking().SingleOrDefaultAsync(b => b.Id == bookingId, ct)
+        var booking = await IncludeDetail(db.Bookings.AsNoTracking()).SingleOrDefaultAsync(b => b.Id == bookingId, ct)
             ?? throw new ApiException(404, "BOOKING_NOT_FOUND", "Booking not found.");
 
         OwnershipChecks.EnsureBookingCustomer(booking, userId);
         return booking.ToResponse(timeProvider.GetUtcNow().UtcDateTime);
     }
 
-    public async Task<PagedResponse<BookingResponse>> ListMineAsync(Guid userId, PageRequest page, CancellationToken ct)
+    public async Task<PagedResponse<BookingResponse>> ListMineAsync(
+        Guid userId, BookingStatusFilter status, PageRequest page, CancellationToken ct)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var query = db.Bookings.AsNoTracking().Where(b => b.UserId == userId);
+        query = ApplyStatusFilter(query, status, now);
         var totalCount = await query.CountAsync(ct);
-        var items = await query
+        var items = await IncludeDetail(query)
             .OrderByDescending(b => b.StartTime)
             .Skip(page.Skip)
             .Take(page.PageSize)
@@ -123,6 +137,22 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
         return new PagedResponse<BookingResponse>(
             items.Select(b => b.ToResponse(now)).ToList(), page.Page, page.PageSize, totalCount);
     }
+
+    /// <summary>
+    /// Maps a <see cref="BookingStatusFilter"/> to a translatable predicate applied BEFORE paging
+    /// (005 data-model.md), so the filter acts on the whole history, not a materialized page.
+    /// `Completed` is encoded as Confirmed + past end time (never a stored status); a stale
+    /// pending-past booking matches none of Upcoming/Completed/Cancelled and so only appears under
+    /// `All`.
+    /// </summary>
+    private static IQueryable<Booking> ApplyStatusFilter(IQueryable<Booking> query, BookingStatusFilter status, DateTime now) =>
+        status switch
+        {
+            BookingStatusFilter.Upcoming => query.Where(b => b.Status != BookingStatus.Cancelled && b.EndTime > now),
+            BookingStatusFilter.Completed => query.Where(b => b.Status == BookingStatus.Confirmed && b.EndTime <= now),
+            BookingStatusFilter.Cancelled => query.Where(b => b.Status == BookingStatus.Cancelled),
+            _ => query,
+        };
 
     /// <summary>Only bookings for the caller's own venue (spec FR-010); venue ownership is checked directly, not per row.</summary>
     public async Task<PagedResponse<BookingResponse>> ListByVenueForOwnerAsync(
@@ -135,7 +165,7 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var query = db.Bookings.AsNoTracking().Where(b => b.Court!.VenueId == venueId);
         var totalCount = await query.CountAsync(ct);
-        var items = await query
+        var items = await IncludeDetail(query)
             .OrderByDescending(b => b.StartTime)
             .Skip(page.Skip)
             .Take(page.PageSize)
@@ -148,7 +178,7 @@ public class BookingService(SportBookDbContext db, TimeProvider timeProvider)
     /// <summary>Pending -> Confirmed only (spec FR-011, data-model.md state transitions); owner via Court.Venue.OwnerId.</summary>
     public async Task<BookingResponse> ConfirmAsync(Guid ownerId, Guid bookingId, CancellationToken ct)
     {
-        var booking = await db.Bookings.Include(b => b.Court).ThenInclude(c => c!.Venue)
+        var booking = await IncludeDetail(db.Bookings)
             .SingleOrDefaultAsync(b => b.Id == bookingId, ct)
             ?? throw new ApiException(404, "BOOKING_NOT_FOUND", "Booking not found.");
 

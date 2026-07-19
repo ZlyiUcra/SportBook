@@ -36,6 +36,9 @@ public static class Mapping
     /// <summary>
     /// `Completed` is derived on read (data-model.md state transitions): a Confirmed booking whose
     /// EndTime has passed is displayed as Completed without a stored transition or background job.
+    /// Callers MUST load the `Court -> Venue -> City` chain (Include) before mapping - the venue/
+    /// city/sport/court labels (005) are read from it; every booking-response path in
+    /// <see cref="Services.BookingService"/> loads that chain.
     /// </summary>
     public static BookingResponse ToResponse(this Booking booking, DateTime utcNow)
     {
@@ -43,7 +46,10 @@ public static class Mapping
             ? BookingStatus.Completed
             : booking.Status;
 
+        var court = booking.Court!;
+        var venue = court.Venue!;
         return new BookingResponse(booking.Id, booking.CourtId, booking.UserId, booking.StartTime,
-            booking.EndTime, status.ToString(), booking.TotalPrice, booking.CreatedAt);
+            booking.EndTime, status.ToString(), booking.TotalPrice, booking.CreatedAt,
+            venue.Name, venue.City!.ToResponse(), court.SportType.ToString(), court.Name);
     }
 }

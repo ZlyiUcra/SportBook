@@ -19,12 +19,16 @@ public class BookingsController(BookingService bookingService) : ControllerBase
         return StatusCode(StatusCodes.Status201Created, result);
     }
 
-    /// <summary>Paginated list of the caller's own bookings.</summary>
+    /// <summary>
+    /// Paginated list of the caller's own bookings. `status` (default All) filters by
+    /// All/Upcoming/Completed/Cancelled server-side, before paging, so it holds across pages (005
+    /// spec FR-006); the owner venue-bookings endpoint does not take this filter.
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<PagedResponse<BookingResponse>>> ListMine(
-        [FromQuery] PageRequest page, CancellationToken ct)
+        [FromQuery] BookingStatusFilter status, [FromQuery] PageRequest paging, CancellationToken ct)
     {
-        return Ok(await bookingService.ListMineAsync(User.GetUserId(), page, ct));
+        return Ok(await bookingService.ListMineAsync(User.GetUserId(), status, paging, ct));
     }
 
     /// <summary>A single booking; only the customer who made it may view it (403 otherwise).</summary>
@@ -44,9 +48,9 @@ public class BookingsController(BookingService bookingService) : ControllerBase
     /// <summary>Paginated list of bookings against one of the caller's own venues.</summary>
     [HttpGet("/api/venues/{venueId:guid}/bookings")]
     public async Task<ActionResult<PagedResponse<BookingResponse>>> ListByVenue(
-        Guid venueId, [FromQuery] PageRequest page, CancellationToken ct)
+        Guid venueId, [FromQuery] PageRequest paging, CancellationToken ct)
     {
-        return Ok(await bookingService.ListByVenueForOwnerAsync(User.GetUserId(), venueId, page, ct));
+        return Ok(await bookingService.ListByVenueForOwnerAsync(User.GetUserId(), venueId, paging, ct));
     }
 
     /// <summary>Confirms a pending booking; only the owner of the booked court's venue may call this (FR-011).</summary>
