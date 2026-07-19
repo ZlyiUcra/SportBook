@@ -82,7 +82,8 @@
     "sportLabel": "Esporte",
     "allSports": "Todos os esportes",
     "noResults": "Nenhum local encontrado.",
-    "pickReferencePrompt": "Selecione uma cidade ou use \"perto de mim\" para ver locais próximos."
+    "pickReferencePrompt": "Selecione uma cidade ou use \"perto de mim\" para ver locais próximos.",
+    "noneInView": "Nenhum local na área visível do mapa. Afaste ou mova o mapa."
   },
   "citySelect": {
     "placeholder": "Selecionar uma cidade",

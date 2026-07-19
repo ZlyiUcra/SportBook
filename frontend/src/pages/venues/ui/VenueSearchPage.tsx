@@ -13,7 +13,20 @@ import { useSearchStore } from '../model/searchStore'
 
 // Lazy so leaflet/react-leaflet/clustering never land in the initial route chunk (spec SC-006) -
 // this import only fires once a reference point exists and the map section actually renders.
+// The type-only import below is erased at build time and does not defeat the laziness.
 const MapView = React.lazy(() => import('@/shared/ui/map/MapView'))
+import type { MapBounds } from '@/shared/ui/map/MapView'
+import type { NearbyVenue } from '@/entities/venue/model/types'
+
+/** A venue is in view when its point lies within the reported bounds (004 research.md "Visibility test"). */
+function isInBounds(venue: NearbyVenue, bounds: MapBounds): boolean {
+  return (
+    venue.latitude >= bounds.south &&
+    venue.latitude <= bounds.north &&
+    venue.longitude >= bounds.west &&
+    venue.longitude <= bounds.east
+  )
+}
 
 /**
  * Reference-point radius view (003 spec US1-US3): the map and the list both read the same
@@ -49,6 +62,21 @@ export function VenueSearchPage() {
     ? `${referencePoint.lat},${referencePoint.lng}|${venues.map((v) => v.id).join(',')}`
     : undefined
 
+  // Latest completed-gesture viewport (004 US2). Page state, deliberately NOT in the search store
+  // - returning to the search must re-frame to the default full-radius view (004 spec FR-004).
+  const [viewportBounds, setViewportBounds] = React.useState<MapBounds | null>(null)
+  // A new reference means a new framing is coming - drop stale bounds so the list shows the full
+  // set until the map reports the framed view (004 spec FR-009). Keyed on the coordinate string,
+  // not the object, because the city-derived reference is rebuilt each render.
+  const referenceKey = referencePoint ? `${referencePoint.lat},${referencePoint.lng}` : ''
+  React.useEffect(() => {
+    setViewportBounds(null)
+  }, [referenceKey])
+
+  // The list shows the viewport-visible subset (004 spec FR-007, supersedes 003 FR-013); the map
+  // keeps rendering the FULL in-range set and emphasis stays the overall nearest (FR-011, FR-014).
+  const visibleVenues = viewportBounds ? venues.filter((venue) => isInBounds(venue, viewportBounds)) : venues
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
       <h1 className="text-2xl font-semibold">{t('venues.title')}</h1>
@@ -80,6 +108,10 @@ export function VenueSearchPage() {
         <p className="text-muted-foreground">{t('venues.noResults')}</p>
       )}
 
+      {referencePoint && venues.length > 0 && visibleVenues.length === 0 && (
+        <p className="text-muted-foreground">{t('venues.noneInView')}</p>
+      )}
+
       {referencePoint && venues.length > 0 && (
         <React.Suspense fallback={<p className="text-sm text-muted-foreground">{t('common.loading')}</p>}>
           <MapView
@@ -87,6 +119,7 @@ export function VenueSearchPage() {
             center={referencePoint}
             cluster
             fitBoundsKey={fitBoundsKey}
+            onViewportChange={setViewportBounds}
             markers={venues.map((venue) => ({
               id: venue.id,
               position: { lat: venue.latitude, lng: venue.longitude },
@@ -104,7 +137,7 @@ export function VenueSearchPage() {
       )}
 
       <div className="flex flex-col gap-3">
-        {venues.map((venue) => (
+        {visibleVenues.map((venue) => (
           <Link key={venue.id} to={`/venues/${venue.id}`}>
             <Card className="transition-colors hover:bg-accent/50">
               <CardHeader>

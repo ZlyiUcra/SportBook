@@ -37,6 +37,13 @@ const emphasizedIcon = L.icon({
 
 export type LatLng = { lat: number; lng: number }
 
+/**
+ * Plain serializable viewport shape (004 data-model.md "MapBounds") - the only form in which the
+ * visible area crosses this module's boundary, so no Leaflet type leaks into pages (contract
+ * MUST). A point is visible when lat in [south, north] and lng in [west, east].
+ */
+export type MapBounds = { south: number; west: number; north: number; east: number }
+
 export type MapMarker = {
   id: string
   position: LatLng
@@ -64,6 +71,12 @@ type MapViewProps = {
   fitBoundsKey?: string
   /** Caps how far `fitBoundsKey` framing may zoom in, so a tight cluster of markers does not over-zoom. */
   maxFitZoom?: number
+  /**
+   * Reports the visible area after each completed zoom/pan gesture (`moveend`/`zoomend` - never
+   * during one, 004 spec FR-008) and once on mount, as a plain `MapBounds`. Drives the
+   * viewport-synced results list (004 US2).
+   */
+  onViewportChange?: (bounds: MapBounds) => void
 }
 
 function ClickHandler({ onPick }: { onPick: (position: LatLng) => void }) {
@@ -72,6 +85,40 @@ function ClickHandler({ onPick }: { onPick: (position: LatLng) => void }) {
       onPick({ lat: e.latlng.lat, lng: e.latlng.lng })
     },
   })
+  return null
+}
+
+/** Converts Leaflet's bounds object to the plain boundary-crossing shape (004 contract MUST). */
+function toMapBounds(map: L.Map): MapBounds {
+  const bounds = map.getBounds()
+  return { south: bounds.getSouth(), west: bounds.getWest(), north: bounds.getNorth(), east: bounds.getEast() }
+}
+
+/**
+ * Reports the viewport on completed gestures only - `moveend`/`zoomend` fire once per finished
+ * drag/zoom, so no debouncing is needed (004 research.md "Viewport reporting"). The mount-time
+ * report gives consumers real bounds before any gesture; `fitBounds` framing then emits its own
+ * `moveend` with the framed view. The callback is read through a ref so re-renders of the parent
+ * never re-subscribe the map events.
+ */
+function ViewportReporter({ onViewportChange }: { onViewportChange: (bounds: MapBounds) => void }) {
+  const callbackRef = React.useRef(onViewportChange)
+  callbackRef.current = onViewportChange
+
+  const map = useMapEvents({
+    moveend() {
+      callbackRef.current(toMapBounds(map))
+    },
+    zoomend() {
+      callbackRef.current(toMapBounds(map))
+    },
+  })
+
+  React.useEffect(() => {
+    callbackRef.current(toMapBounds(map))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return null
 }
 
@@ -110,6 +157,7 @@ export default function MapView({
   cluster = false,
   fitBoundsKey,
   maxFitZoom = 16,
+  onViewportChange,
 }: MapViewProps) {
   const markerElements = markers.map((marker) => (
     <Marker
@@ -125,6 +173,7 @@ export default function MapView({
     <MapContainer center={[center.lat, center.lng]} zoom={zoom} className={className ?? 'h-64 w-full'}>
       <TileLayer url={mapTiles.tileUrl} attribution={mapTiles.attribution} />
       {onPick && <ClickHandler onPick={onPick} />}
+      {onViewportChange && <ViewportReporter onViewportChange={onViewportChange} />}
       {fitBoundsKey !== undefined && <FitBounds markers={markers} fitBoundsKey={fitBoundsKey} maxFitZoom={maxFitZoom} />}
       {cluster ? <MarkerClusterGroup>{markerElements}</MarkerClusterGroup> : markerElements}
     </MapContainer>

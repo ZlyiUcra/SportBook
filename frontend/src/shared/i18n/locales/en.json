@@ -82,7 +82,8 @@
     "sportLabel": "Sport",
     "allSports": "All sports",
     "noResults": "No venues found.",
-    "pickReferencePrompt": "Pick a city or use \"near me\" to see venues near you."
+    "pickReferencePrompt": "Pick a city or use \"near me\" to see venues near you.",
+    "noneInView": "No venues in the visible map area. Zoom out or move the map."
   },
   "citySelect": {
     "placeholder": "Select a city",

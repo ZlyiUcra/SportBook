@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@/shared/i18n'
@@ -6,23 +6,32 @@ import { VenueSearchPage } from '@/pages/venues/ui/VenueSearchPage'
 import { useSearchStore } from '@/pages/venues/model/searchStore'
 import { getNearbyVenues } from '@/entities/venue/api/venueApi'
 import { suggestCities } from '@/entities/city/api/cityApi'
-import type { MapMarker } from '@/shared/ui/map/MapView'
+import type { MapBounds, MapMarker } from '@/shared/ui/map/MapView'
 import type { NearbyVenue } from '@/entities/venue/model/types'
 import type { City } from '@/entities/city/model/types'
+
+// Captures the page's onViewportChange so tests can emit MapBounds like a completed zoom/pan
+// gesture would (004 US2). vi.hoisted because the mock factory below is hoisted above imports.
+const viewport = vi.hoisted(() => ({
+  emit: null as ((bounds: { south: number; west: number; north: number; east: number }) => void) | null,
+}))
 
 // research.md testing stance: no leaflet/WebGL in jsdom - the real MapView is mocked with a thin
 // stand-in that exposes markers (and which one is emphasized) as plain text.
 vi.mock('@/shared/ui/map/MapView', () => ({
-  default: ({ markers }: { markers: MapMarker[] }) => (
-    <ul data-testid="mock-map-markers">
-      {markers.map((marker) => (
-        <li key={marker.id}>
-          {marker.id}
-          {marker.emphasized ? ' (nearest)' : ''}
-        </li>
-      ))}
-    </ul>
-  ),
+  default: ({ markers, onViewportChange }: { markers: MapMarker[]; onViewportChange?: (bounds: MapBounds) => void }) => {
+    viewport.emit = onViewportChange ?? null
+    return (
+      <ul data-testid="mock-map-markers">
+        {markers.map((marker) => (
+          <li key={marker.id}>
+            {marker.id}
+            {marker.emphasized ? ' (nearest)' : ''}
+          </li>
+        ))}
+      </ul>
+    )
+  },
 }))
 
 vi.mock('@/entities/venue/api/venueApi', () => ({
@@ -57,8 +66,15 @@ const lvivCity: City = {
   longitude: 24.02324,
 }
 
-function makeNearby(id: string, distanceKm: number): NearbyVenue {
-  return { id, name: `Venue ${id}`, city, address: '1 St', description: null, latitude: 50.45, longitude: 30.52, distanceKm }
+function makeNearby(id: string, distanceKm: number, latitude = 50.45, longitude = 30.52): NearbyVenue {
+  return { id, name: `Venue ${id}`, city, address: '1 St', description: null, latitude, longitude, distanceKm }
+}
+
+/** Emits bounds the way a completed zoom/pan gesture would - see the MapView mock above. */
+function emitViewport(bounds: MapBounds) {
+  act(() => {
+    viewport.emit?.(bounds)
+  })
 }
 
 function stubGeolocation(latitude: number, longitude: number) {
@@ -148,5 +164,46 @@ describe('VenueSearchPage - reference-point radius view', () => {
     expect(getNearbyVenues).not.toHaveBeenCalled()
     expect(screen.queryByTestId('mock-map-markers')).not.toBeInTheDocument()
     expect(screen.getByText('Pick a city or use "near me" to see venues near you.')).toBeInTheDocument()
+  })
+
+  it('T008: the list follows the viewport - zoom in narrows it, zoom out widens it back', async () => {
+    // near-1 sits at the reference; far-2 is ~17km north - both in range, spatially apart.
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('near-1', 0.5), makeNearby('far-2', 17, 50.6)])
+    stubGeolocation(50.45466, 30.5238)
+
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /near me/i }))
+    await waitFor(() => expect(screen.getByTestId('mock-map-markers')).toBeInTheDocument())
+
+    // Before any viewport report: the full in-range set (spec FR-009).
+    expect(screen.getByText('Venue near-1')).toBeInTheDocument()
+    expect(screen.getByText('Venue far-2')).toBeInTheDocument()
+
+    // "Zoom into" the northern area - only far-2 lies inside.
+    emitViewport({ south: 50.55, north: 50.65, west: 30.4, east: 30.6 })
+    expect(screen.queryByText('Venue near-1')).not.toBeInTheDocument()
+    expect(screen.getByText('Venue far-2')).toBeInTheDocument()
+    // The map still shows the FULL set and emphasis stays the overall nearest (FR-011, FR-014).
+    expect(screen.getByText('near-1 (nearest)')).toBeInTheDocument()
+
+    // "Zoom back out" - the list widens again.
+    emitViewport({ south: 50.3, north: 50.7, west: 30.3, east: 30.7 })
+    expect(screen.getByText('Venue near-1')).toBeInTheDocument()
+    expect(screen.getByText('Venue far-2')).toBeInTheDocument()
+  })
+
+  it('T008: an empty viewport shows "no venues in view", distinct from the no-results state', async () => {
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('near-1', 0.5)])
+    stubGeolocation(50.45466, 30.5238)
+
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /near me/i }))
+    await waitFor(() => expect(screen.getByTestId('mock-map-markers')).toBeInTheDocument())
+
+    emitViewport({ south: 51.5, north: 51.6, west: 31.5, east: 31.6 })
+
+    expect(screen.getByText('No venues in the visible map area. Zoom out or move the map.')).toBeInTheDocument()
+    expect(screen.queryByText('No venues found.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Venue near-1')).not.toBeInTheDocument()
   })
 })
