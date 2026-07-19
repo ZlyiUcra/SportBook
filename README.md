@@ -66,6 +66,12 @@ never persisted - no repeated location prompt), the results list follows the map
 to narrow it, zoom out to widen it), and long lists page at 10 venues - see
 `specs/004-search-return-viewport-list/spec.md`.
 
+`005` enriches the customer "My bookings" page: each booking row shows the venue, its city, the
+sport, and the court (not just a bare time and price), an All / Upcoming / Completed / Cancelled
+status filter is applied server-side across the whole history before paging so it holds across
+pages (Completed is a derived view of Confirmed bookings whose time has passed - never a stored
+status), and a long list pages with Previous/Next - see `specs/005-my-bookings-detail/spec.md`.
+
 Automated tests cover the booking flow (25 tests: 11 unit, 14 integration against a real SQL Server
 instance) plus the city/map feature's suggestion ranking, nearest-city resolution, nearby-radius
 enforcement, and venue location validation, plus the venue radius feature's distance/order/cap
@@ -265,9 +271,13 @@ Login/Register requires being signed in - you're redirected to Login if you aren
    already booked - by anyone, Pending or Confirmed - don't appear).
 4. Pick a free slot and book it. The booking is created as **Pending** with its price already
    computed (`pricePerHour x hours`) - nothing about the price is entered by you.
-5. **My Bookings** (`/bookings`) lists every booking you've made, with its current status
-   (Pending, Confirmed, Cancelled) and price. You can cancel a booking from here as long as it
-   starts more than 2 hours from now; inside that window the cancel action is refused.
+5. **My Bookings** (`/bookings`) lists every booking you've made. Each row shows the venue, its
+   city, the sport and court, the time, the status (Pending, Confirmed, Cancelled), and the price.
+   Filter by All / Upcoming / Completed / Cancelled to narrow the list across your whole history
+   (Completed covers Confirmed bookings whose time has passed), and page a long list with
+   Previous/Next - changing the filter returns to page 1. You can cancel a booking from here as long
+   as it starts more than 2 hours from now; inside that window the cancel action is refused.
+   Cancelled bookings stay in the list as a record.
 6. From a venue's page you can also leave a review (1-5 stars + an optional comment) once you're
    signed in - submitting a second review for the same venue overwrites your first one instead of
    adding a new one, and the venue's average rating updates right away.
@@ -324,3 +334,11 @@ need the SQL Server container from step 1 running and reachable - they create an
 - `specs/004-search-return-viewport-list/plan.md` - technical plan (session store, viewport
   reporting, client-side paging).
 - `specs/004-search-return-viewport-list/tasks.md` - full task breakdown and current progress.
+- `specs/005-my-bookings-detail/spec.md` - enriched "My bookings" rows, status filter, and paging
+  spec.
+- `specs/005-my-bookings-detail/plan.md` - technical plan (derived Completed status, server-side
+  filter-before-paging, shared booking-summary component).
+- `specs/005-my-bookings-detail/data-model.md` - widened BookingResponse and the
+  court->venue->city Include chain.
+- `specs/005-my-bookings-detail/contracts/api.md` - status filter query parameter and pagination.
+- `specs/005-my-bookings-detail/tasks.md` - full task breakdown and current progress.
