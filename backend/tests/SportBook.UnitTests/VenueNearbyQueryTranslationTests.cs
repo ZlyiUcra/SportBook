@@ -1,9 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using SportBook.Domain.Enums;
 using SportBook.UnitTests.TestInfrastructure;
 
 namespace SportBook.UnitTests;
 
-/// <summary>T030: `ToQueryString()` proves the `CityId IN &lt;neighbor set&gt;` filter translates to SQL rather than client-evaluating (research.md Nearby-cities computation shape).</summary>
+/// <summary>
+/// Query-translation guards for both of VenueService's nearby-search paths: T030 (002) proves
+/// the city-neighbor `CityId IN &lt;set&gt;` filter translates; T011 (003) proves the
+/// coordinate-radius `Latitude != null` (+ optional sport) filter translates and pushes no
+/// trigonometry into SQL - distance itself is computed in C# over the materialized candidates
+/// (003 research.md "Distance computation").
+/// </summary>
 public class VenueNearbyQueryTranslationTests
 {
     [Fact]
@@ -19,5 +26,22 @@ public class VenueNearbyQueryTranslationTests
 
         Assert.Contains("WHERE", sql, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("CityId", sql);
+    }
+
+    [Fact]
+    public void Latitude_not_null_filter_with_optional_sport_translates_to_sql_with_no_trigonometry()
+    {
+        using var db = new TestDb();
+
+        var sql = db.Db.Venues
+            .Where(v => v.Latitude != null)
+            .Where(v => v.Courts.Any(c => c.SportType == SportType.Tennis && c.IsActive))
+            .ToQueryString();
+
+        Assert.Contains("WHERE", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Latitude", sql);
+        Assert.DoesNotContain("SIN(", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("COS(", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("ATN2(", sql, StringComparison.OrdinalIgnoreCase);
     }
 }
