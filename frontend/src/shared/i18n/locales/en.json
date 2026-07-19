@@ -82,18 +82,16 @@
     "sportLabel": "Sport",
     "allSports": "All sports",
     "noResults": "No venues found.",
-    "includeNearby": "Include nearby cities (150km)",
-    "showMap": "Show map",
-    "hideMap": "Hide map"
+    "pickReferencePrompt": "Pick a city or use \"near me\" to see venues near you."
   },
   "citySelect": {
     "placeholder": "Select a city",
     "searchPlaceholder": "Type a city name...",
     "typeMore": "Type at least 2 characters.",
     "noResults": "No matching city.",
-    "myCity": "My city",
     "locating": "Locating...",
-    "myCityError": "Couldn't detect your city. Pick one manually."
+    "nearMe": "Near me",
+    "nearMeError": "Couldn't detect your location. Pick a city instead."
   },
   "venueDetail": {
     "courts": "Courts",

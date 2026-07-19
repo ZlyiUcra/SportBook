@@ -82,18 +82,16 @@
     "sportLabel": "Esporte",
     "allSports": "Todos os esportes",
     "noResults": "Nenhum local encontrado.",
-    "includeNearby": "Incluir cidades próximas (150km)",
-    "showMap": "Mostrar mapa",
-    "hideMap": "Ocultar mapa"
+    "pickReferencePrompt": "Selecione uma cidade ou use \"perto de mim\" para ver locais próximos."
   },
   "citySelect": {
     "placeholder": "Selecionar uma cidade",
     "searchPlaceholder": "Digite o nome de uma cidade...",
     "typeMore": "Digite pelo menos 2 caracteres.",
     "noResults": "Nenhuma cidade encontrada.",
-    "myCity": "Minha cidade",
     "locating": "Localizando...",
-    "myCityError": "Não foi possível detectar sua cidade. Selecione manualmente."
+    "nearMe": "Perto de mim",
+    "nearMeError": "Não foi possível detectar sua localização. Selecione uma cidade."
   },
   "venueDetail": {
     "courts": "Quadras",
