@@ -62,12 +62,31 @@ export function VenueDetailPage() {
     },
   })
 
+  // Always-visible return to the search (004 spec FR-001) - a route link, not history
+  // navigation, so it works identically for customers who landed here directly (research.md
+  // "Back control"); the search itself restores from the session store (004 US1).
+  const backToSearch = (
+    <Link to="/" className="self-start text-sm text-muted-foreground underline">
+      {t('venueDetail.backToSearch')}
+    </Link>
+  )
+
   if (venueQuery.isLoading) {
-    return <p className="p-4 text-muted-foreground">{t('common.loading')}</p>
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        {backToSearch}
+        <p className="text-muted-foreground">{t('common.loading')}</p>
+      </div>
+    )
   }
 
   if (venueQuery.isError || !venueQuery.data) {
-    return <p className="p-4 text-destructive">{t('common.requestFailed')}</p>
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        {backToSearch}
+        <p className="text-destructive">{t('common.requestFailed')}</p>
+      </div>
+    )
   }
 
   const venue = venueQuery.data
@@ -76,6 +95,7 @@ export function VenueDetailPage() {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
+      {backToSearch}
       <div>
         <h1 className="text-2xl font-semibold">{venue.name}</h1>
         <p className="text-sm text-muted-foreground">

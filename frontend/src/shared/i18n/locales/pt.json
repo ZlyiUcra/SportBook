@@ -94,6 +94,7 @@
     "nearMeError": "Não foi possível detectar sua localização. Selecione uma cidade."
   },
   "venueDetail": {
+    "backToSearch": "Voltar para a busca",
     "courts": "Quadras",
     "noCourts": "Este local não tem quadras ativas.",
     "pricePerHour": "{{price}}/h",

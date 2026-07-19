@@ -7,8 +7,9 @@ import { getNearbyVenues } from '@/entities/venue/api/venueApi'
 import { sportTypes, type SportType } from '@/entities/venue/model/types'
 import { CityCombobox } from '@/features/city-select/ui/CityCombobox'
 import { NearMeButton } from '@/features/city-select/ui/NearMeButton'
-import { cityName, type City } from '@/entities/city/model/types'
+import { cityName } from '@/entities/city/model/types'
 import { useReferencePoint } from '@/shared/lib/useReferencePoint'
+import { useSearchStore } from '../model/searchStore'
 
 // Lazy so leaflet/react-leaflet/clustering never land in the initial route chunk (spec SC-006) -
 // this import only fires once a reference point exists and the map section actually renders.
@@ -19,14 +20,20 @@ const MapView = React.lazy(() => import('@/shared/ui/map/MapView'))
  * in-range set from `GET /api/venues/nearby`, centered on the resolved reference point (device
  * location via "near me", else the selected city, else none - `useReferencePoint`). Supersedes
  * 002's page-based `VenueSearchMap` and `includeNearby` toggle (research.md "What this
- * supersedes on the search page").
+ * supersedes on the search page"). Since 004, the search inputs live in the session-scoped
+ * `useSearchStore` instead of component state, so navigating to a venue page and back restores
+ * the search - reference point, sport filter, results - with no geolocation prompt (004 US1).
  */
 export function VenueSearchPage() {
   const { t, i18n } = useTranslation()
-  const [city, setCity] = React.useState<City | null>(null)
-  const [sportType, setSportType] = React.useState<SportType | ''>('')
+  const city = useSearchStore((state) => state.city)
+  const setCity = useSearchStore((state) => state.setCity)
+  const sportType = useSearchStore((state) => state.sportType)
+  const setSportType = useSearchStore((state) => state.setSportType)
+  const deviceCoords = useSearchStore((state) => state.deviceCoords)
+  const setDeviceCoords = useSearchStore((state) => state.setDeviceCoords)
 
-  const { referencePoint, geolocationStatus, requestDeviceLocation } = useReferencePoint(city)
+  const { referencePoint, geolocationStatus, requestDeviceLocation } = useReferencePoint(city, deviceCoords, setDeviceCoords)
 
   const nearbyQuery = useQuery({
     queryKey: ['venues-nearby', referencePoint, sportType],

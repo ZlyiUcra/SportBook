@@ -94,6 +94,7 @@
     "nearMeError": "Couldn't detect your location. Pick a city instead."
   },
   "venueDetail": {
+    "backToSearch": "Back to search",
     "courts": "Courts",
     "noCourts": "This venue has no active courts.",
     "pricePerHour": "{{price}}/h",

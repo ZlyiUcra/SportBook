@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@/shared/i18n'
 import { VenueSearchPage } from '@/pages/venues/ui/VenueSearchPage'
+import { useSearchStore } from '@/pages/venues/model/searchStore'
 import { getNearbyVenues } from '@/entities/venue/api/venueApi'
 import { suggestCities } from '@/entities/city/api/cityApi'
 import type { MapMarker } from '@/shared/ui/map/MapView'
@@ -95,6 +96,8 @@ describe('VenueSearchPage - reference-point radius view', () => {
   beforeEach(() => {
     vi.mocked(getNearbyVenues).mockReset()
     vi.mocked(suggestCities).mockReset()
+    // Since 004 the search state is a module-level session store - reset it between tests.
+    useSearchStore.setState({ city: null, sportType: '', deviceCoords: null })
   })
 
   it('T014: the near-me flow shows the in-range venues on the map and in the list nearest-first', async () => {
