@@ -12,9 +12,6 @@ import { getVenue } from '@/entities/venue/api/venueApi'
 import { getAvailability } from '@/entities/booking/api/bookingApi'
 import { createBooking } from '@/features/booking/create/api/createBooking'
 import { listReviews } from '@/entities/review/api/reviewApi'
-import { createReview } from '@/features/review/create/api/createReview'
-import { ReviewForm } from '@/features/review/create/ui/ReviewForm'
-import { useSessionStore } from '@/entities/session/model/store'
 import { cityName } from '@/entities/city/model/types'
 
 // Lazy so leaflet/react-leaflet never land in the initial route chunk (spec SC-006) - this
@@ -46,20 +43,10 @@ export function VenueDetailPage() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['availability', selectedCourtId, date] }),
   })
 
-  const currentUser = useSessionStore((state) => state.user)
-
   const reviewsQuery = useQuery({
     queryKey: ['reviews', id],
     queryFn: () => listReviews(id!),
     enabled: !!id,
-  })
-
-  const reviewMutation = useMutation({
-    mutationFn: (values: Parameters<typeof createReview>[1]) => createReview(id!, values),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews', id] })
-      queryClient.invalidateQueries({ queryKey: ['venue', id] })
-    },
   })
 
   // Always-visible return to the search (004 spec FR-001) - a route link, not history
@@ -228,33 +215,6 @@ export function VenueDetailPage() {
           </Card>
         ))}
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {reviewsQuery.data?.items.some((r) => r.userId === currentUser?.id)
-              ? t('review.editTitle')
-              : t('review.addTitle')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ReviewForm
-            defaultValues={(() => {
-              const mine = reviewsQuery.data?.items.find((r) => r.userId === currentUser?.id)
-              return mine ? { rating: mine.rating, comment: mine.comment ?? '' } : undefined
-            })()}
-            onSubmit={(values) => reviewMutation.mutate(values)}
-            isSubmitting={reviewMutation.isPending}
-          />
-          {reviewMutation.isError && (
-            <p role="alert" className="mt-2 text-sm text-destructive">
-              {reviewMutation.error instanceof ApiRequestError
-                ? reviewMutation.error.message
-                : t('common.requestFailed')}
-            </p>
-          )}
-        </CardContent>
-      </Card>
     </div>
   )
 }

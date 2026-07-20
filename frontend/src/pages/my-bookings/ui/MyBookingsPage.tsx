@@ -3,12 +3,17 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog'
 import { cn } from '@/shared/lib/utils'
 import { ApiRequestError } from '@/shared/api/axiosInstance'
 import { bookingStatusFilters, listMyBookings, type BookingStatusFilter } from '@/entities/booking/api/bookingApi'
 import type { Booking } from '@/entities/booking/model/types'
 import { BookingSummary } from '@/entities/booking/ui/BookingSummary'
 import { cancelBooking } from '@/features/booking/cancel/api/cancelBooking'
+import { listReviews } from '@/entities/review/api/reviewApi'
+import { createReview } from '@/features/review/create/api/createReview'
+import { ReviewForm } from '@/features/review/create/ui/ReviewForm'
+import { useSessionStore } from '@/entities/session/model/store'
 
 /**
  * The caller's own bookings (001 T039) - each row now shows venue/city/sport/court detail (005
@@ -85,16 +90,19 @@ export function MyBookingsPage() {
           <Card key={booking.id}>
             <CardContent className="flex flex-wrap items-center justify-between gap-4 py-4">
               <BookingSummary booking={booking} />
-              {isCancellable(booking) && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={cancelMutation.isPending}
-                  onClick={() => cancelMutation.mutate(booking.id)}
-                >
-                  {t('bookings.cancel')}
-                </Button>
-              )}
+              <div className="flex gap-2">
+                {booking.status === 'Completed' && <ReviewAction booking={booking} />}
+                {isCancellable(booking) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={cancelMutation.isPending}
+                    onClick={() => cancelMutation.mutate(booking.id)}
+                  >
+                    {t('bookings.cancel')}
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -114,5 +122,61 @@ export function MyBookingsPage() {
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * The review entry for a completed booking (005/006 US2) - reached only from here, never from the
+ * venue page. Reviews are per venue, not per booking, so it reuses the venue's review list to
+ * pre-fill the caller's existing review; the eligibility gate (006 US1) is enforced server-side, so
+ * a rejection (e.g. a legacy author who no longer qualifies) surfaces via ApiRequestError.
+ */
+function ReviewAction({ booking }: { booking: Booking }) {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const currentUser = useSessionStore((state) => state.user)
+  const [open, setOpen] = React.useState(false)
+
+  const reviewsQuery = useQuery({
+    queryKey: ['reviews', booking.venueId],
+    queryFn: () => listReviews(booking.venueId),
+    enabled: open,
+  })
+
+  const reviewMutation = useMutation({
+    mutationFn: (values: Parameters<typeof createReview>[1]) => createReview(booking.venueId, values),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', booking.venueId] })
+      setOpen(false)
+    },
+  })
+
+  const mine = reviewsQuery.data?.items.find((r) => r.userId === currentUser?.id)
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          {mine ? t('review.editAction') : t('review.addAction')}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{mine ? t('review.editTitle') : t('review.addTitle')}</DialogTitle>
+        </DialogHeader>
+        <ReviewForm
+          defaultValues={mine ? { rating: mine.rating, comment: mine.comment ?? '' } : undefined}
+          onSubmit={(values) => reviewMutation.mutate(values)}
+          isSubmitting={reviewMutation.isPending}
+        />
+        {reviewMutation.isError && (
+          <p role="alert" className="text-sm text-destructive">
+            {reviewMutation.error instanceof ApiRequestError
+              ? reviewMutation.error.message
+              : t('common.requestFailed')}
+          </p>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }

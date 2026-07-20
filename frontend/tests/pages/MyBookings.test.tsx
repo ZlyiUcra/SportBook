@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@/shared/i18n'
 import { MyBookingsPage } from '@/pages/my-bookings/ui/MyBookingsPage'
 import { listMyBookings } from '@/entities/booking/api/bookingApi'
+import { listReviews } from '@/entities/review/api/reviewApi'
+import { createReview } from '@/features/review/create/api/createReview'
 import type { PagedResponse } from '@/shared/api/types'
 import type { Booking } from '@/entities/booking/model/types'
 import type { City } from '@/entities/city/model/types'
@@ -13,6 +15,14 @@ vi.mock('@/entities/booking/api/bookingApi', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/entities/booking/api/bookingApi')>()
   return { ...actual, listMyBookings: vi.fn() }
 })
+
+vi.mock('@/entities/review/api/reviewApi', () => ({
+  listReviews: vi.fn(),
+}))
+
+vi.mock('@/features/review/create/api/createReview', () => ({
+  createReview: vi.fn(),
+}))
 
 const city: City = {
   id: 703448,
@@ -26,19 +36,20 @@ const city: City = {
   longitude: 30.5238,
 }
 
-function makeBooking(id: string): Booking {
+function makeBooking(id: string, status: Booking['status'] = 'Confirmed'): Booking {
   return {
     id,
     courtId: `court-${id}`,
     userId: 'user-1',
     startTime: '2026-08-01T10:00:00Z',
     endTime: '2026-08-01T11:00:00Z',
-    status: 'Confirmed',
+    status,
     totalPrice: 300,
     venueName: 'Sport Arena',
     city,
     sport: 'Tennis',
     courtName: 'Center Court',
+    venueId: `venue-${id}`,
   }
 }
 
@@ -107,5 +118,39 @@ describe('MyBookingsPage', () => {
     // Changing the filter resets to page 1 (spec FR-008).
     fireEvent.click(screen.getByRole('button', { name: 'Cancelled' }))
     await waitFor(() => expect(listMyBookings).toHaveBeenLastCalledWith('Cancelled', 1))
+  })
+
+  it('T009 (006): the review action shows only on a Completed booking', async () => {
+    vi.mocked(listMyBookings).mockResolvedValue(
+      paged([makeBooking('b1', 'Completed'), makeBooking('b2', 'Confirmed')]),
+    )
+
+    renderPage()
+    await screen.findAllByText('Sport Arena')
+
+    const reviewActions = screen.getAllByRole('button', { name: 'Leave a review' })
+    expect(reviewActions).toHaveLength(1)
+  })
+
+  it('T009 (006): submitting the review entry posts to that booking\'s venue', async () => {
+    vi.mocked(listMyBookings).mockResolvedValue(paged([makeBooking('b1', 'Completed')]))
+    vi.mocked(listReviews).mockResolvedValue({ items: [], page: 1, pageSize: 20, totalCount: 0 })
+    vi.mocked(createReview).mockResolvedValue({
+      id: 'review-1',
+      venueId: 'venue-b1',
+      userId: 'user-1',
+      userName: 'Me',
+      rating: 5,
+      comment: '',
+      createdAt: '2026-08-02T00:00:00Z',
+    })
+
+    renderPage()
+    await screen.findByText('Sport Arena')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Leave a review' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Submit review' }))
+
+    await waitFor(() => expect(createReview).toHaveBeenCalledWith('venue-b1', expect.anything()))
   })
 })

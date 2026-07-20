@@ -90,21 +90,21 @@ non-completed bookings offer none.
 
 ### Implementation for User Story 2
 
-- [ ] T004 [US2] Backend: add `Guid VenueId` to `BookingResponse` in
+- [x] T004 [US2] Backend: add `Guid VenueId` to `BookingResponse` in
       `backend/src/SportBook.Application/Dtos/BookingDtos.cs` and populate it in
       `Mapping.ToResponse(this Booking, ...)` in `backend/src/SportBook.Application/Dtos/Mapping.cs`
       from the already-loaded `booking.Court!.VenueId` (no new Include, no other field added), per
       contracts/api.md and data-model.md
-- [ ] T005 [P] [US2] Integration test: a booking response carries `venueId` equal to its court's
+- [x] T005 [P] [US2] Integration test: a booking response carries `venueId` equal to its court's
       venue, alongside the 005 labels, in
       `backend/tests/SportBook.IntegrationTests/BookingDetailTests.cs`
-- [ ] T006 [P] [US2] Frontend: add `venueId: string` to the `Booking` type in
+- [x] T006 [P] [US2] Frontend: add `venueId: string` to the `Booking` type in
       `frontend/src/entities/booking/model/types.ts` (depends on the contract; parallel to backend)
-- [ ] T007 [US2] Frontend: remove the review submission `Card`/`ReviewForm` block from
+- [x] T007 [US2] Frontend: remove the review submission `Card`/`ReviewForm` block from
       `frontend/src/pages/venue-detail/ui/VenueDetailPage.tsx` (and its now-unused `createReview`
       mutation, `ReviewForm` import, and current-user prefill lookup); KEEP the review list display
       and its `listReviews` query untouched (spec FR-003, FR-010)
-- [ ] T008 [US2] Frontend: on `frontend/src/pages/my-bookings/ui/MyBookingsPage.tsx`, show a review
+- [x] T008 [US2] Frontend: on `frontend/src/pages/my-bookings/ui/MyBookingsPage.tsx`, show a review
       action only on rows whose status is `Completed`; opening it reveals the review entry (in-place
       panel or dialog) hosting `ReviewForm`, submitting via `createReview(booking.venueId, values)`,
       pre-filled with the caller's existing review for that venue (reuse `listReviews(venueId)`,
@@ -112,7 +112,7 @@ non-completed bookings offer none.
       message via `ApiRequestError`; the action is absent on Pending/Confirmed-upcoming/Cancelled
       rows (spec FR-004, FR-005). Add i18n keys (review-action label, entry title) in
       `frontend/src/shared/i18n/locales/{en,uk,pt}.json` (depends on T006, T007)
-- [ ] T009 [US2] Frontend test: the venue page renders the review list but NO submission form; on
+- [x] T009 [US2] Frontend test: the venue page renders the review list but NO submission form; on
       "My bookings" the review action shows only on a Completed row and submitting posts to that
       booking's venue, in `frontend/tests/pages/VenueDetail.test.tsx` and
       `frontend/tests/pages/MyBookings.test.tsx` (depends on T007, T008)

@@ -171,7 +171,9 @@
     "comment": "Comentário",
     "submit": "Enviar avaliação",
     "addTitle": "Deixar uma avaliação",
-    "editTitle": "Atualizar sua avaliação"
+    "editTitle": "Atualizar sua avaliação",
+    "addAction": "Deixar uma avaliação",
+    "editAction": "Editar sua avaliação"
   },
   "about": {
     "title": "Sobre o SportBook",

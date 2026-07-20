@@ -7,7 +7,8 @@ namespace SportBook.IntegrationTests;
 
 /// <summary>
 /// T004 (005): the booking response carries the venue/city/sport/court labels on both the customer
-/// "My bookings" list and the owner "Venue bookings" list (shared shape).
+/// "My bookings" list and the owner "Venue bookings" list (shared shape). T005 (006): it also
+/// carries `VenueId`, equal to its court's venue.
 /// </summary>
 [Collection(ApiCollection.Name)]
 public class BookingDetailTests(ApiFixture fixture)
@@ -31,6 +32,7 @@ public class BookingDetailTests(ApiFixture fixture)
         Assert.Equal(ApiClientExtensions.KyivCityId, booking.City.Id);
         Assert.Equal("Tennis", booking.Sport);
         Assert.False(string.IsNullOrWhiteSpace(booking.CourtName));
+        Assert.Equal(court.VenueId, booking.VenueId);
     }
 
     [Fact]

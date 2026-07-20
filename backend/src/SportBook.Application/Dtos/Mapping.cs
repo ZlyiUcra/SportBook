@@ -50,6 +50,6 @@ public static class Mapping
         var venue = court.Venue!;
         return new BookingResponse(booking.Id, booking.CourtId, booking.UserId, booking.StartTime,
             booking.EndTime, status.ToString(), booking.TotalPrice, booking.CreatedAt,
-            venue.Name, venue.City!.ToResponse(), court.SportType.ToString(), court.Name);
+            venue.Name, venue.City!.ToResponse(), court.SportType.ToString(), court.Name, venue.Id);
     }
 }

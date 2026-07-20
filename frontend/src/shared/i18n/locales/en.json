@@ -171,7 +171,9 @@
     "comment": "Comment",
     "submit": "Submit review",
     "addTitle": "Leave a review",
-    "editTitle": "Update your review"
+    "editTitle": "Update your review",
+    "addAction": "Leave a review",
+    "editAction": "Edit your review"
   },
   "about": {
     "title": "About SportBook",

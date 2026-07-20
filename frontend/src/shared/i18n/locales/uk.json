@@ -171,7 +171,9 @@
     "comment": "Коментар",
     "submit": "Залишити відгук",
     "addTitle": "Залишити відгук",
-    "editTitle": "Оновити ваш відгук"
+    "editTitle": "Оновити ваш відгук",
+    "addAction": "Залишити відгук",
+    "editAction": "Редагувати відгук"
   },
   "about": {
     "title": "Про SportBook",
