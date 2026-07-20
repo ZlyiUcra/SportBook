@@ -29,7 +29,9 @@ no separate "business" signup:
   One review per user per venue - submitting again replaces your previous rating and comment
   rather than creating a duplicate, and the venue's average rating updates immediately. The review
   entry itself lives on "My Bookings" next to each completed booking, not on the venue page - the
-  venue page still shows everyone else's reviews.
+  venue page still shows everyone else's reviews. A review stays editable by its author for only
+  24 hours after it was first left, and editing it requires a real comment of at least 10
+  characters - past that window it is read-only, though still visible to everyone.
 
 Every account can act as both a customer and a venue owner at the same time - registration always
 creates a plain account, and there is currently no separate "become a venue owner" step or
@@ -82,11 +84,19 @@ showing the reviews others left. The rating input is now an interactive five-sta
 preview, click, keyboard, and touch) instead of a dropdown - see
 `specs/006-reviews-after-completed/spec.md`.
 
+`007` narrows how long a review stays changeable: replacing an existing review is only accepted
+within 24 hours of when it was first created - measured from that original creation time, never
+reset by an earlier edit - after which it becomes read-only to its author while still displaying to
+everyone. Replacing a review within that window also now requires a real comment of at least 10
+characters, so an edit can no longer blank one out; a first-time submission's comment stays
+optional. See `specs/007-review-edit-window/spec.md`.
+
 Automated tests cover the booking flow (25 tests: 11 unit, 14 integration against a real SQL Server
 instance) plus the city/map feature's suggestion ranking, nearest-city resolution, nearby-radius
 enforcement, and venue location validation, plus the venue radius feature's distance/order/cap
 logic, SQL-translation guard, and the nearby endpoint's range validation and radius enforcement,
-plus the review eligibility gate (unit and integration). Tests for venue management and reviews
+plus the review eligibility gate and the edit window/comment-length rules (unit and integration).
+Tests for venue management and reviews
 (001) are deferred to that feature's polish phase - see
 `specs/001-sportbook-venue-booking/tasks.md`.
 
@@ -294,7 +304,9 @@ Login/Register requires being signed in - you're redirected to Login if you aren
    Pick your rating with the five-star control (hover to preview, click, or use the keyboard) and
    an optional comment; submitting again for the same venue overwrites your previous review instead
    of adding a new one, and the venue's average rating updates right away. The venue's own page
-   still shows everyone else's reviews, just not a submission form.
+   still shows everyone else's reviews, just not a submission form. You can keep editing your review
+   for 24 hours after you first left it - editing requires a real comment of at least 10 characters
+   - after that it is shown to you read-only, though it stays visible to everyone else.
 
 ### Managing your own venues (owner flow)
 
@@ -364,3 +376,11 @@ need the SQL Server container from step 1 running and reachable - they create an
   `venueId` on `BookingResponse`.
 - `specs/006-reviews-after-completed/contracts/api.md` - the `REVIEW_NOT_ELIGIBLE` rejection.
 - `specs/006-reviews-after-completed/tasks.md` - full task breakdown and current progress.
+- `specs/007-review-edit-window/spec.md` - the 24-hour edit window and minimum edit comment length
+  spec.
+- `specs/007-review-edit-window/plan.md` - technical plan (the window measured from the immutable
+  CreatedAt, replace-branch-only guard clauses).
+- `specs/007-review-edit-window/data-model.md` - the edit-window and edit-comment rules.
+- `specs/007-review-edit-window/contracts/api.md` - the `REVIEW_EDIT_WINDOW_CLOSED` and
+  `REVIEW_COMMENT_TOO_SHORT` rejections.
+- `specs/007-review-edit-window/tasks.md` - full task breakdown and current progress.

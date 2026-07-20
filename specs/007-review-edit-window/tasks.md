@@ -138,15 +138,22 @@ stays as low-friction as before.
 
 **Purpose**: i18n, README, and end-to-end validation
 
-- [ ] T011 [P] i18n: add rejection/read-only-view copy for `REVIEW_EDIT_WINDOW_CLOSED` context
+- [x] T011 [P] i18n: add rejection/read-only-view copy for `REVIEW_EDIT_WINDOW_CLOSED` context
       (read-only label) and the edit-mode comment requirement in
-      `frontend/src/shared/i18n/locales/{en,uk,pt}.json`
-- [ ] T012 [P] Update root `README.md`: a review stays editable by its author for 24 hours after
+      `frontend/src/shared/i18n/locales/{en,uk,pt}.json`. Done as part of T004/T009 (the read-only
+      view and the edit-mode comment validation needed the copy to exist to implement); confirmed
+      complete here.
+- [x] T012 [P] Update root `README.md`: a review stays editable by its author for 24 hours after
       creation and, when edited, requires a real (10+ character) comment; add the 007 spec to
       "Further reading"
-- [ ] T013 Run quickstart.md validation scenarios end-to-end against a locally running stack, plus
+- [x] T013 Run quickstart.md validation scenarios end-to-end against a locally running stack, plus
       non-regression: full `dotnet test`, `yarn test`, and a `yarn build` initial-chunk comparison
-      (must be unchanged - no new dependency)
+      (must be unchanged - no new dependency). Automated: full `dotnet test` (51 unit + 71
+      integration, all green) and `yarn test` (27, all green); `yarn build` bundle unchanged
+      (~672kB, no new dependency). NOTE: no live browser click-through was performed - this
+      environment has no headless-browser tooling (Playwright) installed, and installing it would
+      add a new dependency requiring sign-off per repo rules; flagged rather than assumed (same
+      note as feature 006).
 
 ---
 
