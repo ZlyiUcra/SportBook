@@ -181,10 +181,10 @@ export function VenueSearchPage() {
         </p>
       )}
 
-      <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
         {pagedVenues.map((venue) => (
           <Link key={venue.id} to={`/venues/${venue.id}`}>
-            <Card className="transition-colors hover:bg-accent/50">
+            <Card className="[--card-spacing:--spacing(2)] transition-colors hover:bg-accent/50">
               <CardHeader>
                 <CardTitle>{venue.name}</CardTitle>
               </CardHeader>
@@ -192,7 +192,6 @@ export function VenueSearchPage() {
                 <p className="text-sm text-muted-foreground">
                   {cityName(venue.city, i18n.language)}, {venue.address} - {venue.distanceKm.toFixed(1)} km
                 </p>
-                {venue.description && <p className="mt-1 text-sm">{venue.description}</p>}
               </CardContent>
             </Card>
           </Link>
