@@ -1,0 +1,202 @@
+{
+  "app": {
+    "title": "SportBook"
+  },
+  "nav": {
+    "venues": "Locales",
+    "myBookings": "Mis reservas",
+    "myVenues": "Mis locales",
+    "venueBookings": "Reservas del local",
+    "about": "Acerca de",
+    "signOut": "Cerrar sesión",
+    "logIn": "Iniciar sesión",
+    "openMenu": "Abrir menú"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "requestFailed": "Error en la solicitud. Inténtalo de nuevo.",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Contraseña",
+    "name": "Nombre",
+    "genericError": "Algo salió mal. Inténtalo de nuevo.",
+    "validation": {
+      "emailInvalid": "Introduce una dirección de correo electrónico válida.",
+      "passwordRequired": "La contraseña es obligatoria.",
+      "passwordMin": "La contraseña debe tener al menos 8 caracteres.",
+      "nameRequired": "El nombre es obligatorio."
+    },
+    "login": {
+      "title": "Iniciar sesión",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión...",
+      "noAccount": "¿Aún no tienes cuenta?",
+      "registerLink": "Regístrate"
+    },
+    "register": {
+      "title": "Registrarse",
+      "submit": "Registrarse",
+      "submitting": "Creando cuenta...",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "loginLink": "Iniciar sesión"
+    }
+  },
+  "settings": {
+    "label": "Ajustes"
+  },
+  "theme": {
+    "label": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "blue": "Azul"
+  },
+  "language": {
+    "label": "Idioma"
+  },
+  "sport": {
+    "Tennis": "Tenis",
+    "Football": "Fútbol",
+    "Basketball": "Baloncesto",
+    "Padel": "Pádel",
+    "Badminton": "Bádminton",
+    "Volleyball": "Voleibol",
+    "Other": "Otro"
+  },
+  "status": {
+    "Pending": "Pendiente",
+    "Confirmed": "Confirmada",
+    "Cancelled": "Cancelada",
+    "Completed": "Completada"
+  },
+  "venues": {
+    "title": "Encontrar un local",
+    "cityPlaceholder": "Ciudad",
+    "sportLabel": "Deporte",
+    "allSports": "Todos los deportes",
+    "noResults": "No se han encontrado locales.",
+    "pickReferencePrompt": "Elige una ciudad o usa \"cerca de mí\" para ver locales cercanos.",
+    "noneInView": "No hay locales en el área visible del mapa. Aleja o mueve el mapa."
+  },
+  "citySelect": {
+    "placeholder": "Selecciona una ciudad",
+    "searchPlaceholder": "Escribe el nombre de una ciudad...",
+    "typeMore": "Escribe al menos 2 caracteres.",
+    "noResults": "No se ha encontrado ninguna ciudad.",
+    "clear": "Borrar ciudad seleccionada",
+    "locating": "Localizando...",
+    "nearMe": "Cerca de mí",
+    "nearMeError": "No se ha podido detectar tu ubicación. Elige una ciudad."
+  },
+  "venueDetail": {
+    "backToSearch": "Volver a la búsqueda",
+    "courts": "Pistas",
+    "noCourts": "Este local no tiene pistas activas.",
+    "pricePerHour": "{{price}}/h",
+    "rating": "Valoración: {{rating}} ({{count}} valoraciones)",
+    "availabilityFor": "Disponibilidad - {{court}}",
+    "date": "Fecha",
+    "noSlots": "No hay horarios libres en esta fecha.",
+    "bookingSuccess": "¡Reservado! Precio total: {{price}}.",
+    "viewBookings": "Ver mis reservas"
+  },
+  "bookings": {
+    "title": "Mis reservas",
+    "empty": "Todavía no tienes reservas.",
+    "noneInFilter": "Ninguna reserva coincide con este filtro.",
+    "total": "Total: {{price}}",
+    "cancel": "Cancelar",
+    "filter": {
+      "All": "Todas",
+      "Upcoming": "Próximas",
+      "Completed": "Completadas",
+      "Cancelled": "Canceladas"
+    }
+  },
+  "owner": {
+    "title": "Mis locales",
+    "addVenue": "Añadir local",
+    "noVenues": "Todavía no tienes locales.",
+    "manageCourts": "Gestionar pistas",
+    "hideCourts": "Ocultar pistas",
+    "addCourt": "Añadir pista",
+    "noCourts": "Este local todavía no tiene pistas.",
+    "venue": {
+      "name": "Nombre",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "description": "Descripción",
+      "nameRequired": "El nombre es obligatorio.",
+      "cityRequired": "La ciudad es obligatoria.",
+      "addressRequired": "La dirección es obligatoria.",
+      "deleteConfirm": "¿Eliminar el local \"{{name}}\"? Esto también eliminará sus pistas y valoraciones.",
+      "pin": {
+        "label": "Marcador de ubicación (opcional)",
+        "place": "Colocar marcador",
+        "move": "Mover marcador",
+        "remove": "Quitar marcador"
+      }
+    },
+    "court": {
+      "name": "Nombre",
+      "sport": "Deporte",
+      "pricePerHour": "Precio por hora",
+      "pricePerHourValue": "{{price}}/h",
+      "opening": "Hora de apertura",
+      "closing": "Hora de cierre",
+      "active": "Activa (visible para los clientes)",
+      "inactive": "inactiva",
+      "nameRequired": "El nombre es obligatorio.",
+      "priceInvalid": "Indica un precio superior a 0.",
+      "deleteConfirm": "¿Eliminar la pista \"{{name}}\"?"
+    }
+  },
+  "ownerBookings": {
+    "selectVenue": "Selecciona un local",
+    "empty": "Todavía no hay reservas para este local.",
+    "confirm": "Confirmar"
+  },
+  "review": {
+    "title": "Valoraciones",
+    "empty": "Todavía no hay valoraciones.",
+    "ratingValue": "{{rating}}/5",
+    "rating": "Valoración",
+    "comment": "Comentario",
+    "commentTooShort": "Editar una valoración requiere un comentario de al menos 10 caracteres.",
+    "submit": "Enviar valoración",
+    "addTitle": "Dejar una valoración",
+    "editTitle": "Actualizar tu valoración",
+    "addAction": "Dejar una valoración",
+    "editAction": "Editar tu valoración",
+    "viewAction": "Ver tu valoración",
+    "readOnlyTitle": "Tu valoración",
+    "readOnlyNotice": "El plazo de 24 horas para editar esta valoración ha pasado - ya no se puede modificar.",
+    "starRating": "Valoración",
+    "starLabel": "Valorar {{count}} de 5"
+  },
+  "about": {
+    "title": "Acerca de SportBook",
+    "intro": "SportBook es una plataforma de doble sentido para reservar instalaciones deportivas (pistas y campos). Un local publica su disponibilidad y permite reservar una hora concreta sin necesidad de llamar por teléfono; el personal del local ve quién va a venir y confirma la reserva.",
+    "oneAccountTitle": "Una cuenta, los dos lados",
+    "oneAccount": "Cualquier cuenta puede actuar tanto como cliente como propietario de un local - el registro siempre crea una cuenta normal, y actualmente no existe un paso separado para \"convertirse en propietario\". Usar las páginas de búsqueda/reserva orientadas al cliente o el panel del propietario es solo cuestión de qué enlace de navegación elijas.",
+    "customerTitle": "Como cliente",
+    "customer": "Busca locales por ciudad y deporte, consulta los horarios libres de una pista en una fecha y reserva uno de ellos. El precio siempre se calcula a partir del precio por hora de la pista - la aplicación nunca confía en un precio enviado por el cliente. Una reserva se puede cancelar hasta 2 horas antes de su inicio; dentro de ese plazo la cancelación se rechaza.",
+    "ownerTitle": "Como propietario de un local",
+    "owner": "Registra tus propios locales y pistas (nombre, dirección, deporte, precio por hora, horario de apertura y cierre), consulta las reservas hechas en ellos y confirma cada reserva pendiente. Un local o pista no se puede eliminar mientras tenga una reserva futura y no cancelada.",
+    "reviewsTitle": "Valoraciones",
+    "reviews": "Solo puedes valorar un local (1 a 5 estrellas más un comentario opcional) después de completar una reserva confirmada en él: una valoración por usuario y local - enviar otra sustituye tu valoración y comentario anteriores en lugar de crear una duplicada, y la valoración media del local se actualiza de inmediato. Una valoración permanece editable durante 24 horas tras su creación; editarla exige un comentario de al menos 10 caracteres, y transcurrido ese plazo pasa a ser de solo lectura.",
+    "mapDataTitle": "Datos del mapa y atribución",
+    "mapDataIntro": "El directorio de ciudades usado en la búsqueda proviene de",
+    "mapDataLicense": "(CC BY 4.0). Las imágenes del mapa son (c)",
+    "mapDataContributors": "y colaboradores.",
+    "loginPrompt": "La mayor parte de la aplicación requiere una cuenta.",
+    "registerCta": "Regístrate"
+  }
+}

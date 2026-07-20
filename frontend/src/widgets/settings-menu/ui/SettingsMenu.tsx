@@ -17,6 +17,7 @@ const LANGUAGES = [
   { code: 'en', label: 'English' },
   { code: 'uk', label: 'Українська' },
   { code: 'pt', label: 'Português' },
+  { code: 'es', label: 'Español' },
 ]
 
 /** Single settings entry point (gear icon) for language + theme - visible on every page, anonymous or authenticated. */
