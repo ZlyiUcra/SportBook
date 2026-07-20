@@ -103,7 +103,10 @@ function MobileNavLink({
  * Also renders on the public `/about` route, where there is no signed-in user. In that case the
  * nav only shows "About" - every other link (Venues, My bookings, My venues, Venue bookings)
  * requires auth and would just bounce an anonymous visitor to Login, so showing them would be
- * misleading. The name/sign-out block is likewise swapped for a "Log in" link.
+ * misleading. The name/sign-out block is likewise swapped for a "Log in" link, and the app-title
+ * logo link is hidden entirely - signed out, it would only ever point back at the same `/about`
+ * page (its own destination `/` requires auth), which read as a dead click rather than the "go
+ * home" affordance a logo normally is.
  */
 export function AppHeader() {
   const { t } = useTranslation()
@@ -121,9 +124,11 @@ export function AppHeader() {
   return (
     <header className="flex items-center justify-between gap-2 border-b px-4 py-2">
       <div className="flex items-center gap-4">
-        <Link to={user ? '/' : '/about'} className="font-semibold">
-          {t('app.title')}
-        </Link>
+        {user && (
+          <Link to="/" className="font-semibold">
+            {t('app.title')}
+          </Link>
+        )}
         <nav className="hidden items-center gap-4 md:flex">
           {user && (
             <>
