@@ -2,11 +2,16 @@ using System.Net;
 using System.Net.Http.Json;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
+using SportBook.Domain.Enums;
 using SportBook.IntegrationTests.TestInfrastructure;
 
 namespace SportBook.IntegrationTests;
 
-/// <summary>T054: a second review by the same user replaces the first rather than duplicating it (data-model.md - one review per user per venue).</summary>
+/// <summary>
+/// T054: a second review by the same user replaces the first rather than duplicating it
+/// (data-model.md - one review per user per venue). Since 006, the reviewer needs a Confirmed,
+/// past booking on the venue's court to be eligible.
+/// </summary>
 [Collection(ApiCollection.Name)]
 public class ReviewUpsertTests(ApiFixture fixture)
 {
@@ -18,10 +23,14 @@ public class ReviewUpsertTests(ApiFixture fixture)
         ownerClient.UseBearer(owner.AccessToken);
         var venue = (await (await ownerClient.PostAsJsonAsync("/api/venues",
             new CreateVenueRequest("Venue", ApiClientExtensions.KyivCityId, "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+        var court = await fixture.Factory.SeedCourtAsync(owner.User.Id, venueId: venue.Id);
 
         var reviewerClient = fixture.Factory.CreateClient();
         var reviewer = await reviewerClient.RegisterAsync("Reviewer");
         reviewerClient.UseBearer(reviewer.AccessToken);
+        var now = DateTime.UtcNow;
+        await fixture.Factory.SeedBookingAsync(court.Id, reviewer.User.Id,
+            now.AddHours(-25), now.AddHours(-24), BookingStatus.Confirmed);
 
         var firstResponse = await reviewerClient.PostAsJsonAsync(
             $"/api/venues/{venue.Id}/reviews", new CreateReviewRequest(3, "First take"));

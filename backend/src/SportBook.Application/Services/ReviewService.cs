@@ -3,13 +3,17 @@ using SportBook.Application.Common;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
 using SportBook.Domain.Entities;
+using SportBook.Domain.Enums;
 using SportBook.Infrastructure;
 
 namespace SportBook.Application.Services;
 
 /// <summary>
 /// Venue reviews (US3): paginated list, and create-or-replace (data-model.md - at most one
-/// review per user per venue, backed by a unique index on (VenueId, UserId)).
+/// review per user per venue, backed by a unique index on (VenueId, UserId)). Create-or-replace
+/// is gated (006 data-model.md): a review may only be created or replaced by a user with a
+/// Confirmed, past booking on one of the venue's courts (a completed game) - checked server-side
+/// so the client is never trusted to self-certify.
 /// </summary>
 public class ReviewService(SportBookDbContext db, TimeProvider timeProvider)
 {
@@ -47,6 +51,16 @@ public class ReviewService(SportBookDbContext db, TimeProvider timeProvider)
         }
 
         var now = timeProvider.GetUtcNow().UtcDateTime;
+
+        var hasCompletedGame = await db.Bookings.AnyAsync(b =>
+            b.UserId == userId && b.Court!.VenueId == venueId &&
+            b.Status == BookingStatus.Confirmed && b.EndTime <= now, ct);
+        if (!hasCompletedGame)
+        {
+            throw new ApiException(409, "REVIEW_NOT_ELIGIBLE",
+                "You can only review a venue after completing a confirmed game there.");
+        }
+
         var existing = await db.Reviews.SingleOrDefaultAsync(r => r.VenueId == venueId && r.UserId == userId, ct);
 
         Review review;

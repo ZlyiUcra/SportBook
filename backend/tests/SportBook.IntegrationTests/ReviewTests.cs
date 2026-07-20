@@ -2,11 +2,16 @@ using System.Net;
 using System.Net.Http.Json;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
+using SportBook.Domain.Enums;
 using SportBook.IntegrationTests.TestInfrastructure;
 
 namespace SportBook.IntegrationTests;
 
-/// <summary>T053: submitting a review appears in the venue's review list and updates its average rating (spec Acceptance Scenarios 1-2, US3).</summary>
+/// <summary>
+/// T053: submitting a review appears in the venue's review list and updates its average rating
+/// (spec Acceptance Scenarios 1-2, US3). Since 006, each reviewer needs a Confirmed, past booking
+/// on the venue's court to be eligible (data-model.md).
+/// </summary>
 [Collection(ApiCollection.Name)]
 public class ReviewTests(ApiFixture fixture)
 {
@@ -18,10 +23,14 @@ public class ReviewTests(ApiFixture fixture)
         ownerClient.UseBearer(owner.AccessToken);
         var venue = (await (await ownerClient.PostAsJsonAsync("/api/venues",
             new CreateVenueRequest("Reviewed Venue", ApiClientExtensions.KyivCityId, "1 St", null))).Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+        var court = await fixture.Factory.SeedCourtAsync(owner.User.Id, venueId: venue.Id);
+        var now = DateTime.UtcNow;
 
         var firstReviewerClient = fixture.Factory.CreateClient();
         var firstReviewer = await firstReviewerClient.RegisterAsync("Reviewer1");
         firstReviewerClient.UseBearer(firstReviewer.AccessToken);
+        await fixture.Factory.SeedBookingAsync(court.Id, firstReviewer.User.Id,
+            now.AddHours(-25), now.AddHours(-24), BookingStatus.Confirmed);
         var createResponse = await firstReviewerClient.PostAsJsonAsync(
             $"/api/venues/{venue.Id}/reviews", new CreateReviewRequest(4, "Good venue"));
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
@@ -29,6 +38,8 @@ public class ReviewTests(ApiFixture fixture)
         var secondReviewerClient = fixture.Factory.CreateClient();
         var secondReviewer = await secondReviewerClient.RegisterAsync("Reviewer2");
         secondReviewerClient.UseBearer(secondReviewer.AccessToken);
+        await fixture.Factory.SeedBookingAsync(court.Id, secondReviewer.User.Id,
+            now.AddHours(-25), now.AddHours(-24), BookingStatus.Confirmed);
         await secondReviewerClient.PostAsJsonAsync(
             $"/api/venues/{venue.Id}/reviews", new CreateReviewRequest(2, "Just OK"));
 

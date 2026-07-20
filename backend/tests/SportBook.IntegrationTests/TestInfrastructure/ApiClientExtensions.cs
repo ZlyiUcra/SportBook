@@ -33,27 +33,35 @@ public static class ApiClientExtensions
 
     /// <summary>
     /// Seeds a venue + court directly through the DbContext (US2 owner endpoints do not exist
-    /// yet - tasks.md US1 independent-test note explicitly allows direct seeding).
+    /// yet - tasks.md US1 independent-test note explicitly allows direct seeding). Pass
+    /// <paramref name="venueId"/> to seed the court under an already-existing venue (e.g. one
+    /// created through the real POST /api/venues endpoint) instead of a fresh one.
     /// </summary>
     public static async Task<Court> SeedCourtAsync(this SportBookApiFactory factory, Guid ownerUserId,
-        decimal pricePerHour = 100m, TimeOnly? openingTime = null, TimeOnly? closingTime = null)
+        decimal pricePerHour = 100m, TimeOnly? openingTime = null, TimeOnly? closingTime = null, Guid? venueId = null)
     {
         Court? court = null;
         await factory.SeedAsync(db =>
         {
-            var venue = new Venue
+            var resolvedVenueId = venueId;
+            if (resolvedVenueId is null)
             {
-                Id = Guid.NewGuid(),
-                OwnerId = ownerUserId,
-                Name = $"Venue {Guid.NewGuid():N}",
-                CityId = KyivCityId,
-                Address = "1 Test St",
-                CreatedAt = DateTime.UtcNow,
-            };
+                var venue = new Venue
+                {
+                    Id = Guid.NewGuid(),
+                    OwnerId = ownerUserId,
+                    Name = $"Venue {Guid.NewGuid():N}",
+                    CityId = KyivCityId,
+                    Address = "1 Test St",
+                    CreatedAt = DateTime.UtcNow,
+                };
+                db.Venues.Add(venue);
+                resolvedVenueId = venue.Id;
+            }
             court = new Court
             {
                 Id = Guid.NewGuid(),
-                VenueId = venue.Id,
+                VenueId = resolvedVenueId.Value,
                 Name = "Court 1",
                 SportType = SportType.Tennis,
                 PricePerHour = pricePerHour,
@@ -61,7 +69,6 @@ public static class ApiClientExtensions
                 ClosingTime = closingTime ?? new TimeOnly(23, 0),
                 CreatedAt = DateTime.UtcNow,
             };
-            db.Venues.Add(venue);
             db.Courts.Add(court);
             return db.SaveChangesAsync();
         });

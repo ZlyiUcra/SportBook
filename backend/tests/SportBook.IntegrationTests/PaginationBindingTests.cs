@@ -95,13 +95,17 @@ public class PaginationBindingTests(ApiFixture fixture)
         var venue = (await (await client.PostAsJsonAsync("/api/venues",
             new CreateVenueRequest("Venue", ApiClientExtensions.KyivCityId, "1 St", null)))
             .Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+        var court = await fixture.Factory.SeedCourtAsync(owner.User.Id, venueId: venue.Id);
+        var now = DateTime.UtcNow;
 
-        // Three reviews from three distinct users.
+        // Three reviews from three distinct users, each with a completed booking (006 eligibility gate).
         for (var i = 0; i < 3; i++)
         {
             var reviewer = fixture.Factory.CreateClient();
             var reviewerAuth = await reviewer.RegisterAsync();
             reviewer.UseBearer(reviewerAuth.AccessToken);
+            await fixture.Factory.SeedBookingAsync(court.Id, reviewerAuth.User.Id,
+                now.AddHours(-25), now.AddHours(-24), BookingStatus.Confirmed);
             await reviewer.PostAsJsonAsync($"/api/venues/{venue.Id}/reviews",
                 new CreateReviewRequest(5, null));
         }

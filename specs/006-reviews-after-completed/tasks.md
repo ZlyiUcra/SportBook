@@ -51,12 +51,12 @@ written.
 
 ### Tests for User Story 1
 
-- [ ] T001 [P] [US1] Unit test: the eligibility predicate accepts a `Confirmed` booking with
+- [x] T001 [P] [US1] Unit test: the eligibility predicate accepts a `Confirmed` booking with
       `EndTime <= now` on a court of the target venue and rejects each of Pending, future
       (`EndTime > now`), Cancelled, no booking, and a Confirmed-past booking on a DIFFERENT venue's
       court; and a bad rating is still rejected with `INVALID_RATING` regardless of eligibility, in
       `backend/tests/SportBook.UnitTests/ReviewEligibilityTests.cs`
-- [ ] T002 [P] [US1] Integration test: `POST /api/venues/{venueId}/reviews` returns 201 then 200 for
+- [x] T002 [P] [US1] Integration test: `POST /api/venues/{venueId}/reviews` returns 201 then 200 for
       an eligible customer (create then replace, still one review), `409 REVIEW_NOT_ELIGIBLE` for an
       ineligible one (no review written), `400 INVALID_RATING` for a bad rating, and
       `GET /api/venues/{venueId}/reviews` (the list) is unaffected, in
@@ -64,7 +64,7 @@ written.
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] In `backend/src/SportBook.Application/Services/ReviewService.cs`
+- [x] T003 [US1] In `backend/src/SportBook.Application/Services/ReviewService.cs`
       `CreateOrReplaceAsync`, after the existing rating check (400) and venue-exists check (404) and
       before the create-or-replace, add the eligibility gate: `if (!await db.Bookings.AnyAsync(b =>
       b.UserId == userId && b.Court!.VenueId == venueId && b.Status == BookingStatus.Confirmed &&
