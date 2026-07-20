@@ -53,12 +53,12 @@ unchanged.
 
 ### Tests for User Story 1
 
-- [ ] T001 [P] [US1] Unit test: replacing a review is allowed when `now <= CreatedAt + 24h` and
+- [x] T001 [P] [US1] Unit test: replacing a review is allowed when `now <= CreatedAt + 24h` and
       rejected when `now > CreatedAt + 24h`; replacing once inside the window then again still
       inside 24h of the *original* creation is allowed (the window is never advanced by a prior
       replace); a first-time submission (no existing review) is never subject to this check, in
       `backend/tests/SportBook.UnitTests/ReviewEditWindowTests.cs`
-- [ ] T002 [P] [US1] Integration test: `POST /api/venues/{venueId}/reviews` replace succeeds within
+- [x] T002 [P] [US1] Integration test: `POST /api/venues/{venueId}/reviews` replace succeeds within
       24h of the existing review's creation, is rejected `409 REVIEW_EDIT_WINDOW_CLOSED` when the
       existing review's `CreatedAt` is seeded more than 24h in the past (stored rating/comment
       unchanged after the rejection), and `GET /api/venues/{venueId}/reviews` still lists a
@@ -67,19 +67,19 @@ unchanged.
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] In `backend/src/SportBook.Application/Services/ReviewService.cs`
+- [x] T003 [US1] In `backend/src/SportBook.Application/Services/ReviewService.cs`
       `CreateOrReplaceAsync`, on the replace branch (an `existing` review was found), before
       mutating it, reject when `now > existing.CreatedAt.AddHours(24)` with
       `throw new ApiException(409, "REVIEW_EDIT_WINDOW_CLOSED", ...)`, reusing the `now` already
       computed from the injected `TimeProvider`; a first-time submission (no `existing`) is
       unaffected (per data-model.md, research.md)
-- [ ] T004 [US1] Frontend: in `frontend/src/pages/my-bookings/ui/MyBookingsPage.tsx`'s
+- [x] T004 [US1] Frontend: in `frontend/src/pages/my-bookings/ui/MyBookingsPage.tsx`'s
       `ReviewAction`, compute whether the caller's existing review (`mine`, from `reviewsQuery`) is
       still inside its 24h window from `mine.createdAt`; when open, keep today's edit form; when
       closed, render the review read-only (rating + comment, no `ReviewForm`) inside the dialog
       instead of the edit form - the review stays visible, only editing is withdrawn (depends on
       T003 existing server-side, though the frontend check is independently testable)
-- [ ] T005 [US1] Frontend test: with an existing review whose `createdAt` is more than 24h in the
+- [x] T005 [US1] Frontend test: with an existing review whose `createdAt` is more than 24h in the
       past, the review action shows the review read-only with no edit form; with one less than 24h
       old, the edit form still appears, in `frontend/tests/pages/MyBookings.test.tsx` (depends on
       T004)

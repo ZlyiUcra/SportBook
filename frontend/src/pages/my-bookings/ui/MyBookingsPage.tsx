@@ -125,11 +125,21 @@ export function MyBookingsPage() {
   )
 }
 
+/** A review is editable by its author only within this many hours of its original creation (007 data-model.md). */
+const REVIEW_EDIT_WINDOW_HOURS = 24
+
+function isWithinEditWindow(createdAt: string): boolean {
+  const elapsedMs = Date.now() - new Date(createdAt).getTime()
+  return elapsedMs <= REVIEW_EDIT_WINDOW_HOURS * 60 * 60 * 1000
+}
+
 /**
  * The review entry for a completed booking (005/006 US2) - reached only from here, never from the
  * venue page. Reviews are per venue, not per booking, so it reuses the venue's review list to
  * pre-fill the caller's existing review; the eligibility gate (006 US1) is enforced server-side, so
- * a rejection (e.g. a legacy author who no longer qualifies) surfaces via ApiRequestError.
+ * a rejection (e.g. a legacy author who no longer qualifies) surfaces via ApiRequestError. Once a
+ * review is older than the 24-hour edit window (007 US1), it is shown read-only here instead of an
+ * edit form - it stays visible, only further editing is withdrawn.
  */
 function ReviewAction({ booking }: { booking: Booking }) {
   const { t } = useTranslation()
@@ -137,10 +147,11 @@ function ReviewAction({ booking }: { booking: Booking }) {
   const currentUser = useSessionStore((state) => state.user)
   const [open, setOpen] = React.useState(false)
 
+  // Not gated on `open` (007): the trigger button's label, and whether the edit window is still
+  // open, must be known before the dialog is ever opened.
   const reviewsQuery = useQuery({
     queryKey: ['reviews', booking.venueId],
     queryFn: () => listReviews(booking.venueId),
-    enabled: open,
   })
 
   const reviewMutation = useMutation({
@@ -152,29 +163,42 @@ function ReviewAction({ booking }: { booking: Booking }) {
   })
 
   const mine = reviewsQuery.data?.items.find((r) => r.userId === currentUser?.id)
+  const isEditWindowOpen = !mine || isWithinEditWindow(mine.createdAt)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          {mine ? t('review.editAction') : t('review.addAction')}
+          {!mine ? t('review.addAction') : isEditWindowOpen ? t('review.editAction') : t('review.viewAction')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{mine ? t('review.editTitle') : t('review.addTitle')}</DialogTitle>
+          <DialogTitle>
+            {!mine ? t('review.addTitle') : isEditWindowOpen ? t('review.editTitle') : t('review.readOnlyTitle')}
+          </DialogTitle>
         </DialogHeader>
-        <ReviewForm
-          defaultValues={mine ? { rating: mine.rating, comment: mine.comment ?? '' } : undefined}
-          onSubmit={(values) => reviewMutation.mutate(values)}
-          isSubmitting={reviewMutation.isPending}
-        />
-        {reviewMutation.isError && (
-          <p role="alert" className="text-sm text-destructive">
-            {reviewMutation.error instanceof ApiRequestError
-              ? reviewMutation.error.message
-              : t('common.requestFailed')}
-          </p>
+        {mine && !isEditWindowOpen ? (
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground">{t('review.readOnlyNotice')}</p>
+            <p className="font-medium">{t('review.ratingValue', { rating: mine.rating })}</p>
+            {mine.comment && <p className="text-sm text-muted-foreground">{mine.comment}</p>}
+          </div>
+        ) : (
+          <>
+            <ReviewForm
+              defaultValues={mine ? { rating: mine.rating, comment: mine.comment ?? '' } : undefined}
+              onSubmit={(values) => reviewMutation.mutate(values)}
+              isSubmitting={reviewMutation.isPending}
+            />
+            {reviewMutation.isError && (
+              <p role="alert" className="text-sm text-destructive">
+                {reviewMutation.error instanceof ApiRequestError
+                  ? reviewMutation.error.message
+                  : t('common.requestFailed')}
+              </p>
+            )}
+          </>
         )}
       </DialogContent>
     </Dialog>

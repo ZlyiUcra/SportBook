@@ -6,9 +6,11 @@ import { MyBookingsPage } from '@/pages/my-bookings/ui/MyBookingsPage'
 import { listMyBookings } from '@/entities/booking/api/bookingApi'
 import { listReviews } from '@/entities/review/api/reviewApi'
 import { createReview } from '@/features/review/create/api/createReview'
+import { useSessionStore } from '@/entities/session/model/store'
 import type { PagedResponse } from '@/shared/api/types'
 import type { Booking } from '@/entities/booking/model/types'
 import type { City } from '@/entities/city/model/types'
+import type { Review } from '@/entities/review/model/types'
 
 // Keep the real bookingStatusFilters constant (drives the tabs) and mock only the network call.
 vi.mock('@/entities/booking/api/bookingApi', async (importOriginal) => {
@@ -57,6 +59,18 @@ function paged(items: Booking[], totalCount = items.length, pageSize = 20): Page
   return { items, page: 1, pageSize, totalCount }
 }
 
+function makeReview(createdAt: string): Review {
+  return {
+    id: 'review-1',
+    venueId: 'venue-b1',
+    userId: 'user-1',
+    userName: 'Me',
+    rating: 4,
+    comment: 'A perfectly fine comment',
+    createdAt,
+  }
+}
+
 function renderPage() {
   const queryClient = new QueryClient()
   return render(
@@ -71,6 +85,7 @@ function renderPage() {
 describe('MyBookingsPage', () => {
   beforeEach(() => {
     vi.mocked(listMyBookings).mockReset()
+    useSessionStore.setState({ user: null })
   })
 
   it('T007: a booking row shows venue, city, sport, and court alongside status and price', async () => {
@@ -152,5 +167,32 @@ describe('MyBookingsPage', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Submit review' }))
 
     await waitFor(() => expect(createReview).toHaveBeenCalledWith('venue-b1', expect.anything()))
+  })
+
+  it('T005 (007): a review created less than 24h ago still shows the edit form', async () => {
+    useSessionStore.setState({ user: { id: 'user-1', name: 'Me', email: 'me@example.com', role: 'Customer', subscriptionTier: 'Free', createdAt: '2026-01-01T00:00:00Z' } })
+    vi.mocked(listMyBookings).mockResolvedValue(paged([makeBooking('b1', 'Completed')]))
+    const recentCreatedAt = new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
+    vi.mocked(listReviews).mockResolvedValue({ items: [makeReview(recentCreatedAt)], page: 1, pageSize: 20, totalCount: 1 })
+
+    renderPage()
+    await screen.findByText('Sport Arena')
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit your review' }))
+
+    expect(await screen.findByRole('button', { name: 'Submit review' })).toBeInTheDocument()
+  })
+
+  it('T005 (007): a review created more than 24h ago shows read-only with no edit form', async () => {
+    useSessionStore.setState({ user: { id: 'user-1', name: 'Me', email: 'me@example.com', role: 'Customer', subscriptionTier: 'Free', createdAt: '2026-01-01T00:00:00Z' } })
+    vi.mocked(listMyBookings).mockResolvedValue(paged([makeBooking('b1', 'Completed')]))
+    const oldCreatedAt = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString()
+    vi.mocked(listReviews).mockResolvedValue({ items: [makeReview(oldCreatedAt)], page: 1, pageSize: 20, totalCount: 1 })
+
+    renderPage()
+    await screen.findByText('Sport Arena')
+    fireEvent.click(await screen.findByRole('button', { name: 'View your review' }))
+
+    expect(await screen.findByText('A perfectly fine comment')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Submit review' })).not.toBeInTheDocument()
   })
 })
