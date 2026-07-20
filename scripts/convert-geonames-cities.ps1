@@ -14,6 +14,11 @@
 
   These raw files are not committed (large, external, refreshed independently of app code) -
   only this script's csv output is.
+
+  Output columns: Id, NameEn, NameUk, NamePt, CountryCode, RegionEn, RegionUk, RegionPt, Latitude,
+  Longitude, Population, NameEs, RegionEs - Es is trailing, not interleaved, so the original
+  CitySeedCsvReader (fixed positional f[0]..f[10]) keeps working unchanged; only the later
+  AddCitySpanishNames migration reads f[11]/f[12].
 #>
 
 param(
@@ -43,15 +48,15 @@ foreach ($line in Get-Content -Path $admin1Path -Encoding UTF8) {
     $admin1[$f[0]] = [pscustomobject]@{ NameEn = $f[1]; GeonameId = $f[3] }
 }
 
-Write-Host "==> Reading uk/pt alternate names from $altPath" -ForegroundColor Cyan
-# geonameid -> @{ uk = name; pt = name }; isPreferredName=1 rows win over first-seen.
+Write-Host "==> Reading uk/pt/es alternate names from $altPath" -ForegroundColor Cyan
+# geonameid -> @{ uk = name; pt = name; es = name }; isPreferredName=1 rows win over first-seen.
 $altNames = @{}
 foreach ($line in Get-Content -Path $altPath -Encoding UTF8) {
     if (-not $line) { continue }
     $f = $line -split "`t"
     if ($f.Length -lt 4) { continue }
     $lang = $f[2]
-    if ($lang -ne 'uk' -and $lang -ne 'pt') { continue }
+    if ($lang -ne 'uk' -and $lang -ne 'pt' -and $lang -ne 'es') { continue }
     $gid = $f[1]
     $name = $f[3]
     $isPreferred = ($f.Length -gt 4) -and ($f[4] -eq '1')
@@ -118,6 +123,12 @@ $rows = foreach ($c in $selected) {
         Latitude    = $c.Latitude
         Longitude   = $c.Longitude
         Population  = $c.Population
+        # Appended after Population (not inserted earlier) so the original 11-field column order
+        # stays stable - CitySeedCsvReader's fixed positional parsing in the first City migration
+        # only ever reads f[0]..f[10]; these trailing fields are read by the later
+        # AddCitySpanishNames migration instead.
+        NameEs      = Get-LocalName -GeonameId $c.Id -Lang 'es' -Fallback $c.NameEn
+        RegionEs    = Get-LocalName -GeonameId $regionGid -Lang 'es' -Fallback $regionEn
     }
 }
 

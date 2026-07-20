@@ -9,8 +9,10 @@ public record CityResponse(
     string NameEn,
     string NameUk,
     string NamePt,
+    string NameEs,
     string RegionEn,
     string RegionUk,
     string RegionPt,
+    string RegionEs,
     decimal Latitude,
     decimal Longitude);

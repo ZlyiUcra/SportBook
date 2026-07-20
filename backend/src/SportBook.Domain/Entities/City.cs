@@ -16,6 +16,8 @@ public class City
 
     public required string NamePt { get; set; }
 
+    public required string NameEs { get; set; }
+
     public required string CountryCode { get; set; }
 
     public required string RegionEn { get; set; }
@@ -23,6 +25,8 @@ public class City
     public required string RegionUk { get; set; }
 
     public required string RegionPt { get; set; }
+
+    public required string RegionEs { get; set; }
 
     public decimal Latitude { get; set; }
 

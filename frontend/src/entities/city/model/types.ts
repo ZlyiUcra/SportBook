@@ -4,9 +4,11 @@ export type City = {
   nameEn: string
   nameUk: string
   namePt: string
+  nameEs: string
   regionEn: string
   regionUk: string
   regionPt: string
+  regionEs: string
   latitude: number
   longitude: number
 }
@@ -15,6 +17,7 @@ export type City = {
 export function cityName(city: City, language: string): string {
   if (language.startsWith('uk')) return city.nameUk
   if (language.startsWith('pt')) return city.namePt
+  if (language.startsWith('es')) return city.nameEs
   return city.nameEn
 }
 
@@ -22,5 +25,6 @@ export function cityName(city: City, language: string): string {
 export function cityRegionName(city: City, language: string): string {
   if (language.startsWith('uk')) return city.regionUk
   if (language.startsWith('pt')) return city.regionPt
+  if (language.startsWith('es')) return city.regionEs
   return city.regionEn
 }

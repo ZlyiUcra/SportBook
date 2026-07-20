@@ -13,8 +13,8 @@ public static class Mapping
         new(user.Id, user.Name, user.Email, user.Role.ToString(), user.SubscriptionTier.ToString(), user.CreatedAt);
 
     public static CityResponse ToResponse(this City city) =>
-        new(city.Id, city.NameEn, city.NameUk, city.NamePt, city.RegionEn, city.RegionUk, city.RegionPt,
-            city.Latitude, city.Longitude);
+        new(city.Id, city.NameEn, city.NameUk, city.NamePt, city.NameEs, city.RegionEn, city.RegionUk,
+            city.RegionPt, city.RegionEs, city.Latitude, city.Longitude);
 
     /// <summary><see cref="Venue.City"/> must already be loaded (Include) before calling this.</summary>
     public static VenueSummaryResponse ToSummaryResponse(this Venue venue) =>

@@ -2,10 +2,16 @@ using System.Globalization;
 
 namespace SportBook.Infrastructure.Migrations;
 
-/// <summary>One row of the seed dataset produced by scripts/convert-geonames-cities.ps1 (data-model.md City).</summary>
+/// <summary>
+/// One row of the seed dataset produced by scripts/convert-geonames-cities.ps1 (data-model.md
+/// City). <see cref="NameEs"/>/<see cref="RegionEs"/> are trailing columns (added by the
+/// AddCitySpanishNames migration, after CreateAndSeedCities already shipped) - kept at the end so
+/// this record's field order still matches the CSV's fixed column order for both migrations.
+/// </summary>
 internal sealed record CitySeedRow(
     int Id, string NameEn, string NameUk, string NamePt, string CountryCode,
-    string RegionEn, string RegionUk, string RegionPt, decimal Latitude, decimal Longitude, int Population);
+    string RegionEn, string RegionUk, string RegionPt, decimal Latitude, decimal Longitude, int Population,
+    string NameEs, string RegionEs);
 
 /// <summary>
 /// Minimal RFC4180 CSV reader for the embedded seed data file - no CSV library dependency
@@ -46,7 +52,9 @@ internal static class CitySeedCsvReader
                 RegionPt: f[7],
                 Latitude: decimal.Parse(f[8], CultureInfo.InvariantCulture),
                 Longitude: decimal.Parse(f[9], CultureInfo.InvariantCulture),
-                Population: int.Parse(f[10], CultureInfo.InvariantCulture)));
+                Population: int.Parse(f[10], CultureInfo.InvariantCulture),
+                NameEs: f[11],
+                RegionEs: f[12]));
         }
 
         return rows;

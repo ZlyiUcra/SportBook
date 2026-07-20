@@ -29,3 +29,6 @@ Thumbs.db
 # Raw GeoNames dump used by scripts/convert-geonames-cities.ps1 - external, large, not
 # committed; only its converted output (backend/.../Data/cities.csv) is.
 .geonames-src/
+
+# Local database backups (contain real user emails/password hashes) - never committed.
+db-backups/

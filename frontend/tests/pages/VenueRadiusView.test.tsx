@@ -47,9 +47,11 @@ const city: City = {
   nameEn: 'Kyiv',
   nameUk: 'Київ',
   namePt: 'Kyiv',
+  nameEs: 'Kyiv',
   regionEn: 'Kyiv City',
   regionUk: 'Місто Київ',
   regionPt: 'Cidade de Kyiv',
+  regionEs: 'Ciudad de Kyiv',
   latitude: 50.45466,
   longitude: 30.5238,
 }
@@ -59,9 +61,11 @@ const lvivCity: City = {
   nameEn: 'Lviv',
   nameUk: 'Львів',
   namePt: 'Lviv',
+  nameEs: 'Lviv',
   regionEn: 'Lviv Oblast',
   regionUk: 'Львівська область',
   regionPt: 'Oblast de Lviv',
+  regionEs: 'Óblast de Lviv',
   latitude: 49.83826,
   longitude: 24.02324,
 }
