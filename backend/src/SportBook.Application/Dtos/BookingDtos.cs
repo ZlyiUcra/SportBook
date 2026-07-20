@@ -4,7 +4,7 @@ namespace SportBook.Application.Dtos;
 /// Status groups a customer can filter "My bookings" by (005 data-model.md). `Completed` is not a
 /// stored status - it is a Confirmed booking whose end time has passed (001 read-time derivation) -
 /// so each value maps to a stored-status + time predicate in
-/// <see cref="Services.BookingService.ListMineAsync"/>, applied before paging so it filters the
+/// <see cref="Services.BookingHelpers.ApplyStatusFilter"/>, applied before paging so it filters the
 /// whole history. `All` (the default) applies no predicate.
 /// </summary>
 public enum BookingStatusFilter

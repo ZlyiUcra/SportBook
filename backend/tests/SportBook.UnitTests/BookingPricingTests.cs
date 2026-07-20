@@ -1,5 +1,5 @@
 using SportBook.Application.Dtos;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Bookings.CreateBooking;
 using SportBook.UnitTests.TestInfrastructure;
 
 namespace SportBook.UnitTests;
@@ -22,11 +22,11 @@ public class BookingPricingTests
     {
         using var testDb = new TestDb();
         var (customer, court) = testDb.SeedCustomerAndCourt(pricePerHour);
-        var service = new BookingService(testDb.Db, new FixedTimeProvider(Now));
+        var handler = new CreateBookingHandler(testDb.Db, new FixedTimeProvider(Now));
 
         var start = new DateTime(2026, 7, 17, 10, 0, 0, DateTimeKind.Utc);
-        var response = await service.CreateAsync(
-            customer.Id, new CreateBookingRequest(court.Id, start, start.AddHours(hours)), CancellationToken.None);
+        var response = await handler.Handle(
+            new CreateBookingCommand(customer.Id, court.Id, start, start.AddHours(hours)), CancellationToken.None);
 
         Assert.Equal(expectedTotal, response.TotalPrice);
         Assert.Equal("Pending", response.Status);

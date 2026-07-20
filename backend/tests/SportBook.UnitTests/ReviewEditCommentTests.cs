@@ -1,7 +1,5 @@
-using SportBook.Application.Common;
-using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Reviews.CreateOrReplaceReview;
 using SportBook.Domain.Enums;
 using SportBook.UnitTests.TestInfrastructure;
 
@@ -32,11 +30,11 @@ public class ReviewEditCommentTests
     {
         using var db = new TestDb();
         var (customerId, venueId) = SeedEligibleReviewer(db);
-        var createService = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        await createService.CreateOrReplaceAsync(customerId, venueId, new CreateReviewRequest(3, "Original comment"), CancellationToken.None);
+        var createHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        await createHandler.Handle(new CreateOrReplaceReviewCommand(customerId, venueId, 3, "Original comment"), CancellationToken.None);
 
-        var ex = await Assert.ThrowsAsync<ApiException>(() => createService.CreateOrReplaceAsync(
-            customerId, venueId, new CreateReviewRequest(4, comment), CancellationToken.None));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => createHandler.Handle(
+            new CreateOrReplaceReviewCommand(customerId, venueId, 4, comment), CancellationToken.None).AsTask());
 
         Assert.Equal(400, ex.StatusCode);
         Assert.Equal("REVIEW_COMMENT_TOO_SHORT", ex.Code);
@@ -47,14 +45,14 @@ public class ReviewEditCommentTests
     {
         using var db = new TestDb();
         var (customerId, venueId) = SeedEligibleReviewer(db);
-        var createService = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        await createService.CreateOrReplaceAsync(customerId, venueId, new CreateReviewRequest(3, "Original comment"), CancellationToken.None);
+        var createHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        await createHandler.Handle(new CreateOrReplaceReviewCommand(customerId, venueId, 3, "Original comment"), CancellationToken.None);
 
-        var (response, created) = await createService.CreateOrReplaceAsync(
-            customerId, venueId, new CreateReviewRequest(4, "1234567890"), CancellationToken.None);
+        var result = await createHandler.Handle(
+            new CreateOrReplaceReviewCommand(customerId, venueId, 4, "1234567890"), CancellationToken.None);
 
-        Assert.False(created);
-        Assert.Equal("1234567890", response.Comment);
+        Assert.False(result.Created);
+        Assert.Equal("1234567890", result.Response.Comment);
     }
 
     [Fact]
@@ -62,12 +60,12 @@ public class ReviewEditCommentTests
     {
         using var db = new TestDb();
         var (customerId, venueId) = SeedEligibleReviewer(db);
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now));
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
 
-        var (response, created) = await service.CreateOrReplaceAsync(
-            customerId, venueId, new CreateReviewRequest(4, null), CancellationToken.None);
+        var result = await handler.Handle(
+            new CreateOrReplaceReviewCommand(customerId, venueId, 4, null), CancellationToken.None);
 
-        Assert.True(created);
-        Assert.Null(response.Comment);
+        Assert.True(result.Created);
+        Assert.Null(result.Response.Comment);
     }
 }

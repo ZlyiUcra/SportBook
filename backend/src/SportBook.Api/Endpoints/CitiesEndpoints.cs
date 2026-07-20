@@ -1,4 +1,6 @@
-using SportBook.Application.Services;
+using Mediator;
+using SportBook.Application.Features.Cities.FindNearestCity;
+using SportBook.Application.Features.Cities.SuggestCities;
 
 namespace SportBook.Api.Endpoints;
 
@@ -11,9 +13,9 @@ public static class CitiesEndpoints
         var group = app.MapGroup("api/cities");
 
         // <summary>Suggests up to 10 directory cities matching `query` (min 2 chars) in any app language, ranked by population.</summary>
-        group.MapGet("", async (string query, CityService cityService, CancellationToken ct) =>
+        group.MapGet("", async (string query, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await cityService.SuggestAsync(query, ct);
+            var result = await mediator.Send(new SuggestCitiesQuery(query), ct);
             return Results.Ok(result);
         });
 
@@ -22,9 +24,9 @@ public static class CitiesEndpoints
         // Geolocation privacy posture): `lat`/`lng` are range-validated and never persisted or
         // logged - this action must not gain request logging without excluding its query string.
         // </summary>
-        group.MapGet("nearest", async (decimal lat, decimal lng, CityService cityService, CancellationToken ct) =>
+        group.MapGet("nearest", async (decimal lat, decimal lng, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await cityService.FindNearestAsync(lat, lng, ct);
+            var result = await mediator.Send(new FindNearestCityQuery(lat, lng), ct);
             return Results.Ok(result);
         });
     }

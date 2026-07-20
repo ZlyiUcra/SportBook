@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Bookings.ListMyBookings;
 using SportBook.Domain.Enums;
 using SportBook.UnitTests.TestInfrastructure;
 
@@ -28,18 +28,18 @@ public class BookingStatusFilterTests
         var cancelled = Seed(db, court.Id, customer.Id, BookingStatus.Cancelled, Now.AddHours(24), Now.AddHours(25));
         var stalePending = Seed(db, court.Id, customer.Id, BookingStatus.Pending, Now.AddHours(-25), Now.AddHours(-24));
 
-        var service = new BookingService(db.Db, new FixedTimeProvider(Now));
+        var handler = new ListMyBookingsHandler(db.Db, new FixedTimeProvider(Now));
 
         Assert.Equal(
             new[] { upcomingConfirmed, upcomingPending, completed, cancelled, stalePending }.OrderBy(x => x).ToArray(),
-            (await Ids(service, customer.Id, BookingStatusFilter.All)).OrderBy(x => x).ToArray());
+            (await Ids(handler, customer.Id, BookingStatusFilter.All)).OrderBy(x => x).ToArray());
 
         Assert.Equal(
             new[] { upcomingConfirmed, upcomingPending }.OrderBy(x => x).ToArray(),
-            (await Ids(service, customer.Id, BookingStatusFilter.Upcoming)).OrderBy(x => x).ToArray());
+            (await Ids(handler, customer.Id, BookingStatusFilter.Upcoming)).OrderBy(x => x).ToArray());
 
-        Assert.Equal(new[] { completed }, await Ids(service, customer.Id, BookingStatusFilter.Completed));
-        Assert.Equal(new[] { cancelled }, await Ids(service, customer.Id, BookingStatusFilter.Cancelled));
+        Assert.Equal(new[] { completed }, await Ids(handler, customer.Id, BookingStatusFilter.Completed));
+        Assert.Equal(new[] { cancelled }, await Ids(handler, customer.Id, BookingStatusFilter.Cancelled));
     }
 
     [Fact]
@@ -58,9 +58,9 @@ public class BookingStatusFilterTests
         Assert.Contains("EndTime", sql);
     }
 
-    private static async Task<Guid[]> Ids(BookingService service, Guid userId, BookingStatusFilter status)
+    private static async Task<Guid[]> Ids(ListMyBookingsHandler handler, Guid userId, BookingStatusFilter status)
     {
-        var result = await service.ListMineAsync(userId, status, new PageRequest { PageSize = 100 }, CancellationToken.None);
+        var result = await handler.Handle(new ListMyBookingsQuery(userId, status, new PageRequest(PageSize: 100)), CancellationToken.None);
         return result.Items.Select(b => b.Id).ToArray();
     }
 

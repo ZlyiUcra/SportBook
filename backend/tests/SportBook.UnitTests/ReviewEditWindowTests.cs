@@ -1,7 +1,5 @@
-using SportBook.Application.Common;
-using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Reviews.CreateOrReplaceReview;
 using SportBook.Domain.Enums;
 using SportBook.UnitTests.TestInfrastructure;
 
@@ -28,16 +26,16 @@ public class ReviewEditWindowTests
     {
         using var db = new TestDb();
         var (customerId, venueId) = SeedEligibleReviewer(db);
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now.AddHours(-23)));
-        await service.CreateOrReplaceAsync(customerId, venueId, new CreateReviewRequest(3, "Original comment"), CancellationToken.None);
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now.AddHours(-23)));
+        await handler.Handle(new CreateOrReplaceReviewCommand(customerId, venueId, 3, "Original comment"), CancellationToken.None);
 
-        var replaceService = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var (response, created) = await replaceService.CreateOrReplaceAsync(
-            customerId, venueId, new CreateReviewRequest(5, "Updated comment here"), CancellationToken.None);
+        var replaceHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var result = await replaceHandler.Handle(
+            new CreateOrReplaceReviewCommand(customerId, venueId, 5, "Updated comment here"), CancellationToken.None);
 
-        Assert.False(created);
-        Assert.Equal(5, response.Rating);
-        Assert.Equal("Updated comment here", response.Comment);
+        Assert.False(result.Created);
+        Assert.Equal(5, result.Response.Rating);
+        Assert.Equal("Updated comment here", result.Response.Comment);
     }
 
     [Fact]
@@ -45,12 +43,12 @@ public class ReviewEditWindowTests
     {
         using var db = new TestDb();
         var (customerId, venueId) = SeedEligibleReviewer(db);
-        var createService = new ReviewService(db.Db, new FixedTimeProvider(Now.AddHours(-25)));
-        await createService.CreateOrReplaceAsync(customerId, venueId, new CreateReviewRequest(3, "Original comment"), CancellationToken.None);
+        var createHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now.AddHours(-25)));
+        await createHandler.Handle(new CreateOrReplaceReviewCommand(customerId, venueId, 3, "Original comment"), CancellationToken.None);
 
-        var replaceService = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var ex = await Assert.ThrowsAsync<ApiException>(() => replaceService.CreateOrReplaceAsync(
-            customerId, venueId, new CreateReviewRequest(5, "Updated comment here"), CancellationToken.None));
+        var replaceHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => replaceHandler.Handle(
+            new CreateOrReplaceReviewCommand(customerId, venueId, 5, "Updated comment here"), CancellationToken.None).AsTask());
 
         Assert.Equal(409, ex.StatusCode);
         Assert.Equal("REVIEW_EDIT_WINDOW_CLOSED", ex.Code);
@@ -62,18 +60,18 @@ public class ReviewEditWindowTests
         using var db = new TestDb();
         var (customerId, venueId) = SeedEligibleReviewer(db);
         var createTime = Now.AddHours(-23);
-        var createService = new ReviewService(db.Db, new FixedTimeProvider(createTime));
-        await createService.CreateOrReplaceAsync(customerId, venueId, new CreateReviewRequest(3, "Original comment"), CancellationToken.None);
+        var createHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(createTime));
+        await createHandler.Handle(new CreateOrReplaceReviewCommand(customerId, venueId, 3, "Original comment"), CancellationToken.None);
 
         // First replace, still inside the window (1 hour after creation).
-        var firstReplaceService = new ReviewService(db.Db, new FixedTimeProvider(createTime.AddHours(1)));
-        await firstReplaceService.CreateOrReplaceAsync(customerId, venueId, new CreateReviewRequest(4, "First replace comment"), CancellationToken.None);
+        var firstReplaceHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(createTime.AddHours(1)));
+        await firstReplaceHandler.Handle(new CreateOrReplaceReviewCommand(customerId, venueId, 4, "First replace comment"), CancellationToken.None);
 
         // A second replace 25 hours after the ORIGINAL creation must be rejected, even though it is
         // only 24 hours after the first replace - the window is anchored to CreatedAt, not the edit.
-        var secondReplaceService = new ReviewService(db.Db, new FixedTimeProvider(createTime.AddHours(25)));
-        var ex = await Assert.ThrowsAsync<ApiException>(() => secondReplaceService.CreateOrReplaceAsync(
-            customerId, venueId, new CreateReviewRequest(5, "Second replace comment"), CancellationToken.None));
+        var secondReplaceHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(createTime.AddHours(25)));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => secondReplaceHandler.Handle(
+            new CreateOrReplaceReviewCommand(customerId, venueId, 5, "Second replace comment"), CancellationToken.None).AsTask());
 
         Assert.Equal("REVIEW_EDIT_WINDOW_CLOSED", ex.Code);
     }
@@ -83,11 +81,11 @@ public class ReviewEditWindowTests
     {
         using var db = new TestDb();
         var (customerId, venueId) = SeedEligibleReviewer(db);
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var (response, created) = await service.CreateOrReplaceAsync(
-            customerId, venueId, new CreateReviewRequest(4, "First ever review"), CancellationToken.None);
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var result = await handler.Handle(
+            new CreateOrReplaceReviewCommand(customerId, venueId, 4, "First ever review"), CancellationToken.None);
 
-        Assert.True(created);
-        Assert.Equal(4, response.Rating);
+        Assert.True(result.Created);
+        Assert.Equal(4, result.Response.Rating);
     }
 }

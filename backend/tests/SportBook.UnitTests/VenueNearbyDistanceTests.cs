@@ -1,17 +1,16 @@
-using Microsoft.Extensions.DependencyInjection;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Venues.SearchNearbyVenues;
 using SportBook.Domain.Entities;
 using SportBook.Domain.Enums;
-using SportBook.Infrastructure;
 using SportBook.UnitTests.TestInfrastructure;
 
 namespace SportBook.UnitTests;
 
 /// <summary>
 /// T010: the nearby distance/order/cap over materialized rows (Sqlite path) - proves
-/// <see cref="VenueService.SearchNearbyAsync"/> filters to <see cref="VenueService.VenueRadiusKm"/>,
-/// orders nearest-first, and caps at 100, entirely in C# over the materialized
-/// coordinate-bearing candidates (003 research.md "Distance computation").
+/// <see cref="SearchNearbyVenuesHandler.Handle"/> filters to
+/// <see cref="SearchNearbyVenuesHandler.VenueRadiusKm"/>, orders nearest-first, and caps at 100,
+/// entirely in C# over the materialized coordinate-bearing candidates (003 research.md "Distance
+/// computation").
 /// </summary>
 public class VenueNearbyDistanceTests
 {
@@ -35,7 +34,8 @@ public class VenueNearbyDistanceTests
         var lvivVenue = SeedVenue(db, owner.Id, city.Id, LvivLat, LvivLng);
         db.Db.SaveChanges();
 
-        var result = await NewVenueService(db).SearchNearbyAsync(KyivLat, KyivLng, null, CancellationToken.None);
+        var handler = new SearchNearbyVenuesHandler(db.Db);
+        var result = await handler.Handle(new SearchNearbyVenuesQuery(KyivLat, KyivLng, null), CancellationToken.None);
 
         var ids = result.Select(v => v.Id).ToList();
         Assert.Contains(kyivVenue.Id, ids);
@@ -57,14 +57,11 @@ public class VenueNearbyDistanceTests
         }
         db.Db.SaveChanges();
 
-        var result = await NewVenueService(db).SearchNearbyAsync(KyivLat, KyivLng, null, CancellationToken.None);
+        var handler = new SearchNearbyVenuesHandler(db.Db);
+        var result = await handler.Handle(new SearchNearbyVenuesQuery(KyivLat, KyivLng, null), CancellationToken.None);
 
         Assert.Equal(100, result.Count);
     }
-
-    /// <summary>`cityService` is never invoked by `SearchNearbyAsync` - this fake scope only satisfies the constructor.</summary>
-    private static VenueService NewVenueService(TestDb db) =>
-        new(db.Db, TimeProvider.System, new CityService(new CityDirectoryCache(new SingleContextScopeFactory(db.Db))));
 
     private static User SeedOwner(TestDb db)
     {
@@ -96,24 +93,5 @@ public class VenueNearbyDistanceTests
         };
         db.Db.Venues.Add(venue);
         return venue;
-    }
-
-    private sealed class SingleContextScopeFactory(SportBookDbContext db) : IServiceScopeFactory
-    {
-        public IServiceScope CreateScope() => new SingleContextScope(db);
-    }
-
-    private sealed class SingleContextScope(SportBookDbContext db) : IServiceScope
-    {
-        public IServiceProvider ServiceProvider { get; } = new SingleContextServiceProvider(db);
-
-        public void Dispose()
-        {
-        }
-    }
-
-    private sealed class SingleContextServiceProvider(SportBookDbContext db) : IServiceProvider
-    {
-        public object? GetService(Type serviceType) => serviceType == typeof(SportBookDbContext) ? db : null;
     }
 }

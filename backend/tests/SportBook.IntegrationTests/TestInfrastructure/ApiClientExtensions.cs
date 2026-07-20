@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using SportBook.Application.Dtos;
+using SportBook.Application.Features.Auth.Register;
 using SportBook.Domain.Entities;
 using SportBook.Domain.Enums;
 
@@ -23,7 +24,7 @@ public static class ApiClientExtensions
     {
         var email = $"user-{Guid.NewGuid():N}@example.com";
         var response = await client.PostAsJsonAsync("/api/auth/register",
-            new RegisterRequest(name ?? "Test User", email, "Test1234!"));
+            new RegisterCommand(name ?? "Test User", email, "Test1234!"));
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<AuthResponse>())!;
     }

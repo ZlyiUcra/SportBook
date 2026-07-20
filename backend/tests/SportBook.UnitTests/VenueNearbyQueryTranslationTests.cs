@@ -5,7 +5,7 @@ using SportBook.UnitTests.TestInfrastructure;
 namespace SportBook.UnitTests;
 
 /// <summary>
-/// Query-translation guards for both of VenueService's nearby-search paths: T030 (002) proves
+/// Query-translation guards for both nearby-search paths: T030 (002) proves
 /// the city-neighbor `CityId IN &lt;set&gt;` filter translates; T011 (003) proves the
 /// coordinate-radius `Latitude != null` (+ optional sport) filter translates and pushes no
 /// trigonometry into SQL - distance itself is computed in C# over the materialized candidates

@@ -14,14 +14,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenService, TokenService>();
-        services.AddScoped<AuthService>();
+        services.AddScoped<AuthTokenIssuer>();
         services.AddSingleton<CityDirectoryCache>();
         services.AddScoped<CityService>();
-        services.AddScoped<VenueService>();
-        services.AddScoped<CourtService>();
-        services.AddScoped<AvailabilityService>();
-        services.AddScoped<BookingService>();
-        services.AddScoped<ReviewService>();
+        services.AddScoped<VenueDetailReader>();
+        services.AddScoped<VenueLocationValidator>();
 
         return services;
     }

@@ -71,7 +71,7 @@ public class SportBookDbContext(DbContextOptions<SportBookDbContext> options) : 
             // same table. Deleting a user with existing bookings must fail explicitly, not
             // silently wipe booking history (no such requirement exists in spec.md).
             entity.HasOne(b => b.User).WithMany().HasForeignKey(b => b.UserId).OnDelete(DeleteBehavior.Restrict);
-            // Supports the overlap check in BookingService.Create (serializable transaction over
+            // Supports the overlap check in CreateBookingHandler (serializable transaction over
             // rows for this court) and availability lookups by date range.
             entity.HasIndex(b => new { b.CourtId, b.StartTime, b.EndTime });
         });
@@ -83,7 +83,7 @@ public class SportBookDbContext(DbContextOptions<SportBookDbContext> options) : 
             // (Review is also reachable from User via Venue -> Review).
             entity.HasOne(r => r.User).WithMany().HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Restrict);
             // Enforces "at most one review per user per venue" (data-model.md Review) -
-            // BookingService.Create-or-replace upserts against this key.
+            // CreateOrReplaceReviewHandler upserts against this key.
             entity.HasIndex(r => new { r.VenueId, r.UserId }).IsUnique();
         });
     }

@@ -4,7 +4,7 @@ namespace SportBook.Domain.Entities;
 
 /// <summary>
 /// A reservation of a Court for a time range by a Customer (data-model.md Booking). Overlap
-/// safety for [StartTime, EndTime) per court is enforced in <c>BookingService.Create</c> via a
+/// safety for [StartTime, EndTime) per court is enforced in <c>CreateBookingHandler</c> via a
 /// serializable transaction with retry, not by a database constraint - SQL Server has no
 /// exclusion constraints (plan.md Storage).
 /// </summary>

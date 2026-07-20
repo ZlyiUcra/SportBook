@@ -5,8 +5,11 @@ sequence (Docker, SQL login, `dotnet user-secrets`), and running tests.
 
 ## Project layout
 
-- `src/SportBook.Api` - controllers, JWT auth, DI wiring, `Program.cs`.
-- `src/SportBook.Application` - services (business logic), DTOs, mapping.
+- `src/SportBook.Api` - Minimal API endpoints (`Endpoints/`, one `MapXxxEndpoints` file per
+  resource), JWT auth, DI wiring, `Program.cs`.
+- `src/SportBook.Application` - vertical slices (`Features/<Resource>/<UseCase>/`, a
+  Command/Query + Handler pair per action, dispatched via martinothamar/Mediator), a small
+  `Services/` layer for logic genuinely shared across slices, DTOs, mapping.
 - `src/SportBook.Domain` - entities and enums, no framework dependencies.
 - `src/SportBook.Infrastructure` - EF Core `DbContext`, migrations, SQL Server provider.
 - `tests/SportBook.UnitTests` - xUnit + EF Core Sqlite in-memory.

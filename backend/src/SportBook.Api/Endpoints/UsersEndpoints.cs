@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using SportBook.Application.Dtos;
-using SportBook.Infrastructure;
+using Mediator;
+using SportBook.Api.Extensions;
+using SportBook.Application.Features.Users.GetMe;
 
 namespace SportBook.Api.Endpoints;
 
@@ -14,17 +14,17 @@ public static class UsersEndpoints
         var group = app.MapGroup("api/users");
 
         // <summary>
-        // Returns the caller's own profile, resolved from the JWT - never another user's. Kept
-        // as inline claim parsing (not `ClaimsPrincipalExtensions.GetUserId()`) to preserve this
-        // endpoint's exact pre-existing behavior across the Minimal API conversion - not a
-        // drive-by cleanup (consilium 2026-07-20).
+        // Returns the caller's own profile, resolved from the JWT - never another user's. Now
+        // reads identity via the shared `GetUserId()` extension, same as every other slice - the
+        // Handler moved the DB lookup off the endpoint, and Handlers cannot see ClaimsPrincipal
+        // (consilium 2026-07-20), so the endpoint-extracts-id-then-passes-into-request pattern
+        // used everywhere else is no longer optional here either. Functionally identical to the
+        // prior inline claim parsing (same NameIdentifier/"sub" claim), not a behavior change.
         // </summary>
-        group.MapGet("me", async (ClaimsPrincipal user, SportBookDbContext db, CancellationToken ct) =>
+        group.MapGet("me", async (ClaimsPrincipal user, IMediator mediator, CancellationToken ct) =>
         {
-            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? user.FindFirstValue("sub")!);
-            var dbUser = await db.Users.SingleAsync(u => u.Id == userId, ct);
-
-            return Results.Ok(new UserResponse(dbUser.Id, dbUser.Name, dbUser.Email, dbUser.Role.ToString(), dbUser.SubscriptionTier.ToString(), dbUser.CreatedAt));
+            var result = await mediator.Send(new GetMeQuery(user.GetUserId()), ct);
+            return Results.Ok(result);
         });
     }
 }

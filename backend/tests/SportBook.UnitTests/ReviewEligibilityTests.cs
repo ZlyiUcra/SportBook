@@ -1,7 +1,5 @@
-using SportBook.Application.Common;
-using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Reviews.CreateOrReplaceReview;
 using SportBook.Domain.Entities;
 using SportBook.Domain.Enums;
 using SportBook.UnitTests.TestInfrastructure;
@@ -24,12 +22,12 @@ public class ReviewEligibilityTests
         var (customer, court) = db.SeedCustomerAndCourt();
         db.SeedBooking(court.Id, customer.Id, Now.AddHours(-25), Now.AddHours(-24), BookingStatus.Confirmed);
 
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var (response, created) = await service.CreateOrReplaceAsync(
-            customer.Id, court.VenueId, new CreateReviewRequest(4, "Great court"), CancellationToken.None);
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var result = await handler.Handle(
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, "Great court"), CancellationToken.None);
 
-        Assert.True(created);
-        Assert.Equal(4, response.Rating);
+        Assert.True(result.Created);
+        Assert.Equal(4, result.Response.Rating);
     }
 
     [Theory]
@@ -41,9 +39,9 @@ public class ReviewEligibilityTests
         var (customer, court) = db.SeedCustomerAndCourt();
         db.SeedBooking(court.Id, customer.Id, Now.AddHours(-25), Now.AddHours(-24), status);
 
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var ex = await Assert.ThrowsAsync<ApiException>(() => service.CreateOrReplaceAsync(
-            customer.Id, court.VenueId, new CreateReviewRequest(4, null), CancellationToken.None));
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None).AsTask());
 
         Assert.Equal(409, ex.StatusCode);
         Assert.Equal("REVIEW_NOT_ELIGIBLE", ex.Code);
@@ -56,9 +54,9 @@ public class ReviewEligibilityTests
         var (customer, court) = db.SeedCustomerAndCourt();
         db.SeedBooking(court.Id, customer.Id, Now.AddHours(24), Now.AddHours(25), BookingStatus.Confirmed);
 
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var ex = await Assert.ThrowsAsync<ApiException>(() => service.CreateOrReplaceAsync(
-            customer.Id, court.VenueId, new CreateReviewRequest(4, null), CancellationToken.None));
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None).AsTask());
 
         Assert.Equal("REVIEW_NOT_ELIGIBLE", ex.Code);
     }
@@ -69,9 +67,9 @@ public class ReviewEligibilityTests
         using var db = new TestDb();
         var (customer, court) = db.SeedCustomerAndCourt();
 
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var ex = await Assert.ThrowsAsync<ApiException>(() => service.CreateOrReplaceAsync(
-            customer.Id, court.VenueId, new CreateReviewRequest(4, null), CancellationToken.None));
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None).AsTask());
 
         Assert.Equal("REVIEW_NOT_ELIGIBLE", ex.Code);
     }
@@ -95,9 +93,9 @@ public class ReviewEligibilityTests
         db.Db.Venues.Add(otherVenue);
         db.Db.SaveChanges();
 
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var ex = await Assert.ThrowsAsync<ApiException>(() => service.CreateOrReplaceAsync(
-            customer.Id, otherVenue.Id, new CreateReviewRequest(4, null), CancellationToken.None));
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
+            new CreateOrReplaceReviewCommand(customer.Id, otherVenue.Id, 4, null), CancellationToken.None).AsTask());
 
         Assert.Equal("REVIEW_NOT_ELIGIBLE", ex.Code);
     }
@@ -109,9 +107,9 @@ public class ReviewEligibilityTests
         var (customer, court) = db.SeedCustomerAndCourt();
         db.SeedBooking(court.Id, customer.Id, Now.AddHours(-25), Now.AddHours(-24), BookingStatus.Confirmed);
 
-        var service = new ReviewService(db.Db, new FixedTimeProvider(Now));
-        var ex = await Assert.ThrowsAsync<ApiException>(() => service.CreateOrReplaceAsync(
-            customer.Id, court.VenueId, new CreateReviewRequest(6, null), CancellationToken.None));
+        var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 6, null), CancellationToken.None).AsTask());
 
         Assert.Equal(400, ex.StatusCode);
         Assert.Equal("INVALID_RATING", ex.Code);

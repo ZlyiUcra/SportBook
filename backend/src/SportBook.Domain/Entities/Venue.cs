@@ -19,7 +19,7 @@ public class Venue
 
     public string? Description { get; set; }
 
-    /// <summary>Both-or-neither with <see cref="Longitude"/> (enforced in VenueService) - set only via the owner's map pin; no coordinate is ever derived from the city.</summary>
+    /// <summary>Both-or-neither with <see cref="Longitude"/> (enforced in VenueLocationValidator) - set only via the owner's map pin; no coordinate is ever derived from the city.</summary>
     public decimal? Latitude { get; set; }
 
     public decimal? Longitude { get; set; }

@@ -1,8 +1,10 @@
 using System.Security.Claims;
+using Mediator;
 using SportBook.Api.Extensions;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Reviews.CreateOrReplaceReview;
+using SportBook.Application.Features.Reviews.ListReviewsByVenue;
 
 namespace SportBook.Api.Endpoints;
 
@@ -14,20 +16,21 @@ public static class ReviewsEndpoints
     {
         // <summary>Paginated list of a venue's reviews, newest first.</summary>
         app.MapGet("api/venues/{venueId:guid}/reviews", async (
-            Guid venueId, [AsParameters] PageRequest paging, ReviewService reviewService, CancellationToken ct) =>
+            Guid venueId, [AsParameters] PageRequest paging, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await reviewService.ListByVenueAsync(venueId, paging, ct);
+            var result = await mediator.Send(new ListReviewsByVenueQuery(venueId, paging), ct);
             return Results.Ok(result);
         });
 
         // <summary>Submits a review; a second submission by the same user for the same venue replaces the first (201 vs 200 signals which).</summary>
         app.MapPost("api/venues/{venueId:guid}/reviews", async (
-            ClaimsPrincipal user, Guid venueId, CreateReviewRequest request, ReviewService reviewService, CancellationToken ct) =>
+            ClaimsPrincipal user, Guid venueId, CreateReviewRequest request, IMediator mediator, CancellationToken ct) =>
         {
-            var (response, created) = await reviewService.CreateOrReplaceAsync(user.GetUserId(), venueId, request, ct);
-            return created
-                ? Results.Json(response, statusCode: StatusCodes.Status201Created)
-                : Results.Ok(response);
+            var command = new CreateOrReplaceReviewCommand(user.GetUserId(), venueId, request.Rating, request.Comment);
+            var result = await mediator.Send(command, ct);
+            return result.Created
+                ? Results.Json(result.Response, statusCode: StatusCodes.Status201Created)
+                : Results.Ok(result.Response);
         });
     }
 }

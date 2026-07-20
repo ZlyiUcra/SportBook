@@ -22,7 +22,7 @@ public static class Mapping
 
     /// <summary>
     /// <see cref="Venue.City"/> must already be loaded (Include) and `Latitude`/`Longitude` must
-    /// be non-null before calling this - callers (VenueService.SearchNearbyAsync) only pass
+    /// be non-null before calling this - callers (SearchNearbyVenuesHandler) only pass
     /// coordinate-bearing venues (003 data-model.md).
     /// </summary>
     public static NearbyVenueResponse ToNearbyResponse(this Venue venue, decimal distanceKm) =>
@@ -37,8 +37,8 @@ public static class Mapping
     /// `Completed` is derived on read (data-model.md state transitions): a Confirmed booking whose
     /// EndTime has passed is displayed as Completed without a stored transition or background job.
     /// Callers MUST load the `Court -> Venue -> City` chain (Include) before mapping - the venue/
-    /// city/sport/court labels (005) are read from it; every booking-response path in
-    /// <see cref="Services.BookingService"/> loads that chain.
+    /// city/sport/court labels (005) are read from it; every booking-response path in the
+    /// Bookings feature handlers (via <see cref="Services.BookingHelpers.IncludeDetail"/>) loads that chain.
     /// </summary>
     public static BookingResponse ToResponse(this Booking booking, DateTime utcNow)
     {

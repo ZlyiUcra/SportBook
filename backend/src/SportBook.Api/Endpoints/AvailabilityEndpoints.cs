@@ -1,5 +1,5 @@
-using SportBook.Application.Dtos;
-using SportBook.Application.Services;
+using Mediator;
+using SportBook.Application.Features.Availability.GetAvailability;
 
 namespace SportBook.Api.Endpoints;
 
@@ -11,9 +11,9 @@ public static class AvailabilityEndpoints
     {
         // <summary>Whole-hour free slots for a court on a given date, within its operating hours.</summary>
         app.MapGet("api/courts/{id:guid}/availability", async (
-            Guid id, DateOnly date, AvailabilityService availabilityService, CancellationToken ct) =>
+            Guid id, DateOnly date, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await availabilityService.GetForDateAsync(id, date, ct);
+            var result = await mediator.Send(new GetAvailabilityQuery(id, date), ct);
             return Results.Ok(result);
         });
     }

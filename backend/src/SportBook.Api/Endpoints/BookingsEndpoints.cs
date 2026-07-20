@@ -1,8 +1,14 @@
 using System.Security.Claims;
+using Mediator;
 using SportBook.Api.Extensions;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Bookings.CancelBooking;
+using SportBook.Application.Features.Bookings.ConfirmBooking;
+using SportBook.Application.Features.Bookings.CreateBooking;
+using SportBook.Application.Features.Bookings.GetBookingById;
+using SportBook.Application.Features.Bookings.ListMyBookings;
+using SportBook.Application.Features.Bookings.ListVenueBookingsForOwner;
 
 namespace SportBook.Api.Endpoints;
 
@@ -20,9 +26,10 @@ public static class BookingsEndpoints
 
         // <summary>Books a court for a whole-hour slot; price and overlap safety are computed server-side.</summary>
         group.MapPost("", async (
-            ClaimsPrincipal user, CreateBookingRequest request, BookingService bookingService, CancellationToken ct) =>
+            ClaimsPrincipal user, CreateBookingRequest request, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await bookingService.CreateAsync(user.GetUserId(), request, ct);
+            var command = new CreateBookingCommand(user.GetUserId(), request.CourtId, request.StartTime, request.EndTime);
+            var result = await mediator.Send(command, ct);
             return Results.Json(result, statusCode: StatusCodes.Status201Created);
         });
 
@@ -32,43 +39,42 @@ public static class BookingsEndpoints
         // spec FR-006); the owner venue-bookings endpoint does not take this filter.
         // </summary>
         group.MapGet("", async (
-            ClaimsPrincipal user, [AsParameters] PageRequest paging, BookingService bookingService,
+            ClaimsPrincipal user, [AsParameters] PageRequest paging, IMediator mediator,
             CancellationToken ct, BookingStatusFilter status = BookingStatusFilter.All) =>
         {
-            var result = await bookingService.ListMineAsync(user.GetUserId(), status, paging, ct);
+            var result = await mediator.Send(new ListMyBookingsQuery(user.GetUserId(), status, paging), ct);
             return Results.Ok(result);
         });
 
         // <summary>A single booking; only the customer who made it may view it (403 otherwise).</summary>
         group.MapGet("{id:guid}", async (
-            ClaimsPrincipal user, Guid id, BookingService bookingService, CancellationToken ct) =>
+            ClaimsPrincipal user, Guid id, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await bookingService.GetByIdAsync(user.GetUserId(), id, ct);
+            var result = await mediator.Send(new GetBookingByIdQuery(user.GetUserId(), id), ct);
             return Results.Ok(result);
         });
 
         // <summary>Cancels a booking; only its customer may call this, and only more than 2 hours before its start (FR-005).</summary>
         group.MapPut("{id:guid}/cancel", async (
-            ClaimsPrincipal user, Guid id, BookingService bookingService, CancellationToken ct) =>
+            ClaimsPrincipal user, Guid id, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await bookingService.CancelAsync(user.GetUserId(), id, ct);
+            var result = await mediator.Send(new CancelBookingCommand(user.GetUserId(), id), ct);
             return Results.Ok(result);
         });
 
         // <summary>Paginated list of bookings against one of the caller's own venues.</summary>
         app.MapGet("api/venues/{venueId:guid}/bookings", async (
-            ClaimsPrincipal user, Guid venueId, [AsParameters] PageRequest paging,
-            BookingService bookingService, CancellationToken ct) =>
+            ClaimsPrincipal user, Guid venueId, [AsParameters] PageRequest paging, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await bookingService.ListByVenueForOwnerAsync(user.GetUserId(), venueId, paging, ct);
+            var result = await mediator.Send(new ListVenueBookingsForOwnerQuery(user.GetUserId(), venueId, paging), ct);
             return Results.Ok(result);
         });
 
         // <summary>Confirms a pending booking; only the owner of the booked court's venue may call this (FR-011).</summary>
         group.MapPut("{id:guid}/confirm", async (
-            ClaimsPrincipal user, Guid id, BookingService bookingService, CancellationToken ct) =>
+            ClaimsPrincipal user, Guid id, IMediator mediator, CancellationToken ct) =>
         {
-            var result = await bookingService.ConfirmAsync(user.GetUserId(), id, ct);
+            var result = await mediator.Send(new ConfirmBookingCommand(user.GetUserId(), id), ct);
             return Results.Ok(result);
         });
     }

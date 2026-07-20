@@ -1,6 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using SportBook.Application.Dtos;
+using SportBook.Application.Features.Auth.Login;
+using SportBook.Application.Features.Auth.Refresh;
+using SportBook.Application.Features.Auth.Register;
 using SportBook.IntegrationTests.TestInfrastructure;
 
 namespace SportBook.IntegrationTests;
@@ -16,7 +19,7 @@ public class AuthTests(ApiFixture fixture)
         var email = $"reg-{Guid.NewGuid():N}@example.com";
 
         var response = await client.PostAsJsonAsync("/api/auth/register",
-            new RegisterRequest("New User", email, "Test1234!"));
+            new RegisterCommand("New User", email, "Test1234!"));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
@@ -34,7 +37,7 @@ public class AuthTests(ApiFixture fixture)
         var auth = await client.RegisterAsync();
 
         var response = await client.PostAsJsonAsync("/api/auth/register",
-            new RegisterRequest("Dup", auth.User.Email, "Test1234!"));
+            new RegisterCommand("Dup", auth.User.Email, "Test1234!"));
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
@@ -46,11 +49,11 @@ public class AuthTests(ApiFixture fixture)
         var auth = await client.RegisterAsync();
 
         var ok = await client.PostAsJsonAsync("/api/auth/login",
-            new LoginRequest(auth.User.Email, "Test1234!"));
+            new LoginCommand(auth.User.Email, "Test1234!"));
         Assert.Equal(HttpStatusCode.OK, ok.StatusCode);
 
         var wrong = await client.PostAsJsonAsync("/api/auth/login",
-            new LoginRequest(auth.User.Email, "WrongPass1!"));
+            new LoginCommand(auth.User.Email, "WrongPass1!"));
         Assert.Equal(HttpStatusCode.Unauthorized, wrong.StatusCode);
     }
 
@@ -60,13 +63,13 @@ public class AuthTests(ApiFixture fixture)
         var client = fixture.Factory.CreateClient();
         var auth = await client.RegisterAsync();
 
-        var first = await client.PostAsJsonAsync("/api/auth/refresh", new RefreshRequest(auth.RefreshToken));
+        var first = await client.PostAsJsonAsync("/api/auth/refresh", new RefreshCommand(auth.RefreshToken));
         Assert.Equal(HttpStatusCode.OK, first.StatusCode);
         var rotated = await first.Content.ReadFromJsonAsync<AuthResponse>();
         Assert.NotNull(rotated);
         Assert.NotEqual(auth.RefreshToken, rotated.RefreshToken);
 
-        var reuse = await client.PostAsJsonAsync("/api/auth/refresh", new RefreshRequest(auth.RefreshToken));
+        var reuse = await client.PostAsJsonAsync("/api/auth/refresh", new RefreshCommand(auth.RefreshToken));
         Assert.Equal(HttpStatusCode.Unauthorized, reuse.StatusCode);
     }
 

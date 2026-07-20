@@ -111,8 +111,10 @@ Tests for venue management and reviews
 ```text
 backend/
   src/
-    SportBook.Api             ASP.NET Core Web API - controllers, JWT auth, DI wiring
-    SportBook.Application     Services (business logic), DTOs, request/response mapping
+    SportBook.Api             ASP.NET Core Web API - Minimal API endpoints (Endpoints/), JWT auth, DI wiring
+    SportBook.Application     Vertical slices (Features/<Resource>/<UseCase>/ - Command/Query +
+                              Handler, dispatched via martinothamar/Mediator), plus a small
+                              Services/ layer for logic genuinely shared across slices, DTOs
     SportBook.Domain          Entities, enums - no framework dependencies
     SportBook.Infrastructure  EF Core DbContext, migrations, SQL Server provider registration,
                               committed City reference data (Data/cities.csv, GeoNames CC BY 4.0)
@@ -143,8 +145,9 @@ specs/003-venue-radius-map/
                              Reference-point radius map of nearby venues - spec, plan, task breakdown
 ```
 
-**Backend stack**: C# / .NET 10, ASP.NET Core Web API (MVC controllers), EF Core 10 +
-`Microsoft.EntityFrameworkCore.SqlServer`, JWT bearer authentication, xUnit.
+**Backend stack**: C# / .NET 10, ASP.NET Core Web API (Minimal API), EF Core 10 +
+`Microsoft.EntityFrameworkCore.SqlServer`, JWT bearer authentication, martinothamar/Mediator
+(command/query dispatch), xUnit.
 
 **Frontend stack**: React 19, Vite, TypeScript, TanStack Query, Zustand, React Hook Form + Zod,
 Axios, Tailwind CSS + shadcn/ui, i18next (English, Ukrainian, Portuguese), Vitest, Leaflet +

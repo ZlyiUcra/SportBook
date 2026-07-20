@@ -1,6 +1,5 @@
-using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
-using SportBook.Application.Services;
+using SportBook.Application.Features.Bookings.CreateBooking;
 using SportBook.Domain.Enums;
 using SportBook.UnitTests.TestInfrastructure;
 
@@ -28,10 +27,10 @@ public class BookingOverlapCheckTests
         using var testDb = new TestDb();
         var (customer, court) = testDb.SeedCustomerAndCourt();
         testDb.SeedBooking(court.Id, customer.Id, At(existingStart), At(existingEnd), BookingStatus.Pending);
-        var service = new BookingService(testDb.Db, new FixedTimeProvider(Now));
+        var handler = new CreateBookingHandler(testDb.Db, new FixedTimeProvider(Now));
 
-        var ex = await Assert.ThrowsAsync<ApiException>(() => service.CreateAsync(
-            customer.Id, new CreateBookingRequest(court.Id, At(newStart), At(newEnd)), CancellationToken.None));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
+            new CreateBookingCommand(customer.Id, court.Id, At(newStart), At(newEnd)), CancellationToken.None).AsTask());
 
         Assert.Equal(409, ex.StatusCode);
         Assert.Equal("SLOT_TAKEN", ex.Code);
@@ -43,10 +42,10 @@ public class BookingOverlapCheckTests
         using var testDb = new TestDb();
         var (customer, court) = testDb.SeedCustomerAndCourt();
         testDb.SeedBooking(court.Id, customer.Id, At(10), At(11), BookingStatus.Confirmed);
-        var service = new BookingService(testDb.Db, new FixedTimeProvider(Now));
+        var handler = new CreateBookingHandler(testDb.Db, new FixedTimeProvider(Now));
 
-        var ex = await Assert.ThrowsAsync<ApiException>(() => service.CreateAsync(
-            customer.Id, new CreateBookingRequest(court.Id, At(10), At(11)), CancellationToken.None));
+        var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
+            new CreateBookingCommand(customer.Id, court.Id, At(10), At(11)), CancellationToken.None).AsTask());
 
         Assert.Equal("SLOT_TAKEN", ex.Code);
     }
@@ -57,10 +56,10 @@ public class BookingOverlapCheckTests
         using var testDb = new TestDb();
         var (customer, court) = testDb.SeedCustomerAndCourt();
         testDb.SeedBooking(court.Id, customer.Id, At(10), At(11), BookingStatus.Pending);
-        var service = new BookingService(testDb.Db, new FixedTimeProvider(Now));
+        var handler = new CreateBookingHandler(testDb.Db, new FixedTimeProvider(Now));
 
-        var response = await service.CreateAsync(
-            customer.Id, new CreateBookingRequest(court.Id, At(11), At(12)), CancellationToken.None);
+        var response = await handler.Handle(
+            new CreateBookingCommand(customer.Id, court.Id, At(11), At(12)), CancellationToken.None);
 
         Assert.Equal(At(11), response.StartTime);
     }
@@ -71,10 +70,10 @@ public class BookingOverlapCheckTests
         using var testDb = new TestDb();
         var (customer, court) = testDb.SeedCustomerAndCourt();
         testDb.SeedBooking(court.Id, customer.Id, At(10), At(11), BookingStatus.Cancelled);
-        var service = new BookingService(testDb.Db, new FixedTimeProvider(Now));
+        var handler = new CreateBookingHandler(testDb.Db, new FixedTimeProvider(Now));
 
-        var response = await service.CreateAsync(
-            customer.Id, new CreateBookingRequest(court.Id, At(10), At(11)), CancellationToken.None);
+        var response = await handler.Handle(
+            new CreateBookingCommand(customer.Id, court.Id, At(10), At(11)), CancellationToken.None);
 
         Assert.Equal("Pending", response.Status);
     }
