@@ -1,9 +1,18 @@
 # API Contracts: Reviews only after a completed, confirmed game
 
-Delta contract on top of `specs/001-sportbook-venue-booking/contracts/api.md`. Everything not listed
-here is unchanged. Auth posture (JWT required to submit) and the standard error shape carry over. No
-endpoint is added, removed, or has its request/response shape changed by this feature - the only
-change is a new rejection reason on the review create/replace endpoint.
+Delta contract on top of `specs/001-sportbook-venue-booking/contracts/api.md` (and the 005 booking
+response). Everything not listed here is unchanged. Auth posture (JWT required to submit) and the
+standard error shape carry over. No endpoint is added or removed. Two changes: a new rejection
+reason on the review create/replace endpoint, and one additive field (`venueId`) on the booking
+response so the customer's completed bookings can target their venue's review.
+
+## BookingResponse - + venueId (additive, affects every booking endpoint)
+
+`BookingResponse` gains `venueId` (Guid) alongside the 005 labels (`venueName`, `city`, `sport`,
+`courtName`); all prior fields remain. It is the id needed to submit a review for the booking's
+venue from "My bookings" (the review endpoint is keyed by venue id), and is exposed for the same
+reason `courtId` already is - actions and links, not display. No other field is added; no
+internal-only data beyond this navigation id (spec keeps the response lean).
 
 ## POST review (create or replace) - + eligibility gate
 

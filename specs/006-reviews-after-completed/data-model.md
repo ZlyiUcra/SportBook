@@ -12,6 +12,13 @@ No field change. One review per customer per venue (the existing unique index on
 Reviews created before this feature are kept as-is (not purged); their authors must now meet the
 eligibility rule to replace them.
 
+## BookingResponse (one additive field)
+
+The transport DTO gains `VenueId` (Guid) beside the 005 labels; no other change. It lets a
+completed booking on "My bookings" target its venue's review endpoint (keyed by venue id), and is
+exposed for the same reason `CourtId` already is - actions/links, not display. No stored-schema
+change - `VenueId` is read from the already-loaded `Court.VenueId`.
+
 ## Booking / Court / Venue (unchanged, reused for eligibility)
 
 No change. The eligibility rule reads the existing navigation chain:
