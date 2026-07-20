@@ -4,6 +4,7 @@ import { logout } from '@/features/auth/logout/api/logout'
 
 const IDLE_MS = 3 * 60 * 1000
 const WARNING_SECONDS = 30
+const ACTIVITY_THROTTLE_MS = 1000
 const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'] as const
 
 /**
@@ -58,10 +59,15 @@ export function useIdleLogout() {
 
   React.useEffect(() => {
     startIdleTimer()
+    // mousemove/scroll can fire dozens of times a second - only reset the idle timer at most
+    // once a second, rather than on every single event.
+    let lastReset = Date.now()
     const handleActivity = () => {
-      if (secondsLeftRef.current === null) {
-        startIdleTimer()
-      }
+      if (secondsLeftRef.current !== null) return
+      const now = Date.now()
+      if (now - lastReset < ACTIVITY_THROTTLE_MS) return
+      lastReset = now
+      startIdleTimer()
     }
     ACTIVITY_EVENTS.forEach((event) => window.addEventListener(event, handleActivity))
     return () => {
