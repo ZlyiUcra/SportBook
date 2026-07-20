@@ -173,7 +173,9 @@
     "addTitle": "Залишити відгук",
     "editTitle": "Оновити ваш відгук",
     "addAction": "Залишити відгук",
-    "editAction": "Редагувати відгук"
+    "editAction": "Редагувати відгук",
+    "starRating": "Оцінка",
+    "starLabel": "Оцінка {{count}} з 5"
   },
   "about": {
     "title": "Про SportBook",

@@ -132,17 +132,17 @@ sets 1-5 by position; the rating is fully settable by keyboard and on touch.
 
 ### Implementation for User Story 3
 
-- [ ] T010 [US3] Frontend: build a self-contained `StarRating` component (no new dependency) in
+- [x] T010 [US3] Frontend: build a self-contained `StarRating` component (no new dependency) in
       `frontend/src/features/review/create/ui/StarRating.tsx` - a controlled `value`/`onChange`
       integer 1-5, five focusable stars where pointer hover previews the value, a click sets 1-5
       proportional to the x-position within the row (five equal segments, clamped), and keyboard
       (arrow/number keys) and touch (tap) set the full 1-5 range, with aria labels for current and
       previewed rating; i18n aria keys in `frontend/src/shared/i18n/locales/{en,uk,pt}.json`
-- [ ] T011 [US3] Frontend: replace the `<select>` rating in
+- [x] T011 [US3] Frontend: replace the `<select>` rating in
       `frontend/src/features/review/create/ui/ReviewForm.tsx` with `StarRating`, wired to the RHF
       `rating` field (via `Controller` or `setValue`, keeping the same 1-5 zod validation and
       submit shape); remove the `RATINGS`/`<select>` markup (depends on T010)
-- [ ] T012 [US3] Frontend test: hovering the third star previews three, clicking near the right edge
+- [x] T012 [US3] Frontend test: hovering the third star previews three, clicking near the right edge
       yields 5 and the fourth star yields 4, and the rating is settable by keyboard, in
       `frontend/tests/features/StarRating.test.tsx` (depends on T011)
 

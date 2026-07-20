@@ -1,11 +1,10 @@
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/ui/button'
 import { Label } from '@/shared/ui/label'
+import { StarRating } from './StarRating'
 import { reviewFormSchema, type ReviewFormValues } from '../model/schema'
-
-const RATINGS = [1, 2, 3, 4, 5]
 
 type ReviewFormProps = {
   defaultValues?: ReviewFormValues
@@ -16,7 +15,7 @@ type ReviewFormProps = {
 /** Same form serves both first-time submission and replacing the caller's existing review (one review per user per venue). */
 export function ReviewForm({ defaultValues, onSubmit, isSubmitting }: ReviewFormProps) {
   const { t } = useTranslation()
-  const { register, handleSubmit } = useForm<ReviewFormValues>({
+  const { control, register, handleSubmit } = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewFormSchema),
     defaultValues: defaultValues ?? { rating: 5, comment: '' },
   })
@@ -24,18 +23,12 @@ export function ReviewForm({ defaultValues, onSubmit, isSubmitting }: ReviewForm
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="review-rating">{t('review.rating')}</Label>
-        <select
-          id="review-rating"
-          {...register('rating', { valueAsNumber: true })}
-          className="max-w-24 rounded-md border border-input bg-background px-2 py-1 text-sm"
-        >
-          {RATINGS.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
+        <Label>{t('review.rating')}</Label>
+        <Controller
+          control={control}
+          name="rating"
+          render={({ field }) => <StarRating value={field.value} onChange={field.onChange} />}
+        />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="review-comment">{t('review.comment')}</Label>

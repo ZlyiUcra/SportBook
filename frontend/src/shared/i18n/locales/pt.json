@@ -173,7 +173,9 @@
     "addTitle": "Deixar uma avaliação",
     "editTitle": "Atualizar sua avaliação",
     "addAction": "Deixar uma avaliação",
-    "editAction": "Editar sua avaliação"
+    "editAction": "Editar sua avaliação",
+    "starRating": "Avaliação",
+    "starLabel": "Avaliar {{count}} de 5"
   },
   "about": {
     "title": "Sobre o SportBook",

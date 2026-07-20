@@ -173,7 +173,9 @@
     "addTitle": "Leave a review",
     "editTitle": "Update your review",
     "addAction": "Leave a review",
-    "editAction": "Edit your review"
+    "editAction": "Edit your review",
+    "starRating": "Rating",
+    "starLabel": "Rate {{count}} out of 5"
   },
   "about": {
     "title": "About SportBook",
