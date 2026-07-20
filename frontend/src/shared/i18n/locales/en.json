@@ -169,6 +169,7 @@
     "ratingValue": "{{rating}}/5",
     "rating": "Rating",
     "comment": "Comment",
+    "commentTooShort": "Editing a review requires a comment of at least 10 characters.",
     "submit": "Submit review",
     "addTitle": "Leave a review",
     "editTitle": "Update your review",

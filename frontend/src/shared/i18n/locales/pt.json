@@ -169,6 +169,7 @@
     "ratingValue": "{{rating}}/5",
     "rating": "Avaliação",
     "comment": "Comentário",
+    "commentTooShort": "Editar uma avaliação requer um comentário de pelo menos 10 caracteres.",
     "submit": "Enviar avaliação",
     "addTitle": "Deixar uma avaliação",
     "editTitle": "Atualizar sua avaliação",

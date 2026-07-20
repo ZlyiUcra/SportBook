@@ -100,31 +100,31 @@ review with no comment at all (still accepted).
 
 ### Tests for User Story 2
 
-- [ ] T006 [P] [US2] Unit test: replacing a review with a missing/empty/whitespace-only comment or
+- [x] T006 [P] [US2] Unit test: replacing a review with a missing/empty/whitespace-only comment or
       one under 10 characters (after trim) is rejected; a comment of exactly 10 characters or more
       is accepted; a first-time submission (no existing review) with no comment is accepted
       regardless of length, in `backend/tests/SportBook.UnitTests/ReviewEditCommentTests.cs`
-- [ ] T007 [P] [US2] Integration test: `POST /api/venues/{venueId}/reviews` replace with an
+- [x] T007 [P] [US2] Integration test: `POST /api/venues/{venueId}/reviews` replace with an
       empty/short comment is rejected `400 REVIEW_COMMENT_TOO_SHORT` (stored review unchanged), a
       10+-character comment on a replace succeeds, and a first-time submission with no comment still
       returns `201`, in `backend/tests/SportBook.IntegrationTests/ReviewEditCommentEndpointTests.cs`
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] In `backend/src/SportBook.Application/Services/ReviewService.cs`
+- [x] T008 [US2] In `backend/src/SportBook.Application/Services/ReviewService.cs`
       `CreateOrReplaceAsync`, on the replace branch, after the T003 edit-window check passes,
       reject when `request.Comment` is null, empty, or (after `.Trim()`) shorter than 10 characters,
       with `throw new ApiException(400, "REVIEW_COMMENT_TOO_SHORT", ...)`; the create branch
       (first-time submission) is unaffected (per data-model.md, research.md; depends on T003 for the
       check ordering)
-- [ ] T009 [US2] Frontend: add an `isEdit: boolean` prop to `ReviewForm` in
+- [x] T009 [US2] Frontend: add an `isEdit: boolean` prop to `ReviewForm` in
       `frontend/src/features/review/create/ui/ReviewForm.tsx`; when true, validate `comment` as
       required and at least 10 characters (extend/parameterize `reviewFormSchema` in
       `frontend/src/features/review/create/model/schema.ts` accordingly), otherwise keep it
       optional as today; pass `isEdit={!!mine}` from `ReviewAction` in
       `frontend/src/pages/my-bookings/ui/MyBookingsPage.tsx` (depends on T004's read-only branch
       existing - the form only renders at all when the window is open)
-- [ ] T010 [US2] Frontend test: with `isEdit`, submitting an empty or 9-character comment is blocked
+- [x] T010 [US2] Frontend test: with `isEdit`, submitting an empty or 9-character comment is blocked
       client-side with a validation message; a 10+-character comment submits; without `isEdit`
       (first-time), submitting with no comment still succeeds, in
       `frontend/tests/features/ReviewForm.test.tsx` (depends on T009)

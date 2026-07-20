@@ -4,19 +4,26 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/ui/button'
 import { Label } from '@/shared/ui/label'
 import { StarRating } from './StarRating'
-import { reviewFormSchema, type ReviewFormValues } from '../model/schema'
+import { makeReviewFormSchema, type ReviewFormValues } from '../model/schema'
 
 type ReviewFormProps = {
   defaultValues?: ReviewFormValues
   onSubmit: (values: ReviewFormValues) => void
   isSubmitting: boolean
+  /** True when replacing an existing review - requires a comment of at least 10 characters (007 US2); a first-time submission keeps it optional. */
+  isEdit?: boolean
 }
 
 /** Same form serves both first-time submission and replacing the caller's existing review (one review per user per venue). */
-export function ReviewForm({ defaultValues, onSubmit, isSubmitting }: ReviewFormProps) {
+export function ReviewForm({ defaultValues, onSubmit, isSubmitting, isEdit = false }: ReviewFormProps) {
   const { t } = useTranslation()
-  const { control, register, handleSubmit } = useForm<ReviewFormValues>({
-    resolver: zodResolver(reviewFormSchema),
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ReviewFormValues>({
+    resolver: zodResolver(makeReviewFormSchema(isEdit)),
     defaultValues: defaultValues ?? { rating: 5, comment: '' },
   })
 
@@ -38,6 +45,7 @@ export function ReviewForm({ defaultValues, onSubmit, isSubmitting }: ReviewForm
           rows={3}
           className="rounded-md border border-input bg-background px-3 py-2 text-sm"
         />
+        {errors.comment && <p className="text-sm text-destructive">{t('review.commentTooShort')}</p>}
       </div>
       <Button type="submit" disabled={isSubmitting} className="self-start">
         {isSubmitting ? t('common.saving') : t('review.submit')}

@@ -15,7 +15,8 @@ namespace SportBook.Application.Services;
 /// Confirmed, past booking on one of the venue's courts (a completed game) - checked server-side
 /// so the client is never trusted to self-certify. Replacing an existing review is further gated
 /// (007 data-model.md): only within 24 hours of its original CreatedAt (never reset by a prior
-/// replace) - a first-time submission is unaffected.
+/// replace), and only with a comment of at least 10 characters - neither rule applies to a
+/// first-time submission.
 /// </summary>
 public class ReviewService(SportBookDbContext db, TimeProvider timeProvider)
 {
@@ -73,6 +74,13 @@ public class ReviewService(SportBookDbContext db, TimeProvider timeProvider)
             {
                 throw new ApiException(409, "REVIEW_EDIT_WINDOW_CLOSED",
                     "This review can no longer be edited - the 24-hour edit window has passed.");
+            }
+
+            var trimmedComment = request.Comment?.Trim();
+            if (string.IsNullOrEmpty(trimmedComment) || trimmedComment.Length < 10)
+            {
+                throw new ApiException(400, "REVIEW_COMMENT_TOO_SHORT",
+                    "Editing a review requires a comment of at least 10 characters.");
             }
 
             existing.Rating = request.Rating;

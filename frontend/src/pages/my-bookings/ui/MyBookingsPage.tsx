@@ -190,6 +190,7 @@ function ReviewAction({ booking }: { booking: Booking }) {
               defaultValues={mine ? { rating: mine.rating, comment: mine.comment ?? '' } : undefined}
               onSubmit={(values) => reviewMutation.mutate(values)}
               isSubmitting={reviewMutation.isPending}
+              isEdit={!!mine}
             />
             {reviewMutation.isError && (
               <p role="alert" className="text-sm text-destructive">
