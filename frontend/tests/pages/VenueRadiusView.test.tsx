@@ -6,20 +6,20 @@ import { VenueSearchPage } from '@/pages/venues/ui/VenueSearchPage'
 import { useSearchStore } from '@/pages/venues/model/searchStore'
 import { getNearbyVenues } from '@/entities/venue/api/venueApi'
 import { suggestCities } from '@/entities/city/api/cityApi'
-import type { MapBounds, MapMarker } from '@/shared/ui/map/MapView'
+import type { MapBounds, MapMarker, MapViewport } from '@/shared/ui/map/MapView'
 import type { NearbyVenue } from '@/entities/venue/model/types'
 import type { City } from '@/entities/city/model/types'
 
 // Captures the page's onViewportChange so tests can emit MapBounds like a completed zoom/pan
 // gesture would (004 US2). vi.hoisted because the mock factory below is hoisted above imports.
 const viewport = vi.hoisted(() => ({
-  emit: null as ((bounds: { south: number; west: number; north: number; east: number }) => void) | null,
+  emit: null as ((report: MapViewport) => void) | null,
 }))
 
 // research.md testing stance: no leaflet/WebGL in jsdom - the real MapView is mocked with a thin
 // stand-in that exposes markers (and which one is emphasized) as plain text.
 vi.mock('@/shared/ui/map/MapView', () => ({
-  default: ({ markers, onViewportChange }: { markers: MapMarker[]; onViewportChange?: (bounds: MapBounds) => void }) => {
+  default: ({ markers, onViewportChange }: { markers: MapMarker[]; onViewportChange?: (report: MapViewport) => void }) => {
     viewport.emit = onViewportChange ?? null
     return (
       <ul data-testid="mock-map-markers">
@@ -70,10 +70,12 @@ function makeNearby(id: string, distanceKm: number, latitude = 50.45, longitude 
   return { id, name: `Venue ${id}`, city, address: '1 St', description: null, latitude, longitude, distanceKm }
 }
 
-/** Emits bounds the way a completed zoom/pan gesture would - see the MapView mock above. */
+/** Emits a viewport report the way a completed zoom/pan gesture would - see the MapView mock above.
+ * The 003 tests only vary `bounds` (the list/count filter); center+zoom are filler, since the radius
+ * view does not assert the restorable camera (that arrived with 008's richer report shape). */
 function emitViewport(bounds: MapBounds) {
   act(() => {
-    viewport.emit?.(bounds)
+    viewport.emit?.({ bounds, center: { lat: 50.45, lng: 30.52 }, zoom: 13 })
   })
 }
 
@@ -113,7 +115,7 @@ describe('VenueSearchPage - reference-point radius view', () => {
     vi.mocked(getNearbyVenues).mockReset()
     vi.mocked(suggestCities).mockReset()
     // Since 004 the search state is a module-level session store - reset it between tests.
-    useSearchStore.setState({ city: null, sportType: '', deviceCoords: null })
+    useSearchStore.setState({ city: null, sportType: '', deviceCoords: null, viewport: null })
   })
 
   it('T014: the near-me flow shows the in-range venues on the map and in the list nearest-first', async () => {

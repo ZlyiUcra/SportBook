@@ -16,7 +16,7 @@ import { useSearchStore } from '../model/searchStore'
 // this import only fires once a reference point exists and the map section actually renders.
 // The type-only import below is erased at build time and does not defeat the laziness.
 const MapView = React.lazy(() => import('@/shared/ui/map/MapView'))
-import type { MapBounds } from '@/shared/ui/map/MapView'
+import type { MapBounds, MapViewport } from '@/shared/ui/map/MapView'
 import type { NearbyVenue } from '@/entities/venue/model/types'
 
 /** Client-side list page size (004 spec FR-012) - a single constant, raise here if ever needed. */
@@ -49,6 +49,8 @@ export function VenueSearchPage() {
   const setSportType = useSearchStore((state) => state.setSportType)
   const deviceCoords = useSearchStore((state) => state.deviceCoords)
   const setDeviceCoords = useSearchStore((state) => state.setDeviceCoords)
+  const viewport = useSearchStore((state) => state.viewport)
+  const setViewport = useSearchStore((state) => state.setViewport)
 
   const { referencePoint, geolocationStatus, requestDeviceLocation } = useReferencePoint(city, deviceCoords, setDeviceCoords)
 
@@ -60,22 +62,36 @@ export function VenueSearchPage() {
 
   const venues = nearbyQuery.data ?? []
   const nearestVenueId = venues[0]?.id
-  // Keyed on the reference point + the returned venue-id set (research.md fitBounds behaviour) -
-  // fits once per change of either, not on every render.
-  const fitBoundsKey = referencePoint
-    ? `${referencePoint.lat},${referencePoint.lng}|${venues.map((v) => v.id).join(',')}`
-    : undefined
 
-  // Latest completed-gesture viewport (004 US2). Page state, deliberately NOT in the search store
-  // - returning to the search must re-frame to the default full-radius view (004 spec FR-004).
+  // Latest completed-gesture viewport BOUNDS for the list/count filter (004 US2). Ephemeral page
+  // state - repopulated on mount by the map's viewport report; NOT the restorable camera (that is
+  // `viewport` in the store, which holds center+zoom, 008).
   const [viewportBounds, setViewportBounds] = React.useState<MapBounds | null>(null)
-  // A new reference means a new framing is coming - drop stale bounds so the list shows the full
-  // set until the map reports the framed view (004 spec FR-009). Keyed on the coordinate string,
-  // not the object, because the city-derived reference is rebuilt each render.
+  // Reference coordinate key, stable across renders (the city-derived reference is rebuilt each
+  // render, so the string key is what the effects compare against).
   const referenceKey = referencePoint ? `${referencePoint.lat},${referencePoint.lng}` : ''
+  // Tell a genuine reference CHANGE from a mount / return-remount: only a real change (a new city
+  // or a fresh "near me") drops the saved camera and the list bounds; a return remount must
+  // preserve both (008 FR-001). On the first mount the ref is still null, so nothing is cleared.
+  // A sport-filter change keeps the same reference, so the camera survives it (008 FR-002).
+  const prevReferenceKeyRef = React.useRef<string | null>(null)
   React.useEffect(() => {
-    setViewportBounds(null)
-  }, [referenceKey])
+    if (prevReferenceKeyRef.current !== null && prevReferenceKeyRef.current !== referenceKey) {
+      setViewportBounds(null)
+      setViewport(null)
+    }
+    prevReferenceKeyRef.current = referenceKey
+  }, [referenceKey, setViewport])
+  // One report feeds both consumers (008 research.md): bounds -> list/count filter, center+zoom ->
+  // the store's restorable camera. Stable identity (setViewport is stable) so it never re-subscribes
+  // the map events.
+  const handleViewportChange = React.useCallback(
+    (report: MapViewport) => {
+      setViewportBounds(report.bounds)
+      setViewport({ lat: report.center.lat, lng: report.center.lng, zoom: report.zoom })
+    },
+    [setViewport],
+  )
 
   // The list shows the viewport-visible subset (004 spec FR-007, supersedes 003 FR-013); the map
   // keeps rendering the FULL in-range set and emphasis stays the overall nearest (FR-011, FR-014).
@@ -134,10 +150,11 @@ export function VenueSearchPage() {
         <React.Suspense fallback={<p className="text-sm text-muted-foreground">{t('common.loading')}</p>}>
           <MapView
             className="h-80 w-full rounded-md"
-            center={referencePoint}
+            center={viewport ? { lat: viewport.lat, lng: viewport.lng } : referencePoint}
+            zoom={viewport?.zoom}
             cluster
-            fitBoundsKey={fitBoundsKey}
-            onViewportChange={setViewportBounds}
+            fitBoundsKey={viewport ? undefined : referenceKey}
+            onViewportChange={handleViewportChange}
             markers={venues.map((venue) => ({
               id: venue.id,
               position: { lat: venue.latitude, lng: venue.longitude },

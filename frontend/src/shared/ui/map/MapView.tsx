@@ -44,6 +44,14 @@ export type LatLng = { lat: number; lng: number }
  */
 export type MapBounds = { south: number; west: number; north: number; east: number }
 
+/**
+ * The full viewport report (008 data-model.md "MapViewport"): `bounds` feeds the list/count
+ * visibility filter (004 FR-007), `center`+`zoom` flow into the search store so the camera can be
+ * restored across a venue-detail detour (008 FR-001). One report, two consumers - no second
+ * callback or ref lifted out of this module (003 single-Leaflet-consumer rule).
+ */
+export type MapViewport = { bounds: MapBounds; center: LatLng; zoom: number }
+
 export type MapMarker = {
   id: string
   position: LatLng
@@ -72,11 +80,12 @@ type MapViewProps = {
   /** Caps how far `fitBoundsKey` framing may zoom in, so a tight cluster of markers does not over-zoom. */
   maxFitZoom?: number
   /**
-   * Reports the visible area after each completed zoom/pan gesture (`moveend`/`zoomend` - never
-   * during one, 004 spec FR-008) and once on mount, as a plain `MapBounds`. Drives the
-   * viewport-synced results list (004 US2).
+   * Reports the viewport after each completed zoom/pan gesture (`moveend`/`zoomend` - never during
+   * one, 004 spec FR-008) and once on mount, as a plain `MapViewport` (bounds + center + zoom, 008).
+   * `bounds` drives the viewport-synced results list (004 US2); `center`+`zoom` let the caller
+   * persist the restorable camera (008 US1).
    */
-  onViewportChange?: (bounds: MapBounds) => void
+  onViewportChange?: (viewport: MapViewport) => void
 }
 
 function ClickHandler({ onPick }: { onPick: (position: LatLng) => void }) {
@@ -95,27 +104,38 @@ function toMapBounds(map: L.Map): MapBounds {
 }
 
 /**
+ * Snapshot of the current viewport as the plain report shape (008) - bounds for the list/count
+ * filter plus center+zoom for the restorable camera. `getCenter`/`getZoom` are cheap reads on the
+ * already-rendered map; no extra Leaflet object crosses the module boundary (single-Leaflet-
+ * consumer rule, 004 contract MUST).
+ */
+function toMapViewport(map: L.Map): MapViewport {
+  const center = map.getCenter()
+  return { bounds: toMapBounds(map), center: { lat: center.lat, lng: center.lng }, zoom: map.getZoom() }
+}
+
+/**
  * Reports the viewport on completed gestures only - `moveend`/`zoomend` fire once per finished
  * drag/zoom, so no debouncing is needed (004 research.md "Viewport reporting"). The mount-time
  * report gives consumers real bounds before any gesture; `fitBounds` framing then emits its own
  * `moveend` with the framed view. The callback is read through a ref so re-renders of the parent
  * never re-subscribe the map events.
  */
-function ViewportReporter({ onViewportChange }: { onViewportChange: (bounds: MapBounds) => void }) {
+function ViewportReporter({ onViewportChange }: { onViewportChange: (viewport: MapViewport) => void }) {
   const callbackRef = React.useRef(onViewportChange)
   callbackRef.current = onViewportChange
 
   const map = useMapEvents({
     moveend() {
-      callbackRef.current(toMapBounds(map))
+      callbackRef.current(toMapViewport(map))
     },
     zoomend() {
-      callbackRef.current(toMapBounds(map))
+      callbackRef.current(toMapViewport(map))
     },
   })
 
   React.useEffect(() => {
-    callbackRef.current(toMapBounds(map))
+    callbackRef.current(toMapViewport(map))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

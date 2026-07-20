@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@/shared/i18n'
@@ -7,11 +7,32 @@ import { useSearchStore } from '@/pages/venues/model/searchStore'
 import { getNearbyVenues } from '@/entities/venue/api/venueApi'
 import type { NearbyVenue } from '@/entities/venue/model/types'
 import type { City } from '@/entities/city/model/types'
+import type { MapViewport } from '@/shared/ui/map/MapView'
 
-// T006 (004 US1): the search restores from the session store across unmount/remount - the exact
-// shape of "open a venue, come back". Map mocked per the research.md testing stance.
+// Captures the props VenueSearchPage passes to MapView so the 008 restore-path tests can assert
+// center/zoom/fitBoundsKey and invoke the viewport report callback. Hoisted so the (also hoisted)
+// mock factory can reference it. The 004 restore tests below ignore these props.
+const { mapProps } = vi.hoisted(() => ({
+  mapProps: {
+    current: null as null | {
+      center?: { lat: number; lng: number }
+      zoom?: number
+      fitBoundsKey?: string
+      onViewportChange?: (report: MapViewport) => void
+    },
+  },
+}))
+
 vi.mock('@/shared/ui/map/MapView', () => ({
-  default: () => <div data-testid="mock-map" />,
+  default: (props: {
+    center?: { lat: number; lng: number }
+    zoom?: number
+    fitBoundsKey?: string
+    onViewportChange?: (report: MapViewport) => void
+  }) => {
+    mapProps.current = props
+    return <div data-testid="mock-map" />
+  },
 }))
 
 vi.mock('@/entities/venue/api/venueApi', () => ({
@@ -64,7 +85,8 @@ describe('VenueSearchPage - return-to-search state restore', () => {
   beforeEach(() => {
     vi.mocked(getNearbyVenues).mockReset()
     // The store is module-level session state - reset it so tests stay independent.
-    useSearchStore.setState({ city: null, sportType: '', deviceCoords: null })
+    useSearchStore.setState({ city: null, sportType: '', deviceCoords: null, viewport: null })
+    mapProps.current = null
   })
 
   it('restores a near-me search across unmount/remount with exactly one geolocation call', async () => {
@@ -106,5 +128,87 @@ describe('VenueSearchPage - return-to-search state restore', () => {
 
     expect(getNearbyVenues).not.toHaveBeenCalled()
     expect(screen.getByText('Pick a city or use "near me" to see venues near you.')).toBeInTheDocument()
+  })
+})
+
+describe('VenueSearchPage - viewport preservation (008)', () => {
+  beforeEach(() => {
+    vi.mocked(getNearbyVenues).mockReset()
+    useSearchStore.setState({ city: null, sportType: '', deviceCoords: null, viewport: null })
+    mapProps.current = null
+  })
+
+  it('passes the saved viewport center/zoom to MapView and suppresses auto-framing', async () => {
+    useSearchStore.setState({
+      city,
+      viewport: { lat: 49.9, lng: 30.1, zoom: 15 },
+    })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v1', 1)])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    expect(mapProps.current?.center).toEqual({ lat: 49.9, lng: 30.1 })
+    expect(mapProps.current?.zoom).toBe(15)
+    // No fitBoundsKey while a viewport is being restored - MapContainer mounts at the saved view
+    // and FitBounds is not rendered (008 reversal of 004 FR-004).
+    expect(mapProps.current?.fitBoundsKey).toBeUndefined()
+  })
+
+  it('frames the in-range set (reference fitBoundsKey) when no viewport is saved', async () => {
+    useSearchStore.setState({ city, viewport: null })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v1', 1)])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    // Reference-only key (venue ids no longer part of it, 008) so a sport change does not reframe.
+    expect(mapProps.current?.fitBoundsKey).toBe(`${city.latitude},${city.longitude}`)
+  })
+
+  it('saves the viewport to the store when MapView reports it', async () => {
+    useSearchStore.setState({ city, viewport: null })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v1', 1)])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 50, west: 30, north: 51, east: 31 },
+        center: { lat: 50.5, lng: 30.5 },
+        zoom: 14,
+      })
+    })
+
+    expect(useSearchStore.getState().viewport).toEqual({ lat: 50.5, lng: 30.5, zoom: 14 })
+  })
+
+  it('clears the saved viewport when the reference point changes (new search)', async () => {
+    useSearchStore.setState({ city, viewport: { lat: 49.9, lng: 30.1, zoom: 15 } })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v1', 1)])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    // Change the reference: drop the city, set a device location at a different point.
+    useSearchStore.setState({ city: null, deviceCoords: { lat: 51.0, lng: 31.0 } })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v2', 2)])
+
+    await waitFor(() => expect(useSearchStore.getState().viewport).toBeNull())
+  })
+
+  it('keeps the saved viewport when only the sport filter changes', async () => {
+    useSearchStore.setState({ city, sportType: '', viewport: { lat: 49.9, lng: 30.1, zoom: 15 } })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v1', 1)])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    useSearchStore.setState({ sportType: 'Tennis' })
+
+    // Same reference -> camera survives (008 FR-002); fitBoundsKey stays suppressed.
+    expect(useSearchStore.getState().viewport).toEqual({ lat: 49.9, lng: 30.1, zoom: 15 })
+    expect(mapProps.current?.fitBoundsKey).toBeUndefined()
   })
 })
