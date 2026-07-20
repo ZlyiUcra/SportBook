@@ -4,53 +4,53 @@
   },
   "nav": {
     "venues": "Locais",
-    "myBookings": "Minhas reservas",
-    "myVenues": "Meus locais",
+    "myBookings": "As minhas reservas",
+    "myVenues": "Os meus locais",
     "venueBookings": "Reservas do local",
     "about": "Sobre",
-    "signOut": "Sair",
-    "logIn": "Entrar",
+    "signOut": "Terminar sessão",
+    "logIn": "Iniciar sessão",
     "openMenu": "Abrir menu"
   },
   "common": {
-    "loading": "Carregando...",
-    "requestFailed": "Falha na requisição. Tente novamente.",
+    "loading": "A carregar...",
+    "requestFailed": "Falha no pedido. Tente novamente.",
     "prev": "Anterior",
-    "next": "Próxima",
-    "save": "Salvar",
-    "saving": "Salvando...",
+    "next": "Seguinte",
+    "save": "Guardar",
+    "saving": "A guardar...",
     "cancel": "Cancelar",
     "edit": "Editar",
-    "delete": "Excluir"
+    "delete": "Eliminar"
   },
   "auth": {
     "email": "Email",
-    "password": "Senha",
+    "password": "Palavra-passe",
     "name": "Nome",
-    "genericError": "Algo deu errado. Tente novamente.",
+    "genericError": "Ocorreu um erro. Tente novamente.",
     "validation": {
-      "emailInvalid": "Digite um endereço de email válido.",
-      "passwordRequired": "A senha é obrigatória.",
-      "passwordMin": "A senha deve ter pelo menos 8 caracteres.",
+      "emailInvalid": "Introduza um endereço de email válido.",
+      "passwordRequired": "A palavra-passe é obrigatória.",
+      "passwordMin": "A palavra-passe deve ter pelo menos 8 caracteres.",
       "nameRequired": "O nome é obrigatório."
     },
     "login": {
-      "title": "Entrar",
-      "submit": "Entrar",
-      "submitting": "Entrando...",
+      "title": "Iniciar sessão",
+      "submit": "Iniciar sessão",
+      "submitting": "A iniciar sessão...",
       "noAccount": "Ainda não tem uma conta?",
-      "registerLink": "Registrar-se"
+      "registerLink": "Registar-se"
     },
     "register": {
-      "title": "Registrar-se",
-      "submit": "Registrar-se",
-      "submitting": "Criando conta...",
+      "title": "Registar-se",
+      "submit": "Registar-se",
+      "submitting": "A criar conta...",
       "haveAccount": "Já tem uma conta?",
-      "loginLink": "Entrar"
+      "loginLink": "Iniciar sessão"
     }
   },
   "settings": {
-    "label": "Configurações"
+    "label": "Definições"
   },
   "theme": {
     "label": "Tema",
@@ -62,12 +62,12 @@
     "label": "Idioma"
   },
   "sport": {
-    "Tennis": "Tênis",
+    "Tennis": "Ténis",
     "Football": "Futebol",
-    "Basketball": "Basquete",
+    "Basketball": "Basquetebol",
     "Padel": "Padel",
     "Badminton": "Badminton",
-    "Volleyball": "Vôlei",
+    "Volleyball": "Voleibol",
     "Other": "Outro"
   },
   "status": {
@@ -79,37 +79,37 @@
   "venues": {
     "title": "Encontrar um local",
     "cityPlaceholder": "Cidade",
-    "sportLabel": "Esporte",
-    "allSports": "Todos os esportes",
+    "sportLabel": "Desporto",
+    "allSports": "Todos os desportos",
     "noResults": "Nenhum local encontrado.",
     "pickReferencePrompt": "Selecione uma cidade ou use \"perto de mim\" para ver locais próximos.",
     "noneInView": "Nenhum local na área visível do mapa. Afaste ou mova o mapa."
   },
   "citySelect": {
     "placeholder": "Selecionar uma cidade",
-    "searchPlaceholder": "Digite o nome de uma cidade...",
-    "typeMore": "Digite pelo menos 2 caracteres.",
+    "searchPlaceholder": "Introduza o nome de uma cidade...",
+    "typeMore": "Introduza pelo menos 2 caracteres.",
     "noResults": "Nenhuma cidade encontrada.",
     "clear": "Limpar cidade selecionada",
-    "locating": "Localizando...",
+    "locating": "A localizar...",
     "nearMe": "Perto de mim",
-    "nearMeError": "Não foi possível detectar sua localização. Selecione uma cidade."
+    "nearMeError": "Não foi possível detetar a sua localização. Selecione uma cidade."
   },
   "venueDetail": {
-    "backToSearch": "Voltar para a busca",
-    "courts": "Quadras",
-    "noCourts": "Este local não tem quadras ativas.",
+    "backToSearch": "Voltar à pesquisa",
+    "courts": "Campos",
+    "noCourts": "Este local não tem campos ativos.",
     "pricePerHour": "{{price}}/h",
     "rating": "Avaliação: {{rating}} ({{count}} avaliações)",
     "availabilityFor": "Disponibilidade - {{court}}",
     "date": "Data",
     "noSlots": "Sem horários livres nesta data.",
     "bookingSuccess": "Reservado! Preço total: {{price}}.",
-    "viewBookings": "Ver minhas reservas"
+    "viewBookings": "Ver as minhas reservas"
   },
   "bookings": {
-    "title": "Minhas reservas",
-    "empty": "Você ainda não tem reservas.",
+    "title": "As minhas reservas",
+    "empty": "Ainda não tem reservas.",
     "noneInFilter": "Nenhuma reserva corresponde a este filtro.",
     "total": "Total: {{price}}",
     "cancel": "Cancelar",
@@ -121,22 +121,22 @@
     }
   },
   "owner": {
-    "title": "Meus locais",
+    "title": "Os meus locais",
     "addVenue": "Adicionar local",
-    "noVenues": "Você ainda não tem locais.",
-    "manageCourts": "Gerenciar quadras",
-    "hideCourts": "Ocultar quadras",
-    "addCourt": "Adicionar quadra",
-    "noCourts": "Este local ainda não tem quadras.",
+    "noVenues": "Ainda não tem locais.",
+    "manageCourts": "Gerir campos",
+    "hideCourts": "Ocultar campos",
+    "addCourt": "Adicionar campo",
+    "noCourts": "Este local ainda não tem campos.",
     "venue": {
       "name": "Nome",
       "city": "Cidade",
-      "address": "Endereço",
+      "address": "Morada",
       "description": "Descrição",
       "nameRequired": "O nome é obrigatório.",
       "cityRequired": "A cidade é obrigatória.",
-      "addressRequired": "O endereço é obrigatório.",
-      "deleteConfirm": "Excluir o local \"{{name}}\"? Isso também remove suas quadras e avaliações.",
+      "addressRequired": "A morada é obrigatória.",
+      "deleteConfirm": "Eliminar o local \"{{name}}\"? Isto também remove os seus campos e avaliações.",
       "pin": {
         "label": "Marcador de localização (opcional)",
         "place": "Colocar marcador",
@@ -146,16 +146,16 @@
     },
     "court": {
       "name": "Nome",
-      "sport": "Esporte",
+      "sport": "Desporto",
       "pricePerHour": "Preço por hora",
       "pricePerHourValue": "{{price}}/h",
       "opening": "Horário de abertura",
-      "closing": "Horário de fechamento",
-      "active": "Ativa (visível para clientes)",
-      "inactive": "inativa",
+      "closing": "Horário de fecho",
+      "active": "Ativo (visível para clientes)",
+      "inactive": "inativo",
       "nameRequired": "O nome é obrigatório.",
-      "priceInvalid": "Informe um preço maior que 0.",
-      "deleteConfirm": "Excluir a quadra \"{{name}}\"?"
+      "priceInvalid": "Indique um preço superior a 0.",
+      "deleteConfirm": "Eliminar o campo \"{{name}}\"?"
     }
   },
   "ownerBookings": {
@@ -172,31 +172,31 @@
     "commentTooShort": "Editar uma avaliação requer um comentário de pelo menos 10 caracteres.",
     "submit": "Enviar avaliação",
     "addTitle": "Deixar uma avaliação",
-    "editTitle": "Atualizar sua avaliação",
+    "editTitle": "Atualizar a sua avaliação",
     "addAction": "Deixar uma avaliação",
-    "editAction": "Editar sua avaliação",
-    "viewAction": "Ver sua avaliação",
-    "readOnlyTitle": "Sua avaliação",
-    "readOnlyNotice": "O prazo de 24 horas para editar esta avaliação passou - ela não pode mais ser alterada.",
+    "editAction": "Editar a sua avaliação",
+    "viewAction": "Ver a sua avaliação",
+    "readOnlyTitle": "A sua avaliação",
+    "readOnlyNotice": "O prazo de 24 horas para editar esta avaliação passou - já não pode ser alterada.",
     "starRating": "Avaliação",
     "starLabel": "Avaliar {{count}} de 5"
   },
   "about": {
     "title": "Sobre o SportBook",
-    "intro": "O SportBook é uma plataforma de dois lados para reservar locais esportivos (quadras e campos). Um local publica sua disponibilidade e permite que as pessoas reservem um horário específico sem precisar telefonar; a equipe do local vê quem vai chegar e confirma a reserva.",
+    "intro": "O SportBook é uma plataforma de dois lados para reservar instalações desportivas (campos e pavilhões). Um local publica a sua disponibilidade e permite que as pessoas reservem um horário específico sem precisar de telefonar; a equipa do local vê quem vai chegar e confirma a reserva.",
     "oneAccountTitle": "Uma conta, os dois lados",
-    "oneAccount": "Toda conta pode atuar tanto como cliente quanto como proprietário de um local - o registro sempre cria uma conta comum, e atualmente não existe uma etapa separada para \"se tornar proprietário\". Usar as páginas de busca/reserva voltadas ao cliente ou o painel do proprietário é apenas uma questão de qual link de navegação você escolhe.",
+    "oneAccount": "Qualquer conta pode atuar tanto como cliente como proprietário de um local - o registo sempre cria uma conta comum, e atualmente não existe uma etapa separada para \"se tornar proprietário\". Usar as páginas de pesquisa/reserva voltadas para o cliente ou o painel do proprietário é apenas uma questão de qual link de navegação escolhe.",
     "customerTitle": "Como cliente",
-    "customer": "Busque locais por cidade e esporte, veja os horários livres de uma quadra em uma data e reserve um deles. O preço é sempre calculado a partir do preço por hora da quadra - o aplicativo nunca confia em um preço enviado pelo cliente. Uma reserva pode ser cancelada até 2 horas antes do início; dentro dessa janela o cancelamento é recusado.",
+    "customer": "Pesquise locais por cidade e desporto, veja os horários livres de um campo numa data e reserve um deles. O preço é sempre calculado a partir do preço por hora do campo - a aplicação nunca confia num preço enviado pelo cliente. Uma reserva pode ser cancelada até 2 horas antes do início; dentro dessa janela o cancelamento é recusado.",
     "ownerTitle": "Como proprietário de um local",
-    "owner": "Cadastre seus próprios locais e quadras (nome, endereço, esporte, preço por hora, horário de funcionamento), veja as reservas feitas neles e confirme cada reserva pendente. Um local ou quadra não pode ser excluído enquanto tiver uma reserva futura e não cancelada.",
+    "owner": "Registe os seus próprios locais e campos (nome, morada, desporto, preço por hora, horário de funcionamento), veja as reservas feitas neles e confirme cada reserva pendente. Um local ou campo não pode ser eliminado enquanto tiver uma reserva futura e não cancelada.",
     "reviewsTitle": "Avaliações",
-    "reviews": "Você só pode avaliar um local (1 a 5 estrelas mais um comentário opcional) depois de concluir uma reserva confirmada nele: uma avaliação por usuário por local - enviar novamente substitui sua avaliação e comentário anteriores em vez de criar uma duplicata, e a avaliação média do local é atualizada imediatamente. Uma avaliação permanece editável por 24 horas após ser criada; editá-la exige um comentário de pelo menos 10 caracteres, e depois desse prazo ela passa a ser somente leitura.",
+    "reviews": "Só pode avaliar um local (1 a 5 estrelas mais um comentário opcional) depois de concluir uma reserva confirmada nele: uma avaliação por utilizador por local - enviar novamente substitui a sua avaliação e comentário anteriores em vez de criar uma duplicata, e a avaliação média do local é atualizada imediatamente. Uma avaliação permanece editável por 24 horas após ser criada; editá-la exige um comentário de pelo menos 10 caracteres, e depois desse prazo passa a ser apenas de leitura.",
     "mapDataTitle": "Dados do mapa e atribuição",
-    "mapDataIntro": "O diretório de cidades usado na busca vem do",
+    "mapDataIntro": "O diretório de cidades usado na pesquisa vem do",
     "mapDataLicense": "(CC BY 4.0). As imagens do mapa são (c)",
     "mapDataContributors": "e colaboradores.",
-    "loginPrompt": "A maior parte do aplicativo requer uma conta.",
-    "registerCta": "Registrar-se"
+    "loginPrompt": "A maior parte da aplicação requer uma conta.",
+    "registerCta": "Registar-se"
   }
 }
