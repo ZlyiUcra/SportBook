@@ -154,14 +154,18 @@ sets 1-5 by position; the rating is fully settable by keyboard and on touch.
 
 **Purpose**: Contract audit and end-to-end validation
 
-- [ ] T013 [P] Response-DTO audit for `BookingResponse` - confirm `venueId` is the only field added
+- [x] T013 [P] Response-DTO audit for `BookingResponse` - confirm `venueId` is the only field added
       this feature and no other internal data leaks (contract MUST, data-model.md)
-- [ ] T014 [P] Update root `README.md`: reviews are now gated on a completed booking and submitted
+- [x] T014 [P] Update root `README.md`: reviews are now gated on a completed booking and submitted
       from "My bookings" (not the venue page, which keeps the review list) with a five-star rating;
       add the 006 spec to "Further reading"
-- [ ] T015 Run quickstart.md validation scenarios end-to-end against a locally running stack, plus
+- [x] T015 Run quickstart.md validation scenarios end-to-end against a locally running stack, plus
       non-regression: full `dotnet test`, `yarn test`, and a `yarn build` initial-chunk comparison
-      (must be unchanged - no new dependency)
+      (must be unchanged - no new dependency). Automated: full `dotnet test` (41 unit + 63
+      integration, all green) and `yarn test` (21, all green); `yarn build` bundle unchanged
+      (~670kB, no new dependency). NOTE: no live browser click-through was performed - this
+      environment has no headless-browser tooling (Playwright) installed, and installing it would
+      add a new dependency requiring sign-off per repo rules; flagged rather than assumed.
 
 ---
 

@@ -24,10 +24,12 @@ no separate "business" signup:
   hour, opening/closing hours), see the bookings made against them, and confirm each pending
   booking. A venue or court cannot be deleted while it still has an upcoming, non-cancelled
   booking against it, so a customer's booking can never silently disappear.
-- **Reviews** are open to any authenticated user who wants to rate a venue (1-5 stars plus an
-  optional comment): one review per user per venue - submitting again replaces your previous
-  rating and comment rather than creating a duplicate, and the venue's average rating updates
-  immediately.
+- **Reviews** are gated on actually having played: you can rate a venue (1-5 stars plus an optional
+  comment) only once you have a booking there that the owner confirmed and whose time has passed.
+  One review per user per venue - submitting again replaces your previous rating and comment
+  rather than creating a duplicate, and the venue's average rating updates immediately. The review
+  entry itself lives on "My Bookings" next to each completed booking, not on the venue page - the
+  venue page still shows everyone else's reviews.
 
 Every account can act as both a customer and a venue owner at the same time - registration always
 creates a plain account, and there is currently no separate "become a venue owner" step or
@@ -72,11 +74,20 @@ status filter is applied server-side across the whole history before paging so i
 pages (Completed is a derived view of Confirmed bookings whose time has passed - never a stored
 status), and a long list pages with Previous/Next - see `specs/005-my-bookings-detail/spec.md`.
 
+`006` gates a venue review on actually having played there: submitting or replacing a review now
+requires a Confirmed booking on the venue whose time has passed, checked server-side, rejecting
+anyone else with a clear reason. The review submission form moved off the venue page entirely - it
+is reached from each completed booking on "My bookings" instead - while the venue page keeps
+showing the reviews others left. The rating input is now an interactive five-star control (hover
+preview, click, keyboard, and touch) instead of a dropdown - see
+`specs/006-reviews-after-completed/spec.md`.
+
 Automated tests cover the booking flow (25 tests: 11 unit, 14 integration against a real SQL Server
 instance) plus the city/map feature's suggestion ranking, nearest-city resolution, nearby-radius
 enforcement, and venue location validation, plus the venue radius feature's distance/order/cap
-logic, SQL-translation guard, and the nearby endpoint's range validation and radius enforcement.
-Tests for venue management and reviews (001) are deferred to that feature's polish phase - see
+logic, SQL-translation guard, and the nearby endpoint's range validation and radius enforcement,
+plus the review eligibility gate (unit and integration). Tests for venue management and reviews
+(001) are deferred to that feature's polish phase - see
 `specs/001-sportbook-venue-booking/tasks.md`.
 
 ## Components
@@ -278,9 +289,12 @@ Login/Register requires being signed in - you're redirected to Login if you aren
    Previous/Next - changing the filter returns to page 1. You can cancel a booking from here as long
    as it starts more than 2 hours from now; inside that window the cancel action is refused.
    Cancelled bookings stay in the list as a record.
-6. From a venue's page you can also leave a review (1-5 stars + an optional comment) once you're
-   signed in - submitting a second review for the same venue overwrites your first one instead of
-   adding a new one, and the venue's average rating updates right away.
+6. Each **Completed** row on My Bookings offers a review action - that's the only place you can
+   leave or edit a review, and only once you've actually completed a confirmed game at that venue.
+   Pick your rating with the five-star control (hover to preview, click, or use the keyboard) and
+   an optional comment; submitting again for the same venue overwrites your previous review instead
+   of adding a new one, and the venue's average rating updates right away. The venue's own page
+   still shows everyone else's reviews, just not a submission form.
 
 ### Managing your own venues (owner flow)
 
@@ -342,3 +356,11 @@ need the SQL Server container from step 1 running and reachable - they create an
   court->venue->city Include chain.
 - `specs/005-my-bookings-detail/contracts/api.md` - status filter query parameter and pagination.
 - `specs/005-my-bookings-detail/tasks.md` - full task breakdown and current progress.
+- `specs/006-reviews-after-completed/spec.md` - review eligibility gate, relocated entry, and
+  five-star widget spec.
+- `specs/006-reviews-after-completed/plan.md` - technical plan (server-side eligibility predicate,
+  in-house star widget).
+- `specs/006-reviews-after-completed/data-model.md` - the eligibility rule and the additive
+  `venueId` on `BookingResponse`.
+- `specs/006-reviews-after-completed/contracts/api.md` - the `REVIEW_NOT_ELIGIBLE` rejection.
+- `specs/006-reviews-after-completed/tasks.md` - full task breakdown and current progress.
