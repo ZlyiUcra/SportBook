@@ -1,6 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using SportBook.Application.Dtos;
+using SportBook.Application.Features.Courts.CreateCourt;
+using SportBook.Application.Features.Courts.UpdateCourt;
+using SportBook.Application.Features.Venues.CreateVenue;
+using SportBook.Application.Features.Venues.UpdateVenue;
 using SportBook.Domain.Enums;
 using SportBook.IntegrationTests.TestInfrastructure;
 

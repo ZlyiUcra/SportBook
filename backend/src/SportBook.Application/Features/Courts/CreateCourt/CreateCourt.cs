@@ -9,6 +9,8 @@ using SportBook.Infrastructure;
 
 namespace SportBook.Application.Features.Courts.CreateCourt;
 
+public record CreateCourtRequest(string Name, SportType SportType, decimal PricePerHour, TimeOnly OpeningTime, TimeOnly ClosingTime);
+
 /// <summary>Creates a court under a venue; only the venue's owner may call this.</summary>
 public sealed record CreateCourtCommand(
     Guid OwnerId, Guid VenueId, string Name, SportType SportType, decimal PricePerHour, TimeOnly OpeningTime, TimeOnly ClosingTime)

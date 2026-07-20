@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
+using SportBook.Application.Features.Bookings.ListMyBookings;
 using SportBook.Domain.Entities;
 using SportBook.Domain.Enums;
 

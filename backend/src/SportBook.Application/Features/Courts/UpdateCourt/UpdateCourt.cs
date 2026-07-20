@@ -8,6 +8,8 @@ using SportBook.Infrastructure;
 
 namespace SportBook.Application.Features.Courts.UpdateCourt;
 
+public record UpdateCourtRequest(string Name, SportType SportType, decimal PricePerHour, TimeOnly OpeningTime, TimeOnly ClosingTime, bool IsActive);
+
 /// <summary>Updates a court; only the owner of its venue may call this.</summary>
 public sealed record UpdateCourtCommand(
     Guid OwnerId, Guid CourtId, string Name, SportType SportType, decimal PricePerHour,

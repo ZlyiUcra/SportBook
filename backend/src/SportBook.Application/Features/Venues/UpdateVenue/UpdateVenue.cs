@@ -8,6 +8,8 @@ using SportBook.Infrastructure;
 
 namespace SportBook.Application.Features.Venues.UpdateVenue;
 
+public record UpdateVenueRequest(string Name, int CityId, string Address, string? Description, decimal? Latitude = null, decimal? Longitude = null);
+
 /// <summary>Updates a venue; only its owner may call this (403 otherwise).</summary>
 public sealed record UpdateVenueCommand(
     Guid OwnerId, Guid VenueId, string Name, int CityId, string Address, string? Description, decimal? Latitude, decimal? Longitude)

@@ -8,6 +8,8 @@ using SportBook.Infrastructure;
 
 namespace SportBook.Application.Features.Reviews.CreateOrReplaceReview;
 
+public record CreateReviewRequest(int Rating, string? Comment);
+
 /// <summary>
 /// Submits a review; a second submission by the same user for the same venue replaces the first
 /// (201 vs 200 signals which - <see cref="Created"/> on the result).

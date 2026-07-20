@@ -10,6 +10,13 @@ using SportBook.Infrastructure;
 namespace SportBook.Application.Features.Venues.SearchVenues;
 
 /// <summary>
+/// List-item shape for venue search; detail data (courts, rating) stays in
+/// <see cref="VenueDetailResponse"/>. `Latitude`/`Longitude` are null when the owner has not set
+/// a pin - consumers must not substitute city coordinates (spec FR-009/FR-010).
+/// </summary>
+public record VenueSummaryResponse(Guid Id, string Name, CityResponse City, string Address, string? Description, decimal? Latitude, decimal? Longitude);
+
+/// <summary>
 /// Paginated venue search by city and/or sport type; a non-null <see cref="OwnerId"/> scopes
 /// results to that owner's own venues (owner dashboard), server-derived from the caller's JWT,
 /// never client-supplied. <see cref="IncludeNearby"/> only has an effect together with

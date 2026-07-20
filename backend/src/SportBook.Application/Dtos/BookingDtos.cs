@@ -1,27 +1,6 @@
 namespace SportBook.Application.Dtos;
 
 /// <summary>
-/// Status groups a customer can filter "My bookings" by (005 data-model.md). `Completed` is not a
-/// stored status - it is a Confirmed booking whose end time has passed (001 read-time derivation) -
-/// so each value maps to a stored-status + time predicate in
-/// <see cref="Services.BookingHelpers.ApplyStatusFilter"/>, applied before paging so it filters the
-/// whole history. `All` (the default) applies no predicate.
-/// </summary>
-public enum BookingStatusFilter
-{
-    All,
-    Upcoming,
-    Completed,
-    Cancelled,
-}
-
-/// <summary>
-/// No `userId` or `totalPrice` fields by design - both are derived server-side from the JWT and
-/// `Court.PricePerHour` (contracts/api.md, consilium security finding on mass assignment).
-/// </summary>
-public record CreateBookingRequest(Guid CourtId, DateTime StartTime, DateTime EndTime);
-
-/// <summary>
 /// The 001 booking fields plus (005) the human-readable venue/city/sport/court labels so a booking
 /// is legible without a second lookup (005 data-model.md), plus (006) the venue id. Only display
 /// labels and one navigation id are added - no owner id or other internal field (005 spec FR-011).
@@ -44,7 +23,3 @@ public record BookingResponse(
     string Sport,
     string CourtName,
     Guid VenueId);
-
-public record FreeSlot(DateTime Start, DateTime End);
-
-public record AvailabilityResponse(Guid CourtId, DateOnly Date, IReadOnlyList<FreeSlot> FreeSlots);

@@ -11,6 +11,12 @@ using SportBook.Infrastructure;
 namespace SportBook.Application.Features.Bookings.CreateBooking;
 
 /// <summary>
+/// No `userId` or `totalPrice` fields by design - both are derived server-side from the JWT and
+/// `Court.PricePerHour` (contracts/api.md, consilium security finding on mass assignment).
+/// </summary>
+public record CreateBookingRequest(Guid CourtId, DateTime StartTime, DateTime EndTime);
+
+/// <summary>
 /// Books a court for a whole-hour slot; price and overlap safety are computed server-side.
 /// No `userId` or `totalPrice` fields by design - both are derived server-side from the JWT and
 /// `Court.PricePerHour` (contracts/api.md, consilium security finding on mass assignment).

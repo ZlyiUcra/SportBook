@@ -1,11 +1,14 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
 using SportBook.Domain.Enums;
 using SportBook.Infrastructure;
 
 namespace SportBook.Application.Features.Availability.GetAvailability;
+
+public record FreeSlot(DateTime Start, DateTime End);
+
+public record AvailabilityResponse(Guid CourtId, DateOnly Date, IReadOnlyList<FreeSlot> FreeSlots);
 
 /// <summary>Free whole-hour slots for a court on a given date, within its operating hours (US1).</summary>
 public sealed record GetAvailabilityQuery(Guid CourtId, DateOnly Date) : IRequest<AvailabilityResponse>;

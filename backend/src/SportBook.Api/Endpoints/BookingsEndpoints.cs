@@ -2,7 +2,6 @@ using System.Security.Claims;
 using MediatR;
 using SportBook.Api.Extensions;
 using SportBook.Application.Common;
-using SportBook.Application.Dtos;
 using SportBook.Application.Features.Bookings.CancelBooking;
 using SportBook.Application.Features.Bookings.ConfirmBooking;
 using SportBook.Application.Features.Bookings.CreateBooking;

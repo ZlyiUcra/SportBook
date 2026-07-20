@@ -6,6 +6,14 @@ using SportBook.Infrastructure;
 
 namespace SportBook.Application.Features.Venues.CreateVenue;
 
+/// <summary>
+/// No `ownerId` field - the owner is always the authenticated caller (research.md Authorization
+/// checklist). `Latitude`/`Longitude` are both-or-neither (contracts/api.md Venues section) -
+/// enforced in VenueLocationValidator, not by the record shape, since "both or neither" is not expressible
+/// as a type constraint here without over-complicating the DTO.
+/// </summary>
+public record CreateVenueRequest(string Name, int CityId, string Address, string? Description, decimal? Latitude = null, decimal? Longitude = null);
+
 /// <summary>Creates a venue owned by the caller. Owner is always the authenticated caller - there is no `ownerId` field on the request.</summary>
 public sealed record CreateVenueCommand(
     Guid OwnerId, string Name, int CityId, string Address, string? Description, decimal? Latitude, decimal? Longitude)

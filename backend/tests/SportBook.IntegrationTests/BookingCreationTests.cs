@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
+using SportBook.Application.Features.Availability.GetAvailability;
+using SportBook.Application.Features.Bookings.CreateBooking;
 using SportBook.IntegrationTests.TestInfrastructure;
 
 namespace SportBook.IntegrationTests;

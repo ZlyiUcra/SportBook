@@ -1,3 +1,5 @@
+using SportBook.Application.Features.Venues.SearchNearbyVenues;
+using SportBook.Application.Features.Venues.SearchVenues;
 using SportBook.Domain.Entities;
 using SportBook.Domain.Enums;
 
