@@ -122,7 +122,7 @@ export function AppHeader() {
   const aboutActive = isAboutRoute(location.pathname)
 
   return (
-    <header className="flex items-center justify-between gap-2 border-b px-4 py-2">
+    <header className="flex items-center justify-between gap-2 border-b px-4 py-1.5">
       <div className="flex items-center gap-4">
         {user && (
           <Link to="/" className="font-semibold">

@@ -111,7 +111,7 @@ export function VenueSearchPage() {
   const pagedVenues = visibleVenues.slice((page - 1) * searchPageSize, page * searchPageSize)
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
+    <div className="mx-auto flex max-w-3xl flex-col gap-2 p-4">
       <h1 className="text-2xl font-semibold">{t('venues.title')}</h1>
 
       <div className="flex flex-wrap gap-2">
