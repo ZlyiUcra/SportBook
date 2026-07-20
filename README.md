@@ -284,13 +284,15 @@ Login/Register requires being signed in - you're redirected to Login if you aren
 1. The home page (`/`) is venue search: pick a city from the directory combobox (type in any of
    the three app languages) and/or a sport type, or tap "Near me" to center the search on your
    device's location instead. Either way you get the same fixed 75km radius view - a clustered map
-   (the nearest venue emphasized, all pins auto-framed to fit) plus a distance-ordered results list
-   of the venues currently visible on the map: zoom in and the list narrows to what is on screen,
-   zoom out and it widens again, and lists longer than 10 venues page with Previous/Next. No map is
-   shown until you pick a city or use "Near me". Opening a venue and coming back (its "back to
-   search" link or the browser's back) restores the same search - reference point, sport filter,
-   results - without asking for your location again; the state lives only for the session and is
-   never written to storage.
+   (the nearest venue emphasized, all pins auto-framed to fit) plus, above a distance-ordered
+   results list, a count of how many venues are currently visible on the map: zoom in and both the
+   count and the list narrow to what is on screen, zoom out and they widen again, and lists longer
+   than 10 venues page with Previous/Next. No map is shown until you pick a city or use "Near me".
+   Opening a venue and coming back (its "back to search" link or the browser's back) restores the
+   same search - reference point, sport filter, results, and the exact zoom/pan you left the map at
+   - without asking for your location again; picking a different city or using "Near me" again
+   resets the map to the full-radius view. None of this is written to storage - it lives only for
+   the session.
 2. Open a venue (`/venues/:id`) to see its address, description, average rating and existing
    reviews, its list of courts (name, sport, price per hour, opening/closing hours), and a map
    with its pin if the owner has set one.
