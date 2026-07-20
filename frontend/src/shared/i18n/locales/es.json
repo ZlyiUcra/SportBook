@@ -85,7 +85,9 @@
     "allSports": "Todos los deportes",
     "noResults": "No se han encontrado locales.",
     "pickReferencePrompt": "Elige una ciudad o usa \"cerca de mí\" para ver locales cercanos.",
-    "noneInView": "No hay locales en el área visible del mapa. Aleja o mueve el mapa."
+    "noneInView": "No hay locales en el área visible del mapa. Aleja o mueve el mapa.",
+    "visibleCount_one": "{{count}} local visible",
+    "visibleCount_other": "{{count}} locales visibles"
   },
   "citySelect": {
     "placeholder": "Selecciona una ciudad",

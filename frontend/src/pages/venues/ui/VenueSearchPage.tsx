@@ -171,6 +171,12 @@ export function VenueSearchPage() {
         </React.Suspense>
       )}
 
+      {referencePoint && venues.length > 0 && (
+        <p className="text-sm text-muted-foreground">
+          {t('venues.visibleCount', { count: visibleVenues.length })}
+        </p>
+      )}
+
       <div className="flex flex-col gap-3">
         {pagedVenues.map((venue) => (
           <Link key={venue.id} to={`/venues/${venue.id}`}>

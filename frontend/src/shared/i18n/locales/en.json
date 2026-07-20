@@ -85,7 +85,9 @@
     "allSports": "All sports",
     "noResults": "No venues found.",
     "pickReferencePrompt": "Pick a city or use \"near me\" to see venues near you.",
-    "noneInView": "No venues in the visible map area. Zoom out or move the map."
+    "noneInView": "No venues in the visible map area. Zoom out or move the map.",
+    "visibleCount_one": "{{count}} venue visible",
+    "visibleCount_other": "{{count}} venues visible"
   },
   "citySelect": {
     "placeholder": "Select a city",

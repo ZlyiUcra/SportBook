@@ -8,6 +8,7 @@ import { getNearbyVenues } from '@/entities/venue/api/venueApi'
 import type { NearbyVenue } from '@/entities/venue/model/types'
 import type { City } from '@/entities/city/model/types'
 import type { MapViewport } from '@/shared/ui/map/MapView'
+import i18n from 'i18next'
 
 // Captures the props VenueSearchPage passes to MapView so the 008 restore-path tests can assert
 // center/zoom/fitBoundsKey and invoke the viewport report callback. Hoisted so the (also hoisted)
@@ -210,5 +211,108 @@ describe('VenueSearchPage - viewport preservation (008)', () => {
     // Same reference -> camera survives (008 FR-002); fitBoundsKey stays suppressed.
     expect(useSearchStore.getState().viewport).toEqual({ lat: 49.9, lng: 30.1, zoom: 15 })
     expect(mapProps.current?.fitBoundsKey).toBeUndefined()
+  })
+})
+
+describe('VenueSearchPage - visible-venue count (008 US2)', () => {
+  beforeEach(() => {
+    vi.mocked(getNearbyVenues).mockReset()
+    useSearchStore.setState({ city: null, sportType: '', deviceCoords: null, viewport: null })
+    mapProps.current = null
+  })
+
+  afterEach(async () => {
+    // The plural test switches language - restore the default so later files stay deterministic.
+    await i18n.changeLanguage('en')
+  })
+
+  it('shows the count of venues visible in the viewport above the list', async () => {
+    useSearchStore.setState({ city })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v1', 1), makeNearby('v2', 2)])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    // Both venues sit at (50.45, 30.52) - bounds that contain them make both visible.
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 50, west: 30, north: 51, east: 31 },
+        center: { lat: 50.5, lng: 30.5 },
+        zoom: 13,
+      })
+    })
+
+    expect(screen.getByText('2 venues visible')).toBeInTheDocument()
+  })
+
+  it('updates to zero when the viewport no longer contains any venue', async () => {
+    useSearchStore.setState({ city })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v1', 1), makeNearby('v2', 2)])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 50, west: 30, north: 51, east: 31 },
+        center: { lat: 50.5, lng: 30.5 },
+        zoom: 13,
+      })
+    })
+    expect(screen.getByText('2 venues visible')).toBeInTheDocument()
+
+    // Pan to an area with no venues.
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 40, west: 20, north: 41, east: 21 },
+        center: { lat: 40.5, lng: 20.5 },
+        zoom: 13,
+      })
+    })
+
+    expect(screen.getByText('0 venues visible')).toBeInTheDocument()
+  })
+
+  it('uses the singular plural form for one visible venue (en)', async () => {
+    useSearchStore.setState({ city })
+    vi.mocked(getNearbyVenues).mockResolvedValue([makeNearby('v1', 1)])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 50, west: 30, north: 51, east: 31 },
+        center: { lat: 50.5, lng: 30.5 },
+        zoom: 13,
+      })
+    })
+
+    expect(screen.getByText('1 venue visible')).toBeInTheDocument()
+  })
+
+  it('uses the Ukrainian plural form (many) for five visible venues', async () => {
+    useSearchStore.setState({ city })
+    vi.mocked(getNearbyVenues).mockResolvedValue([
+      makeNearby('v1', 1),
+      makeNearby('v2', 2),
+      makeNearby('v3', 3),
+      makeNearby('v4', 4),
+      makeNearby('v5', 5),
+    ])
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 50, west: 30, north: 51, east: 31 },
+        center: { lat: 50.5, lng: 30.5 },
+        zoom: 13,
+      })
+    })
+
+    await i18n.changeLanguage('uk')
+    expect(await screen.findByText('5 видимих майданчиків')).toBeInTheDocument()
   })
 })
