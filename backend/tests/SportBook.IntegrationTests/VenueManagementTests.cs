@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
 using SportBook.Domain.Enums;
@@ -74,5 +75,36 @@ public class VenueManagementTests(ApiFixture fixture)
         var updatedCourt = (await courtUpdate.Content.ReadFromJsonAsync<CourtResponse>())!;
         Assert.Equal("Court Renamed", updatedCourt.Name);
         Assert.False(updatedCourt.IsActive);
+    }
+
+    /// <summary>
+    /// Regression test for the Minimal API migration (consilium 2026-07-20): every other test in
+    /// this file posts `CreateCourtRequest`/`UpdateCourtRequest` as a typed C# record via
+    /// `PostAsJsonAsync`, which - with no custom `JsonSerializerOptions` on the test client -
+    /// serializes the `SportType` enum as a bare integer, the same shape .NET deserializes with
+    /// no converter at all. That makes the whole suite structurally blind to whether the server's
+    /// `JsonStringEnumConverter` (registered via `ConfigureHttpJsonOptions` in `Program.cs`) is
+    /// actually wired up. The real frontend sends `sportType` as a JSON STRING (its TS enum is
+    /// string-valued) - this test reproduces that exact wire shape with a raw string body,
+    /// bypassing the test client's own enum serialization entirely.
+    /// </summary>
+    [Fact]
+    public async Task Creating_a_court_with_a_raw_string_valued_sportType_body_succeeds()
+    {
+        var client = fixture.Factory.CreateClient();
+        var owner = await client.RegisterAsync("Owner");
+        client.UseBearer(owner.AccessToken);
+
+        var venue = (await (await client.PostAsJsonAsync("/api/venues",
+            new CreateVenueRequest("String Enum Venue", ApiClientExtensions.KyivCityId, "1 St", null, null, null)))
+            .Content.ReadFromJsonAsync<VenueDetailResponse>())!;
+
+        var rawJson = """{"name":"Court 1","sportType":"Tennis","pricePerHour":150,"openingTime":"08:00:00","closingTime":"22:00:00"}""";
+        var response = await client.PostAsync(
+            $"/api/venues/{venue.Id}/courts", new StringContent(rawJson, Encoding.UTF8, "application/json"));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var court = (await response.Content.ReadFromJsonAsync<CourtResponse>())!;
+        Assert.Equal("Tennis", court.SportType);
     }
 }

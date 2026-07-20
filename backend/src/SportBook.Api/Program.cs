@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using SportBook.Api.Endpoints;
 using SportBook.Api.Middleware;
 using SportBook.Application;
 using SportBook.Application.Security;
@@ -14,9 +15,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Enums as their string names (e.g. "Tennis"), not numeric indices - matches the manual
 // ToString() mapping already used for read DTOs and lets write DTOs (e.g. CreateCourtRequest)
-// bind sportType from the same string values the frontend already sends/displays.
-builder.Services.AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+// bind sportType from the same string values the frontend already sends/displays. Minimal API
+// endpoints read Http.Json.JsonOptions, NOT Mvc.JsonOptions - this must be configured here even
+// though there are no more MVC controllers (consilium 2026-07-20: the two are separate option
+// objects and neither carries over to the other automatically).
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -78,7 +82,14 @@ app.UseCors(DevCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapAuthEndpoints();
+app.MapAvailabilityEndpoints();
+app.MapBookingsEndpoints();
+app.MapCitiesEndpoints();
+app.MapCourtsEndpoints();
+app.MapReviewsEndpoints();
+app.MapUsersEndpoints();
+app.MapVenuesEndpoints();
 
 app.Run();
 
