@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
+import { PasswordInput } from '@/shared/ui/password-input'
 import { Label } from '@/shared/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { ApiRequestError } from '@/shared/api/axiosInstance'
@@ -52,7 +53,12 @@ export function RegisterForm() {
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="password">{t('auth.password')}</Label>
-            <Input id="password" type="password" {...register('password')} />
+            <PasswordInput
+              id="password"
+              showPasswordLabel={t('auth.showPassword')}
+              hidePasswordLabel={t('auth.hidePassword')}
+              {...register('password')}
+            />
             {errors.password && <p className="text-sm text-destructive">{t('auth.validation.passwordMin')}</p>}
           </div>
           <Button type="submit" disabled={mutation.isPending}>

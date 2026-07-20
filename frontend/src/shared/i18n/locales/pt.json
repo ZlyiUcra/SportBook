@@ -27,6 +27,8 @@
     "email": "Email",
     "password": "Palavra-passe",
     "name": "Nome",
+    "showPassword": "Mostrar palavra-passe",
+    "hidePassword": "Ocultar palavra-passe",
     "genericError": "Ocorreu um erro. Tente novamente.",
     "validation": {
       "emailInvalid": "Introduza um endereço de email válido.",

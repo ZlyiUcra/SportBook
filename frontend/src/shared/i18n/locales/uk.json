@@ -27,6 +27,8 @@
     "email": "Email",
     "password": "Пароль",
     "name": "Ім'я",
+    "showPassword": "Показати пароль",
+    "hidePassword": "Сховати пароль",
     "genericError": "Щось пішло не так. Спробуйте ще раз.",
     "validation": {
       "emailInvalid": "Введіть коректну email-адресу.",
