@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Authorization;
 using SportBook.Application.Dtos;
@@ -16,7 +16,7 @@ public sealed record UpdateVenueCommand(
 public sealed class UpdateVenueHandler(SportBookDbContext db, VenueLocationValidator locationValidator, VenueDetailReader detailReader)
     : IRequestHandler<UpdateVenueCommand, VenueDetailResponse>
 {
-    public async ValueTask<VenueDetailResponse> Handle(UpdateVenueCommand request, CancellationToken ct)
+    public async Task<VenueDetailResponse> Handle(UpdateVenueCommand request, CancellationToken ct)
     {
         var venue = await db.Venues.SingleOrDefaultAsync(v => v.Id == request.VenueId, ct)
             ?? throw new ApiException(404, "VENUE_NOT_FOUND", "Venue not found.");

@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using SportBook.Application.Features.Availability.GetAvailability;
 
 namespace SportBook.Api.Endpoints;

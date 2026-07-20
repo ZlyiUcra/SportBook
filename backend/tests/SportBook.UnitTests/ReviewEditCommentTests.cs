@@ -34,7 +34,7 @@ public class ReviewEditCommentTests
         await createHandler.Handle(new CreateOrReplaceReviewCommand(customerId, venueId, 3, "Original comment"), CancellationToken.None);
 
         var ex = await Assert.ThrowsAsync<ApiException>(() => createHandler.Handle(
-            new CreateOrReplaceReviewCommand(customerId, venueId, 4, comment), CancellationToken.None).AsTask());
+            new CreateOrReplaceReviewCommand(customerId, venueId, 4, comment), CancellationToken.None));
 
         Assert.Equal(400, ex.StatusCode);
         Assert.Equal("REVIEW_COMMENT_TOO_SHORT", ex.Code);

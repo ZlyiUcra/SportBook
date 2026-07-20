@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using SportBook.Application.Features.Auth.Login;
 using SportBook.Application.Features.Auth.Logout;
 using SportBook.Application.Features.Auth.Refresh;

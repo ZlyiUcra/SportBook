@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Authorization;
 using SportBook.Application.Common;
@@ -15,7 +15,7 @@ public sealed record ListVenueBookingsForOwnerQuery(Guid OwnerId, Guid VenueId, 
 public sealed class ListVenueBookingsForOwnerHandler(SportBookDbContext db, TimeProvider timeProvider)
     : IRequestHandler<ListVenueBookingsForOwnerQuery, PagedResponse<BookingResponse>>
 {
-    public async ValueTask<PagedResponse<BookingResponse>> Handle(ListVenueBookingsForOwnerQuery request, CancellationToken ct)
+    public async Task<PagedResponse<BookingResponse>> Handle(ListVenueBookingsForOwnerQuery request, CancellationToken ct)
     {
         var venue = await db.Venues.AsNoTracking().SingleOrDefaultAsync(v => v.Id == request.VenueId, ct)
             ?? throw new ApiException(404, "VENUE_NOT_FOUND", "Venue not found.");

@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using SportBook.Application.Dtos;
 using SportBook.Application.Services;
 using SportBook.Domain.Entities;
@@ -15,7 +15,7 @@ public sealed class CreateVenueHandler(
     SportBookDbContext db, TimeProvider timeProvider, VenueLocationValidator locationValidator, VenueDetailReader detailReader)
     : IRequestHandler<CreateVenueCommand, VenueDetailResponse>
 {
-    public async ValueTask<VenueDetailResponse> Handle(CreateVenueCommand request, CancellationToken ct)
+    public async Task<VenueDetailResponse> Handle(CreateVenueCommand request, CancellationToken ct)
     {
         await locationValidator.ValidateAsync(request.CityId, request.Latitude, request.Longitude, ct);
 

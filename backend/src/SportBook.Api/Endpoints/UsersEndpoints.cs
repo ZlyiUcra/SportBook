@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Mediator;
+using MediatR;
 using SportBook.Api.Extensions;
 using SportBook.Application.Features.Users.GetMe;
 

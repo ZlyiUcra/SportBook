@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Authorization;
 using SportBook.Application.Exceptions;
@@ -17,7 +17,7 @@ public sealed record DeleteVenueCommand(Guid OwnerId, Guid VenueId) : IRequest;
 
 public sealed class DeleteVenueHandler(SportBookDbContext db, TimeProvider timeProvider) : IRequestHandler<DeleteVenueCommand>
 {
-    public async ValueTask<Unit> Handle(DeleteVenueCommand request, CancellationToken ct)
+    public async Task Handle(DeleteVenueCommand request, CancellationToken ct)
     {
         var venue = await db.Venues.SingleOrDefaultAsync(v => v.Id == request.VenueId, ct)
             ?? throw new ApiException(404, "VENUE_NOT_FOUND", "Venue not found.");
@@ -33,6 +33,5 @@ public sealed class DeleteVenueHandler(SportBookDbContext db, TimeProvider timeP
 
         db.Venues.Remove(venue);
         await db.SaveChangesAsync(ct);
-        return Unit.Value;
     }
 }

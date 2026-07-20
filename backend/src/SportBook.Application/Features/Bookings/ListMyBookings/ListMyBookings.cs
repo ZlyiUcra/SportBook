@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
@@ -17,7 +17,7 @@ public sealed record ListMyBookingsQuery(Guid UserId, BookingStatusFilter Status
 public sealed class ListMyBookingsHandler(SportBookDbContext db, TimeProvider timeProvider)
     : IRequestHandler<ListMyBookingsQuery, PagedResponse<BookingResponse>>
 {
-    public async ValueTask<PagedResponse<BookingResponse>> Handle(ListMyBookingsQuery request, CancellationToken ct)
+    public async Task<PagedResponse<BookingResponse>> Handle(ListMyBookingsQuery request, CancellationToken ct)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var query = db.Bookings.AsNoTracking().Where(b => b.UserId == request.UserId);

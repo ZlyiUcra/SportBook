@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
@@ -29,7 +29,7 @@ public sealed record CreateOrReplaceReviewResult(ReviewResponse Response, bool C
 public sealed class CreateOrReplaceReviewHandler(SportBookDbContext db, TimeProvider timeProvider)
     : IRequestHandler<CreateOrReplaceReviewCommand, CreateOrReplaceReviewResult>
 {
-    public async ValueTask<CreateOrReplaceReviewResult> Handle(CreateOrReplaceReviewCommand request, CancellationToken ct)
+    public async Task<CreateOrReplaceReviewResult> Handle(CreateOrReplaceReviewCommand request, CancellationToken ct)
     {
         if (request.Rating is < 1 or > 5)
         {

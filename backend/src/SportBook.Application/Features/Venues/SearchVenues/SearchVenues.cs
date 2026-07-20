@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
@@ -23,7 +23,7 @@ public sealed record SearchVenuesQuery(
 public sealed class SearchVenuesHandler(SportBookDbContext db, CityService cityService)
     : IRequestHandler<SearchVenuesQuery, PagedResponse<VenueSummaryResponse>>
 {
-    public async ValueTask<PagedResponse<VenueSummaryResponse>> Handle(SearchVenuesQuery request, CancellationToken ct)
+    public async Task<PagedResponse<VenueSummaryResponse>> Handle(SearchVenuesQuery request, CancellationToken ct)
     {
         IQueryable<Venue> query = db.Venues.AsNoTracking().Include(v => v.City);
 

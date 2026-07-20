@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Authorization;
 using SportBook.Application.Exceptions;
@@ -12,7 +12,7 @@ public sealed record DeleteCourtCommand(Guid OwnerId, Guid CourtId) : IRequest;
 
 public sealed class DeleteCourtHandler(SportBookDbContext db, TimeProvider timeProvider) : IRequestHandler<DeleteCourtCommand>
 {
-    public async ValueTask<Unit> Handle(DeleteCourtCommand request, CancellationToken ct)
+    public async Task Handle(DeleteCourtCommand request, CancellationToken ct)
     {
         var court = await db.Courts.Include(c => c.Venue).SingleOrDefaultAsync(c => c.Id == request.CourtId, ct)
             ?? throw new ApiException(404, "COURT_NOT_FOUND", "Court not found.");
@@ -28,6 +28,5 @@ public sealed class DeleteCourtHandler(SportBookDbContext db, TimeProvider timeP
 
         db.Courts.Remove(court);
         await db.SaveChangesAsync(ct);
-        return Unit.Value;
     }
 }

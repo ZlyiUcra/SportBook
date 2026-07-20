@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Security;
 using SportBook.Infrastructure;
@@ -10,7 +10,7 @@ public sealed record LogoutCommand(string RefreshToken) : IRequest;
 
 public sealed class LogoutHandler(SportBookDbContext db, ITokenService tokenService) : IRequestHandler<LogoutCommand>
 {
-    public async ValueTask<Unit> Handle(LogoutCommand request, CancellationToken ct)
+    public async Task Handle(LogoutCommand request, CancellationToken ct)
     {
         var tokenHash = tokenService.HashToken(request.RefreshToken);
         var existing = await db.RefreshTokens.SingleOrDefaultAsync(rt => rt.TokenHash == tokenHash, ct);
@@ -19,7 +19,5 @@ public sealed class LogoutHandler(SportBookDbContext db, ITokenService tokenServ
             existing.RevokedAt = DateTime.UtcNow;
             await db.SaveChangesAsync(ct);
         }
-
-        return Unit.Value;
     }
 }

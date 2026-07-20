@@ -27,14 +27,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddSportBookInfrastructure(builder.Configuration);
 builder.Services.AddSportBookApplication(builder.Configuration);
 
-// Command/query dispatch for the Application layer's Features slices (consilium 2026-07-20:
-// martinothamar/Mediator, not MediatR - MIT-licensed, source-generated, no revenue-gated
-// commercial tier). The generator discovers IRequestHandler<> implementations across the
-// compilation, including SportBook.Application's referenced assembly. ServiceLifetime.Scoped
-// (not the library's Singleton default) - every handler takes a scoped SportBookDbContext, and
-// registering singletons that capture a scoped dependency is a captive-dependency bug the DI
-// container's own validation rejects.
-builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
+// Command/query dispatch for the Application layer's Features slices. MediatR's commercial
+// license (RPL-1.5 or paid, since v13.0.0) has a free Community tier for organizations under
+// $5M annual revenue and $10M raised capital - this project qualifies. Handlers are registered
+// transient (the library's default), which is safe with a scoped SportBookDbContext since
+// nothing here is captured for the app's lifetime.
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SportBook.Application.ServiceCollectionExtensions).Assembly));
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
     ?? throw new InvalidOperationException("Jwt configuration section is missing.");

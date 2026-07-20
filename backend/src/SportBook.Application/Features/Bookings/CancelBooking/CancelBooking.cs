@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Authorization;
 using SportBook.Application.Dtos;
@@ -16,7 +16,7 @@ public sealed class CancelBookingHandler(SportBookDbContext db, TimeProvider tim
 {
     private const int CancellationCutoffHours = 2;
 
-    public async ValueTask<BookingResponse> Handle(CancelBookingCommand request, CancellationToken ct)
+    public async Task<BookingResponse> Handle(CancelBookingCommand request, CancellationToken ct)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var booking = await BookingHelpers.IncludeDetail(db.Bookings).SingleOrDefaultAsync(b => b.Id == request.BookingId, ct)

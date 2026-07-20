@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Common;
 using SportBook.Application.Dtos;
@@ -12,7 +12,7 @@ public sealed record ListReviewsByVenueQuery(Guid VenueId, PageRequest Paging) :
 
 public sealed class ListReviewsByVenueHandler(SportBookDbContext db) : IRequestHandler<ListReviewsByVenueQuery, PagedResponse<ReviewResponse>>
 {
-    public async ValueTask<PagedResponse<ReviewResponse>> Handle(ListReviewsByVenueQuery request, CancellationToken ct)
+    public async Task<PagedResponse<ReviewResponse>> Handle(ListReviewsByVenueQuery request, CancellationToken ct)
     {
         if (!await db.Venues.AsNoTracking().AnyAsync(v => v.Id == request.VenueId, ct))
         {

@@ -48,7 +48,7 @@ public class ReviewEditWindowTests
 
         var replaceHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
         var ex = await Assert.ThrowsAsync<ApiException>(() => replaceHandler.Handle(
-            new CreateOrReplaceReviewCommand(customerId, venueId, 5, "Updated comment here"), CancellationToken.None).AsTask());
+            new CreateOrReplaceReviewCommand(customerId, venueId, 5, "Updated comment here"), CancellationToken.None));
 
         Assert.Equal(409, ex.StatusCode);
         Assert.Equal("REVIEW_EDIT_WINDOW_CLOSED", ex.Code);
@@ -71,7 +71,7 @@ public class ReviewEditWindowTests
         // only 24 hours after the first replace - the window is anchored to CreatedAt, not the edit.
         var secondReplaceHandler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(createTime.AddHours(25)));
         var ex = await Assert.ThrowsAsync<ApiException>(() => secondReplaceHandler.Handle(
-            new CreateOrReplaceReviewCommand(customerId, venueId, 5, "Second replace comment"), CancellationToken.None).AsTask());
+            new CreateOrReplaceReviewCommand(customerId, venueId, 5, "Second replace comment"), CancellationToken.None));
 
         Assert.Equal("REVIEW_EDIT_WINDOW_CLOSED", ex.Code);
     }

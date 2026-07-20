@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
 using SportBook.Application.Services;
@@ -11,7 +11,7 @@ public sealed record FindNearestCityQuery(decimal Lat, decimal Lng) : IRequest<C
 /// <summary>The server never persists or logs the received coordinates (contract MUST).</summary>
 public sealed class FindNearestCityHandler(CityDirectoryCache cache) : IRequestHandler<FindNearestCityQuery, CityResponse>
 {
-    public async ValueTask<CityResponse> Handle(FindNearestCityQuery request, CancellationToken ct)
+    public async Task<CityResponse> Handle(FindNearestCityQuery request, CancellationToken ct)
     {
         if (request.Lat is < -90 or > 90)
         {

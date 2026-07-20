@@ -41,7 +41,7 @@ public class ReviewEligibilityTests
 
         var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
         var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
-            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None).AsTask());
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None));
 
         Assert.Equal(409, ex.StatusCode);
         Assert.Equal("REVIEW_NOT_ELIGIBLE", ex.Code);
@@ -56,7 +56,7 @@ public class ReviewEligibilityTests
 
         var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
         var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
-            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None).AsTask());
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None));
 
         Assert.Equal("REVIEW_NOT_ELIGIBLE", ex.Code);
     }
@@ -69,7 +69,7 @@ public class ReviewEligibilityTests
 
         var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
         var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
-            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None).AsTask());
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 4, null), CancellationToken.None));
 
         Assert.Equal("REVIEW_NOT_ELIGIBLE", ex.Code);
     }
@@ -95,7 +95,7 @@ public class ReviewEligibilityTests
 
         var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
         var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
-            new CreateOrReplaceReviewCommand(customer.Id, otherVenue.Id, 4, null), CancellationToken.None).AsTask());
+            new CreateOrReplaceReviewCommand(customer.Id, otherVenue.Id, 4, null), CancellationToken.None));
 
         Assert.Equal("REVIEW_NOT_ELIGIBLE", ex.Code);
     }
@@ -109,7 +109,7 @@ public class ReviewEligibilityTests
 
         var handler = new CreateOrReplaceReviewHandler(db.Db, new FixedTimeProvider(Now));
         var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
-            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 6, null), CancellationToken.None).AsTask());
+            new CreateOrReplaceReviewCommand(customer.Id, court.VenueId, 6, null), CancellationToken.None));
 
         Assert.Equal(400, ex.StatusCode);
         Assert.Equal("INVALID_RATING", ex.Code);

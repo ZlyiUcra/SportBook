@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using SportBook.Application.Features.Cities.FindNearestCity;
 using SportBook.Application.Features.Cities.SuggestCities;
 

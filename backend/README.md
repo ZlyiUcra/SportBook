@@ -8,8 +8,8 @@ sequence (Docker, SQL login, `dotnet user-secrets`), and running tests.
 - `src/SportBook.Api` - Minimal API endpoints (`Endpoints/`, one `MapXxxEndpoints` file per
   resource), JWT auth, DI wiring, `Program.cs`.
 - `src/SportBook.Application` - vertical slices (`Features/<Resource>/<UseCase>/`, a
-  Command/Query + Handler pair per action, dispatched via martinothamar/Mediator), a small
-  `Services/` layer for logic genuinely shared across slices, DTOs, mapping.
+  Command/Query + Handler pair per action, dispatched via MediatR), a small `Services/` layer for
+  logic genuinely shared across slices, DTOs, mapping.
 - `src/SportBook.Domain` - entities and enums, no framework dependencies.
 - `src/SportBook.Infrastructure` - EF Core `DbContext`, migrations, SQL Server provider.
 - `tests/SportBook.UnitTests` - xUnit + EF Core Sqlite in-memory.

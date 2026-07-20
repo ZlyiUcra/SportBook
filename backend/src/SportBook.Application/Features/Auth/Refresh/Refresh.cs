@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
@@ -14,7 +14,7 @@ public sealed record RefreshCommand(string RefreshToken) : IRequest<AuthResponse
 public sealed class RefreshHandler(SportBookDbContext db, ITokenService tokenService, AuthTokenIssuer tokenIssuer)
     : IRequestHandler<RefreshCommand, AuthResponse>
 {
-    public async ValueTask<AuthResponse> Handle(RefreshCommand request, CancellationToken ct)
+    public async Task<AuthResponse> Handle(RefreshCommand request, CancellationToken ct)
     {
         var tokenHash = tokenService.HashToken(request.RefreshToken);
         var existing = await db.RefreshTokens

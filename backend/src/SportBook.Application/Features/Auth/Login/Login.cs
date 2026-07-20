@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
@@ -14,7 +14,7 @@ public sealed record LoginCommand(string Email, string Password) : IRequest<Auth
 public sealed class LoginHandler(SportBookDbContext db, IPasswordHasher passwordHasher, AuthTokenIssuer tokenIssuer)
     : IRequestHandler<LoginCommand, AuthResponse>
 {
-    public async ValueTask<AuthResponse> Handle(LoginCommand request, CancellationToken ct)
+    public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken ct)
     {
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
         var user = await db.Users.SingleOrDefaultAsync(u => u.Email == normalizedEmail, ct);

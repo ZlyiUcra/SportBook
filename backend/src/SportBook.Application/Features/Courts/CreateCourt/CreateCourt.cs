@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Authorization;
 using SportBook.Application.Dtos;
@@ -16,7 +16,7 @@ public sealed record CreateCourtCommand(
 
 public sealed class CreateCourtHandler(SportBookDbContext db, TimeProvider timeProvider) : IRequestHandler<CreateCourtCommand, CourtResponse>
 {
-    public async ValueTask<CourtResponse> Handle(CreateCourtCommand request, CancellationToken ct)
+    public async Task<CourtResponse> Handle(CreateCourtCommand request, CancellationToken ct)
     {
         var venue = await db.Venues.SingleOrDefaultAsync(v => v.Id == request.VenueId, ct)
             ?? throw new ApiException(404, "VENUE_NOT_FOUND", "Venue not found.");

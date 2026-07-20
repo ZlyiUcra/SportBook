@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using SportBook.Application.Dtos;
 using SportBook.Application.Services;
 
@@ -9,6 +9,6 @@ public sealed record GetVenueByIdQuery(Guid Id) : IRequest<VenueDetailResponse>;
 
 public sealed class GetVenueByIdHandler(VenueDetailReader reader) : IRequestHandler<GetVenueByIdQuery, VenueDetailResponse>
 {
-    public ValueTask<VenueDetailResponse> Handle(GetVenueByIdQuery request, CancellationToken ct) =>
-        new(reader.GetByIdAsync(request.Id, ct));
+    public Task<VenueDetailResponse> Handle(GetVenueByIdQuery request, CancellationToken ct) =>
+        reader.GetByIdAsync(request.Id, ct);
 }

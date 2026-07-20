@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
@@ -16,7 +16,7 @@ public sealed record GetAvailabilityQuery(Guid CourtId, DateOnly Date) : IReques
 /// </summary>
 public sealed class GetAvailabilityHandler(SportBookDbContext db) : IRequestHandler<GetAvailabilityQuery, AvailabilityResponse>
 {
-    public async ValueTask<AvailabilityResponse> Handle(GetAvailabilityQuery request, CancellationToken ct)
+    public async Task<AvailabilityResponse> Handle(GetAvailabilityQuery request, CancellationToken ct)
     {
         var court = await db.Courts.AsNoTracking()
             .SingleOrDefaultAsync(c => c.Id == request.CourtId && c.IsActive, ct)

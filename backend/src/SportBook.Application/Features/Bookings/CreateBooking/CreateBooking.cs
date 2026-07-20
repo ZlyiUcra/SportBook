@@ -1,5 +1,5 @@
 using System.Data;
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
@@ -29,7 +29,7 @@ public sealed class CreateBookingHandler(SportBookDbContext db, TimeProvider tim
 {
     private const int MaxCreateAttempts = 3;
 
-    public async ValueTask<BookingResponse> Handle(CreateBookingCommand request, CancellationToken ct)
+    public async Task<BookingResponse> Handle(CreateBookingCommand request, CancellationToken ct)
     {
         var start = BookingHelpers.AsUtc(request.StartTime);
         var end = BookingHelpers.AsUtc(request.EndTime);

@@ -30,7 +30,7 @@ public class BookingOverlapCheckTests
         var handler = new CreateBookingHandler(testDb.Db, new FixedTimeProvider(Now));
 
         var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
-            new CreateBookingCommand(customer.Id, court.Id, At(newStart), At(newEnd)), CancellationToken.None).AsTask());
+            new CreateBookingCommand(customer.Id, court.Id, At(newStart), At(newEnd)), CancellationToken.None));
 
         Assert.Equal(409, ex.StatusCode);
         Assert.Equal("SLOT_TAKEN", ex.Code);
@@ -45,7 +45,7 @@ public class BookingOverlapCheckTests
         var handler = new CreateBookingHandler(testDb.Db, new FixedTimeProvider(Now));
 
         var ex = await Assert.ThrowsAsync<ApiException>(() => handler.Handle(
-            new CreateBookingCommand(customer.Id, court.Id, At(10), At(11)), CancellationToken.None).AsTask());
+            new CreateBookingCommand(customer.Id, court.Id, At(10), At(11)), CancellationToken.None));
 
         Assert.Equal("SLOT_TAKEN", ex.Code);
     }

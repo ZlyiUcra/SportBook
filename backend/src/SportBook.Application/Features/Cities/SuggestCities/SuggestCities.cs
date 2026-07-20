@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
 using SportBook.Application.Services;
@@ -12,7 +12,7 @@ public sealed record SuggestCitiesQuery(string Query) : IRequest<IReadOnlyList<C
 public sealed class SuggestCitiesHandler(CityDirectoryCache cache) : IRequestHandler<SuggestCitiesQuery, IReadOnlyList<CityResponse>>
 {
     /// <summary>Min 2 chars (else 400); matches any localized name column; TOP 10 ordered by population DESC (contracts/api.md Cities section).</summary>
-    public async ValueTask<IReadOnlyList<CityResponse>> Handle(SuggestCitiesQuery request, CancellationToken ct)
+    public async Task<IReadOnlyList<CityResponse>> Handle(SuggestCitiesQuery request, CancellationToken ct)
     {
         if (request.Query.Length < 2)
         {

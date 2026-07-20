@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Authorization;
 using SportBook.Application.Dtos;
@@ -14,7 +14,7 @@ public sealed record ConfirmBookingCommand(Guid OwnerId, Guid BookingId) : IRequ
 
 public sealed class ConfirmBookingHandler(SportBookDbContext db, TimeProvider timeProvider) : IRequestHandler<ConfirmBookingCommand, BookingResponse>
 {
-    public async ValueTask<BookingResponse> Handle(ConfirmBookingCommand request, CancellationToken ct)
+    public async Task<BookingResponse> Handle(ConfirmBookingCommand request, CancellationToken ct)
     {
         var booking = await BookingHelpers.IncludeDetail(db.Bookings).SingleOrDefaultAsync(b => b.Id == request.BookingId, ct)
             ?? throw new ApiException(404, "BOOKING_NOT_FOUND", "Booking not found.");

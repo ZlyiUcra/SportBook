@@ -1,4 +1,4 @@
-using Mediator;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SportBook.Application.Dtos;
 using SportBook.Application.Exceptions;
@@ -32,7 +32,7 @@ public sealed class SearchNearbyVenuesHandler(SportBookDbContext db) : IRequestH
     /// materialized candidates via the existing pure <see cref="CityDistance.DistanceKm"/>, so no
     /// trigonometry is pushed into SQL and the logic stays unit-testable on the Sqlite provider.
     /// </summary>
-    public async ValueTask<IReadOnlyList<NearbyVenueResponse>> Handle(SearchNearbyVenuesQuery request, CancellationToken ct)
+    public async Task<IReadOnlyList<NearbyVenueResponse>> Handle(SearchNearbyVenuesQuery request, CancellationToken ct)
     {
         if (request.Lat is < -90 or > 90)
         {
