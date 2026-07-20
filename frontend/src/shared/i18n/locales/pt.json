@@ -191,7 +191,7 @@
     "ownerTitle": "Como proprietário de um local",
     "owner": "Cadastre seus próprios locais e quadras (nome, endereço, esporte, preço por hora, horário de funcionamento), veja as reservas feitas neles e confirme cada reserva pendente. Um local ou quadra não pode ser excluído enquanto tiver uma reserva futura e não cancelada.",
     "reviewsTitle": "Avaliações",
-    "reviews": "Qualquer usuário autenticado pode avaliar um local (1 a 5 estrelas mais um comentário opcional): uma avaliação por usuário por local - enviar novamente substitui sua avaliação e comentário anteriores em vez de criar uma duplicata, e a avaliação média do local é atualizada imediatamente.",
+    "reviews": "Você só pode avaliar um local (1 a 5 estrelas mais um comentário opcional) depois de concluir uma reserva confirmada nele: uma avaliação por usuário por local - enviar novamente substitui sua avaliação e comentário anteriores em vez de criar uma duplicata, e a avaliação média do local é atualizada imediatamente. Uma avaliação permanece editável por 24 horas após ser criada; editá-la exige um comentário de pelo menos 10 caracteres, e depois desse prazo ela passa a ser somente leitura.",
     "mapDataTitle": "Dados do mapa e atribuição",
     "mapDataIntro": "O diretório de cidades usado na busca vem do",
     "mapDataLicense": "(CC BY 4.0). As imagens do mapa são (c)",
