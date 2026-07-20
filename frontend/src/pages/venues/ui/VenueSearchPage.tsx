@@ -1,5 +1,5 @@
 import React from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/ui/button'
@@ -58,6 +58,10 @@ export function VenueSearchPage() {
     queryKey: ['venues-nearby', referencePoint, sportType],
     queryFn: () => getNearbyVenues(referencePoint!.lat, referencePoint!.lng, sportType || undefined),
     enabled: referencePoint !== null,
+    // Keep the previous result set while a sport-filter refetch is in flight (008), so the map
+    // (mounted only while venues.length > 0) does not unmount/remount and lose the restored
+    // viewport mid-transition - the same fix as MyBookingsPage's status filter.
+    placeholderData: keepPreviousData,
   })
 
   const venues = nearbyQuery.data ?? []

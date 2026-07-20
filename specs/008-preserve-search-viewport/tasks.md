@@ -55,10 +55,10 @@ only the sport filter - the viewport stays.
 
 ### Tests for User Story 1
 
-- [ ] T001 [P] [US1] Store unit test: `setViewport({lat,lng,zoom})` stores the viewport, `setViewport(null)`
+- [x] T001 [P] [US1] Store unit test: `setViewport({lat,lng,zoom})` stores the viewport, `setViewport(null)`
       clears it, the initial viewport is `null`, and the existing `city`/`sportType`/`deviceCoords`
       fields and their setters are unaffected, in `frontend/tests/pages/searchStore.test.ts` (new file)
-- [ ] T002 [P] [US1] Page test (extend `frontend/tests/pages/VenueSearchReturn.test.tsx`): on remount
+- [x] T002 [P] [US1] Page test (extend `frontend/tests/pages/VenueSearchReturn.test.tsx`): on remount
       with a saved viewport in the store, the mocked `MapView` is rendered with the saved center/zoom
       and `fitBoundsKey` is withheld (restore path, not auto-reframe); after a viewport report the
       store viewport is updated; changing the reference point clears the store viewport; changing only
@@ -66,17 +66,17 @@ only the sport filter - the viewport stays.
 
 ### Implementation for User Story 1
 
-- [ ] T003 [P] [US1] In `frontend/src/pages/venues/model/searchStore.ts`, add a `viewport:
+- [x] T003 [P] [US1] In `frontend/src/pages/venues/model/searchStore.ts`, add a `viewport:
       { lat: number; lng: number; zoom: number } | null` field (initial `null`) and a
       `setViewport(viewport)` setter; keep the store `create`-only with NO `persist` middleware (004
       contract MUST, spec FR-005). Document that the viewport is the restorable camera (008 spec
       FR-001) and that clear-on-reference is page-driven (the store has no knowledge of the reference)
-- [ ] T004 [P] [US1] In `frontend/src/shared/ui/map/MapView.tsx`, enrich the `onViewportChange`
+- [x] T004 [P] [US1] In `frontend/src/shared/ui/map/MapView.tsx`, enrich the `onViewportChange`
       payload from `MapBounds` to `{ bounds: MapBounds; center: LatLng; zoom: number }` (update the
       prop type and the `ViewportReporter` to report `map.getCenter()`/`map.getZoom()` alongside
       `map.getBounds()` on `moveend`/`zoomend` and on mount, per research.md). No Leaflet type leaves
       the module - only the plain shape (003 single-Leaflet-consumer rule, 004 contract MUST)
-- [ ] T005 [US1] In `frontend/src/pages/venues/ui/VenueSearchPage.tsx`: read `viewport`/`setViewport`
+- [x] T005 [US1] In `frontend/src/pages/venues/ui/VenueSearchPage.tsx`: read `viewport`/`setViewport`
       from the store; in the `onViewportChange` handler set both the local `viewportBounds`
       (`report.bounds`, list/count filter, unchanged behavior) AND `setViewport({lat,lng,zoom})` from
       the report; extend the existing `referenceKey` effect to also `setViewport(null)` (clear on a new
@@ -102,18 +102,18 @@ state; switch language - the plural form is correct.
 
 ### Tests for User Story 2
 
-- [ ] T006 [US2] Page test (extend `frontend/tests/pages/VenueSearchReturn.test.tsx`): the count above
+- [x] T006 [US2] Page test (extend `frontend/tests/pages/VenueSearchReturn.test.tsx`): the count above
       the list equals `visibleVenues.length`; it updates when the visible set changes; it reads zero
       when the viewport is empty; the label uses the correct plural form for the active locale (en
       `_one`/`_other`) (depends on T007 for the key and T008 for the render)
 
 ### Implementation for User Story 2
 
-- [ ] T007 [P] [US2] In `frontend/src/shared/i18n/locales/{en,uk,pt,es}.json`, add a
+- [x] T007 [P] [US2] In `frontend/src/shared/i18n/locales/{en,uk,pt,es}.json`, add a
       `venues.visibleCount` plural key - `_one`/`_other` for en/pt/es, `_one`/`_few`/`_many`/`_other`
       for uk - interpolated as `{{count}}` (e.g. en `_one`: "{{count}} venue visible", `_other`:
       "{{count}} venues visible"). i18next resolves the form from the count per locale (spec FR-009)
-- [ ] T008 [US2] In `frontend/src/pages/venues/ui/VenueSearchPage.tsx`, render `visibleVenues.length`
+- [x] T008 [US2] In `frontend/src/pages/venues/ui/VenueSearchPage.tsx`, render `visibleVenues.length`
       via `t('venues.visibleCount', { count: visibleVenues.length })` above the results list, under the
       same conditions the list/map render (a reference point exists and the in-range set is
       non-empty); when the visible set is empty the count reads zero and 004's "no venues in view"
@@ -129,7 +129,7 @@ viewport exactly.
 
 **Purpose**: README and end-to-end validation
 
-- [ ] T009 [P] Update root `README.md`: note that the venue search preserves the map viewport across
+- [x] T009 [P] Update root `README.md`: note that the venue search preserves the map viewport across
       venue visits and shows a count of venues visible in the viewport; add the 008 spec to "Further
       reading" (if that section exists, as in 007)
 - [ ] T010 Run `quickstart.md` scenarios 1-4 end-to-end against a locally running stack, plus

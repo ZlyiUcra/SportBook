@@ -91,6 +91,12 @@ everyone. Replacing a review within that window also now requires a real comment
 characters, so an edit can no longer blank one out; a first-time submission's comment stays
 optional. See `specs/007-review-edit-window/spec.md`.
 
+`008` reverses one part of 004: returning from a venue detail page now restores the map's
+zoom/pan exactly as the customer left it, instead of resetting to the default full-radius framing
+- the viewport still resets on a genuinely new search (a different city or a fresh "near me"), and
+survives a sport-filter change. The results list is also preceded by a locale-aware count of the
+venues currently visible in the map viewport. See `specs/008-preserve-search-viewport/spec.md`.
+
 Automated tests cover the booking flow (25 tests: 11 unit, 14 integration against a real SQL Server
 instance) plus the city/map feature's suggestion ranking, nearest-city resolution, nearby-radius
 enforcement, and venue location validation, plus the venue radius feature's distance/order/cap
@@ -384,3 +390,12 @@ need the SQL Server container from step 1 running and reachable - they create an
 - `specs/007-review-edit-window/contracts/api.md` - the `REVIEW_EDIT_WINDOW_CLOSED` and
   `REVIEW_COMMENT_TOO_SHORT` rejections.
 - `specs/007-review-edit-window/tasks.md` - full task breakdown and current progress.
+- `specs/008-preserve-search-viewport/spec.md` - the viewport-restore reversal and visible-venue
+  count spec.
+- `specs/008-preserve-search-viewport/plan.md` - technical plan (in-memory `useSearchStore` camera,
+  `fitBoundsKey` withheld while restoring).
+- `specs/008-preserve-search-viewport/data-model.md` - the `MapViewport` shape and restore/reset
+  rules.
+- `specs/008-preserve-search-viewport/contracts/api.md` - the frontend-only contract MUSTs (no new
+  API surface).
+- `specs/008-preserve-search-viewport/tasks.md` - full task breakdown and current progress.
