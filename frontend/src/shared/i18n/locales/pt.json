@@ -49,6 +49,12 @@
       "submitting": "A criar conta...",
       "haveAccount": "Já tem uma conta?",
       "loginLink": "Iniciar sessão"
+    },
+    "idleLogout": {
+      "title": "Ainda está aí?",
+      "message": "A sua sessão está prestes a terminar. Deseja continuar sessão?",
+      "stayButton": "Continuar sessão",
+      "logoutButton": "Terminar sessão agora"
     }
   },
   "settings": {
@@ -196,6 +202,8 @@
     "owner": "Registe os seus próprios locais e campos (nome, morada, desporto, preço por hora, horário de funcionamento), veja as reservas feitas neles e confirme cada reserva pendente. Um local ou campo não pode ser eliminado enquanto tiver uma reserva futura e não cancelada.",
     "reviewsTitle": "Avaliações",
     "reviews": "Só pode avaliar um local (1 a 5 estrelas mais um comentário opcional) depois de concluir uma reserva confirmada nele: uma avaliação por utilizador por local - enviar novamente substitui a sua avaliação e comentário anteriores em vez de criar uma duplicata, e a avaliação média do local é atualizada imediatamente. Uma avaliação permanece editável por 24 horas após ser criada; editá-la exige um comentário de pelo menos 10 caracteres, e depois desse prazo passa a ser apenas de leitura.",
+    "sessionTitle": "Manter a sessão iniciada",
+    "session": "A sua sessão sobrevive a fechar o separador ou a recarregar a página. Por segurança, se a aplicação não detetar atividade durante algum tempo, avisa com uma contagem decrescente antes de terminar a sessão automaticamente - qualquer ação nesse aviso cancela-a.",
     "mapDataTitle": "Dados do mapa e atribuição",
     "mapDataIntro": "O diretório de cidades usado na pesquisa vem do",
     "mapDataLicense": "(CC BY 4.0). As imagens do mapa são (c)",

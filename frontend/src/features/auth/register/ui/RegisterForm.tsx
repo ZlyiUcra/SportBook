@@ -26,7 +26,7 @@ export function RegisterForm() {
   const mutation = useMutation({
     mutationFn: registerRequest,
     onSuccess: (data) => {
-      signIn(data.accessToken, data.user)
+      signIn(data.accessToken, data.refreshToken, data.user)
       navigate('/')
     },
   })

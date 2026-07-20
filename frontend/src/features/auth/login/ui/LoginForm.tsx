@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { PasswordInput } from '@/shared/ui/password-input'
@@ -16,6 +16,7 @@ import { loginSchema, type LoginFormValues } from '../model/schema'
 export function LoginForm() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const signIn = useSessionStore((state) => state.signIn)
   const {
     register,
@@ -26,8 +27,9 @@ export function LoginForm() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      signIn(data.accessToken, data.user)
-      navigate('/')
+      signIn(data.accessToken, data.refreshToken, data.user)
+      const from = (location.state as { from?: { pathname: string } } | null)?.from
+      navigate(from?.pathname ?? '/')
     },
   })
 

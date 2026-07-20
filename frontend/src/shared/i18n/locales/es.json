@@ -49,6 +49,12 @@
       "submitting": "Creando cuenta...",
       "haveAccount": "¿Ya tienes una cuenta?",
       "loginLink": "Iniciar sesión"
+    },
+    "idleLogout": {
+      "title": "¿Sigues ahí?",
+      "message": "Tu sesión está a punto de terminar. ¿Quieres continuar conectado?",
+      "stayButton": "Continuar conectado",
+      "logoutButton": "Cerrar sesión ahora"
     }
   },
   "settings": {
@@ -196,6 +202,8 @@
     "owner": "Registra tus propios locales y pistas (nombre, dirección, deporte, precio por hora, horario de apertura y cierre), consulta las reservas hechas en ellos y confirma cada reserva pendiente. Un local o pista no se puede eliminar mientras tenga una reserva futura y no cancelada.",
     "reviewsTitle": "Valoraciones",
     "reviews": "Solo puedes valorar un local (1 a 5 estrellas más un comentario opcional) después de completar una reserva confirmada en él: una valoración por usuario y local - enviar otra sustituye tu valoración y comentario anteriores en lugar de crear una duplicada, y la valoración media del local se actualiza de inmediato. Una valoración permanece editable durante 24 horas tras su creación; editarla exige un comentario de al menos 10 caracteres, y transcurrido ese plazo pasa a ser de solo lectura.",
+    "sessionTitle": "Mantener la sesión iniciada",
+    "session": "Tu sesión sobrevive a cerrar la pestaña o recargar la página. Por seguridad, si la aplicación no detecta actividad durante un tiempo, avisa con una cuenta atrás antes de cerrar la sesión automáticamente - cualquier acción en ese aviso lo cancela.",
     "mapDataTitle": "Datos del mapa y atribución",
     "mapDataIntro": "El directorio de ciudades usado en la búsqueda proviene de",
     "mapDataLicense": "(CC BY 4.0). Las imágenes del mapa son (c)",

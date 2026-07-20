@@ -36,6 +36,11 @@ export function AboutPage() {
       </section>
 
       <section>
+        <h2 className="font-medium">{t('about.sessionTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('about.session')}</p>
+      </section>
+
+      <section>
         <h2 className="font-medium">{t('about.mapDataTitle')}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           {t('about.mapDataIntro')}{' '}

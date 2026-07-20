@@ -2,6 +2,8 @@ import { Routes, Route, Outlet, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { SettingsMenu } from '@/widgets/settings-menu/ui/SettingsMenu'
 import { AppHeader } from '@/widgets/app-header/ui/AppHeader'
+import { useSessionBootstrap } from '@/entities/session/model/useSessionBootstrap'
+import { IdleLogoutDialog } from '@/features/auth/idle-logout/ui/IdleLogoutDialog'
 import { RequireAuth } from './providers/RequireAuth'
 import { LoginPage } from '@/pages/login/ui/LoginPage'
 import { RegisterPage } from '@/pages/register/ui/RegisterPage'
@@ -17,6 +19,7 @@ function AuthenticatedLayout() {
   return (
     <RequireAuth>
       <AppHeader />
+      <IdleLogoutDialog />
       <Outlet />
     </RequireAuth>
   )
@@ -53,6 +56,8 @@ function PublicLayout() {
 }
 
 export function App() {
+  useSessionBootstrap()
+
   return (
     <Routes>
       <Route element={<AnonymousLayout />}>

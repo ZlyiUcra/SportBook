@@ -49,6 +49,12 @@
       "submitting": "Creating account...",
       "haveAccount": "Already have an account?",
       "loginLink": "Log in"
+    },
+    "idleLogout": {
+      "title": "Still there?",
+      "message": "Your session is about to end. Stay signed in?",
+      "stayButton": "Stay signed in",
+      "logoutButton": "Log out now"
     }
   },
   "settings": {
@@ -196,6 +202,8 @@
     "owner": "List your own venues and courts (name, address, sport type, price per hour, opening/closing hours), see the bookings made against them, and confirm each pending booking. A venue or court cannot be deleted while it still has an upcoming, non-cancelled booking against it.",
     "reviewsTitle": "Reviews",
     "reviews": "You can rate a venue (1-5 stars plus an optional comment) only after completing a confirmed booking there: one review per user per venue - submitting again replaces your previous rating and comment rather than creating a duplicate, and the venue's average rating updates immediately. A review stays editable for 24 hours after you first leave it; editing it requires a comment of at least 10 characters, and after that window it becomes read-only.",
+    "sessionTitle": "Staying signed in",
+    "session": "Your session survives closing the tab or reloading the page. For security, if the app detects no activity for a while, it warns you with a countdown before automatically signing you out - any action in that warning cancels it.",
     "mapDataTitle": "Map data and attribution",
     "mapDataIntro": "The city directory used for search comes from",
     "mapDataLicense": "(CC BY 4.0). Map imagery is (c)",
