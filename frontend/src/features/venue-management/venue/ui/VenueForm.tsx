@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 import { CityCombobox } from '@/features/city-select/ui/CityCombobox'
+import { PageLoader } from '@/shared/ui/page-loader'
 import type { City } from '@/entities/city/model/types'
 import { venueFormSchema, type VenueFormValues } from '../model/schema'
 
@@ -102,7 +103,7 @@ export function VenueForm({ defaultValues, defaultCity, onSubmit, onCancel, isSu
         {errors.longitude && <p className="text-sm text-destructive">{errors.longitude.message}</p>}
 
         {pinPickerOpen && selectedCity && (
-          <React.Suspense fallback={<p className="text-sm text-muted-foreground">{t('common.loading')}</p>}>
+          <React.Suspense fallback={<PageLoader />}>
             <MapView
               className="h-64 w-full rounded-md"
               center={

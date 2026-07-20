@@ -13,6 +13,7 @@ import { CourtForm } from '@/features/venue-management/court/ui/CourtForm'
 import { createCourt, updateCourt, deleteCourt } from '@/features/venue-management/court/api/courtManagementApi'
 import type { EditCourtFormValues } from '@/features/venue-management/court/model/schema'
 import { cityName } from '@/entities/city/model/types'
+import { PageLoader } from '@/shared/ui/page-loader'
 
 /** T051: create/edit/delete own venues and their courts. */
 export function OwnerDashboardPage() {
@@ -130,7 +131,7 @@ export function OwnerDashboardPage() {
         </Card>
       )}
 
-      {myVenuesQuery.isLoading && <p className="text-muted-foreground">{t('common.loading')}</p>}
+      {myVenuesQuery.isLoading && <PageLoader />}
       {myVenuesQuery.isError && <p className="text-destructive">{t('common.requestFailed')}</p>}
       {myVenuesQuery.data && myVenuesQuery.data.items.length === 0 && !creatingVenue && (
         <p className="text-muted-foreground">{t('owner.noVenues')}</p>
@@ -190,9 +191,7 @@ export function OwnerDashboardPage() {
 
               {expandedVenueId === venue.id && (
                 <div className="flex flex-col gap-3 border-t pt-3">
-                  {expandedVenueQuery.isLoading && (
-                    <p className="text-muted-foreground">{t('common.loading')}</p>
-                  )}
+                  {expandedVenueQuery.isLoading && <PageLoader />}
                   {expandedVenueQuery.data?.courts.length === 0 && !creatingCourt && (
                     <p className="text-muted-foreground">{t('owner.noCourts')}</p>
                   )}

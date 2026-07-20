@@ -9,6 +9,7 @@ import { listBookingsByVenue } from '@/entities/booking/api/bookingApi'
 import { BookingSummary } from '@/entities/booking/ui/BookingSummary'
 import { confirmBooking } from '@/features/booking/confirm/api/confirmBooking'
 import { cityName } from '@/entities/city/model/types'
+import { PageLoader } from '@/shared/ui/page-loader'
 
 /** T052: bookings for one of the caller's own venues, with a confirm action on Pending ones. */
 export function OwnerBookingsPage() {
@@ -35,7 +36,7 @@ export function OwnerBookingsPage() {
   })
 
   if (myVenuesQuery.isLoading) {
-    return <p className="p-4 text-muted-foreground">{t('common.loading')}</p>
+    return <PageLoader />
   }
 
   if (!myVenuesQuery.data || myVenuesQuery.data.items.length === 0) {
@@ -64,7 +65,7 @@ export function OwnerBookingsPage() {
         ))}
       </select>
 
-      {bookingsQuery.isLoading && <p className="text-muted-foreground">{t('common.loading')}</p>}
+      {bookingsQuery.isLoading && <PageLoader />}
       {bookingsQuery.isError && <p className="text-destructive">{t('common.requestFailed')}</p>}
       {bookingsQuery.data && bookingsQuery.data.items.length === 0 && (
         <p className="text-muted-foreground">{t('ownerBookings.empty')}</p>

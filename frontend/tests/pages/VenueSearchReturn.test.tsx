@@ -216,6 +216,64 @@ describe('VenueSearchPage - viewport preservation (008)', () => {
   })
 })
 
+describe('VenueSearchPage - pagination restore (013)', () => {
+  beforeEach(() => {
+    vi.mocked(getNearbyVenues).mockReset()
+    useSearchStore.setState({ city: null, sportType: '', deviceCoords: null, viewport: null, page: 1 })
+    mapProps.current = null
+  })
+
+  it('keeps a restored page across remount - the map settling to its restored viewport is not a real change', async () => {
+    const many = Array.from({ length: 12 }, (_, i) => makeNearby(`v-${String(i + 1).padStart(2, '0')}`, i + 1))
+    vi.mocked(getNearbyVenues).mockResolvedValue(many)
+    useSearchStore.setState({ city, viewport: { lat: 49.9, lng: 30.1, zoom: 15 }, page: 2 })
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    // The map's mandatory once-on-mount report (MapView.tsx contract) settling at the restored
+    // viewport - must NOT reset the restored page.
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 49, west: 29, north: 51, east: 31 },
+        center: { lat: 49.9, lng: 30.1 },
+        zoom: 15,
+      })
+    })
+    expect(useSearchStore.getState().page).toBe(2)
+    expect(screen.getByText('Venue v-11')).toBeInTheDocument()
+
+    // A genuine subsequent pan still resets to page 1 (spec FR-013 behavior, unchanged).
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 40, west: 20, north: 41, east: 21 },
+        center: { lat: 40.5, lng: 20.5 },
+        zoom: 13,
+      })
+    })
+    expect(useSearchStore.getState().page).toBe(1)
+  })
+
+  it('resets to page 1 on a fresh search with no restored viewport (unchanged pre-013 behavior)', async () => {
+    const many = Array.from({ length: 12 }, (_, i) => makeNearby(`v-${String(i + 1).padStart(2, '0')}`, i + 1))
+    vi.mocked(getNearbyVenues).mockResolvedValue(many)
+    useSearchStore.setState({ city, viewport: null, page: 2 })
+
+    renderPage()
+    await waitFor(() => expect(screen.getByTestId('mock-map')).toBeInTheDocument())
+
+    // No prior viewport to restore - the map's first-ever report is a genuine new observation.
+    act(() => {
+      mapProps.current?.onViewportChange?.({
+        bounds: { south: 49, west: 29, north: 51, east: 31 },
+        center: { lat: 50, lng: 30 },
+        zoom: 13,
+      })
+    })
+    expect(useSearchStore.getState().page).toBe(1)
+  })
+})
+
 describe('VenueSearchPage - visible-venue count (008 US2)', () => {
   beforeEach(() => {
     vi.mocked(getNearbyVenues).mockReset()

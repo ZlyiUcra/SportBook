@@ -13,6 +13,7 @@ import { getAvailability } from '@/entities/booking/api/bookingApi'
 import { createBooking } from '@/features/booking/create/api/createBooking'
 import { listReviews } from '@/entities/review/api/reviewApi'
 import { cityName } from '@/entities/city/model/types'
+import { PageLoader } from '@/shared/ui/page-loader'
 
 // Lazy so leaflet/react-leaflet never land in the initial route chunk (spec SC-006) - this
 // import only fires when a venue actually has a precise location to show.
@@ -62,7 +63,7 @@ export function VenueDetailPage() {
     return (
       <div className="flex flex-col gap-4 p-4">
         {backToSearch}
-        <p className="text-muted-foreground">{t('common.loading')}</p>
+        <PageLoader />
       </div>
     )
   }
@@ -97,7 +98,7 @@ export function VenueDetailPage() {
       </div>
 
       {venue.latitude !== null && venue.longitude !== null && (
-        <React.Suspense fallback={<p className="text-sm text-muted-foreground">{t('common.loading')}</p>}>
+        <React.Suspense fallback={<PageLoader />}>
           <MapView
             className="h-64 w-full rounded-md"
             center={{ lat: venue.latitude, lng: venue.longitude }}
@@ -152,9 +153,7 @@ export function VenueDetailPage() {
               />
             </div>
 
-            {availabilityQuery.isLoading && (
-              <p className="text-muted-foreground">{t('common.loading')}</p>
-            )}
+            {availabilityQuery.isLoading && <PageLoader />}
             {availabilityQuery.data && availabilityQuery.data.freeSlots.length === 0 && (
               <p className="text-muted-foreground">{t('venueDetail.noSlots')}</p>
             )}
@@ -199,7 +198,7 @@ export function VenueDetailPage() {
       )}
 
       <h2 className="text-lg font-medium">{t('review.title')}</h2>
-      {reviewsQuery.isLoading && <p className="text-muted-foreground">{t('common.loading')}</p>}
+      {reviewsQuery.isLoading && <PageLoader />}
       {reviewsQuery.data && reviewsQuery.data.items.length === 0 && (
         <p className="text-muted-foreground">{t('review.empty')}</p>
       )}

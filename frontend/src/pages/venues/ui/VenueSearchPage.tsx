@@ -10,6 +10,7 @@ import { CityCombobox } from '@/features/city-select/ui/CityCombobox'
 import { NearMeButton } from '@/features/city-select/ui/NearMeButton'
 import { cityName } from '@/entities/city/model/types'
 import { useReferencePoint } from '@/shared/lib/useReferencePoint'
+import { PageLoader } from '@/shared/ui/page-loader'
 import { useSearchStore } from '../model/searchStore'
 
 // Lazy so leaflet/react-leaflet/clustering never land in the initial route chunk (spec SC-006) -
@@ -51,6 +52,8 @@ export function VenueSearchPage() {
   const setDeviceCoords = useSearchStore((state) => state.setDeviceCoords)
   const viewport = useSearchStore((state) => state.viewport)
   const setViewport = useSearchStore((state) => state.setViewport)
+  const page = useSearchStore((state) => state.page)
+  const setPage = useSearchStore((state) => state.setPage)
 
   const { referencePoint, geolocationStatus, requestDeviceLocation } = useReferencePoint(city, deviceCoords, setDeviceCoords)
 
@@ -101,13 +104,39 @@ export function VenueSearchPage() {
   // keeps rendering the FULL in-range set and emphasis stays the overall nearest (FR-011, FR-014).
   const visibleVenues = viewportBounds ? venues.filter((venue) => isInBounds(venue, viewportBounds)) : venues
 
-  // List pagination (004 US3) - slices ONLY the list, never the map markers (spec FR-014). Any
-  // change of the visible set (viewport, sport filter, reference) resets to page 1 (spec FR-013).
-  const [page, setPage] = React.useState(1)
+  // List pagination (004 US3) - slices ONLY the list, never the map markers (spec FR-014). A
+  // genuine change of the visible set (a real pan/zoom, a sport filter change, a new reference)
+  // resets to page 1 (spec FR-013). MapView always reports its viewport once right after mount,
+  // by contract (MapView.tsx) - normally a real signal, EXCEPT when this component mounts with an
+  // already-restored camera (013: returning from a venue detail page, or a fresh page load with a
+  // persisted search), where that one report just confirms the position the map was already
+  // initialized with, not a new one; `hadRestoredViewportRef` (captured once, before any report
+  // can arrive) distinguishes the two so only that specific case is exempted from resetting.
+  type PageResetDeps = { viewportBounds: MapBounds | null; sportType: SportType | ''; referenceKey: string }
+  const prevPageResetDepsRef = React.useRef<PageResetDeps | null>(null)
+  const hadRestoredViewportRef = React.useRef(viewport !== null)
   React.useEffect(() => {
-    setPage(1)
-  }, [viewportBounds, sportType, referenceKey])
+    const prev = prevPageResetDepsRef.current
+    if (prev !== null) {
+      const filterOrReferenceChanged = prev.sportType !== sportType || prev.referenceKey !== referenceKey
+      const isMountSettleReport = prev.viewportBounds === null && hadRestoredViewportRef.current
+      const realViewportChange = viewportBounds !== prev.viewportBounds && !isMountSettleReport
+      if (filterOrReferenceChanged || realViewportChange) {
+        setPage(1)
+      }
+    }
+    prevPageResetDepsRef.current = { viewportBounds, sportType, referenceKey }
+  }, [viewportBounds, sportType, referenceKey, setPage])
   const totalPages = Math.max(1, Math.ceil(visibleVenues.length / searchPageSize))
+  // A restored page number (from storage) can be out of range once real results arrive (fewer
+  // venues than before, or none) - clamp it down rather than showing an empty page. Guarded on
+  // `nearbyQuery.data` so this does not fire against the transient empty array before the query
+  // has actually resolved, which would otherwise clamp straight back to 1 and defeat restoration.
+  React.useEffect(() => {
+    if (nearbyQuery.data && page > totalPages) {
+      setPage(totalPages)
+    }
+  }, [nearbyQuery.data, page, totalPages, setPage])
   const pagedVenues = visibleVenues.slice((page - 1) * searchPageSize, page * searchPageSize)
 
   return (
@@ -139,7 +168,7 @@ export function VenueSearchPage() {
 
       {!referencePoint && <p className="text-muted-foreground">{t('venues.pickReferencePrompt')}</p>}
 
-      {referencePoint && nearbyQuery.isLoading && <p className="text-muted-foreground">{t('common.loading')}</p>}
+      {referencePoint && nearbyQuery.isLoading && <PageLoader />}
       {referencePoint && nearbyQuery.isError && <p className="text-destructive">{t('common.requestFailed')}</p>}
 
       {referencePoint && nearbyQuery.data && venues.length === 0 && (
@@ -151,7 +180,7 @@ export function VenueSearchPage() {
       )}
 
       {referencePoint && venues.length > 0 && (
-        <React.Suspense fallback={<p className="text-sm text-muted-foreground">{t('common.loading')}</p>}>
+        <React.Suspense fallback={<PageLoader />}>
           <MapView
             className="h-80 w-full rounded-md"
             center={viewport ? { lat: viewport.lat, lng: viewport.lng } : referencePoint}

@@ -15,6 +15,8 @@
   "common": {
     "loading": "Cargando...",
     "requestFailed": "Error en la solicitud. Inténtalo de nuevo.",
+    "somethingWentWrong": "Algo salió mal.",
+    "reloadPage": "Recargar página",
     "prev": "Anterior",
     "next": "Siguiente",
     "save": "Guardar",

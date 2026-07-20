@@ -14,6 +14,7 @@ import { listReviews } from '@/entities/review/api/reviewApi'
 import { createReview } from '@/features/review/create/api/createReview'
 import { ReviewForm } from '@/features/review/create/ui/ReviewForm'
 import { useSessionStore } from '@/entities/session/model/store'
+import { PageLoader } from '@/shared/ui/page-loader'
 
 /**
  * The caller's own bookings (001 T039) - each row now shows venue/city/sport/court detail (005
@@ -69,7 +70,7 @@ export function MyBookingsPage() {
         ))}
       </div>
 
-      {bookingsQuery.isLoading && <p className="text-muted-foreground">{t('common.loading')}</p>}
+      {bookingsQuery.isLoading && <PageLoader />}
       {bookingsQuery.isError && <p className="text-destructive">{t('common.requestFailed')}</p>}
       {isEmpty && (
         <p className="text-muted-foreground">
